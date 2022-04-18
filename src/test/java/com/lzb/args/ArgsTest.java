@@ -11,15 +11,24 @@ public class ArgsTest {
     public void setUp() throws Exception {
     }
 
+    // happy path:正常边界
     // 单个参数解析
-    // TODO:lizebin l
+    // TODO:lizebin l-Boolean
     @Test
-    public void test_parse_l() {
-        Args args = new Args('l');
-        assertFalse(args.getBoolean('l'));
+    public void test_parse_l_true() {
+        String input = "-l";
+        Args args = Args.parse(input);
+        assertTrue(args.isLogging());
     }
 
-    // TODO:lizebin p#
+    @Test
+    public void test_parse_l_false() {
+        String emptyString = "";
+        Args args = Args.parse(emptyString);
+        assertFalse(args.isLogging());
+    }
+
+    // TODO:lizebin p#-
     // TODO:lizebin d*
 
     // 多个参数解析

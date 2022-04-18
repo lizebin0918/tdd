@@ -1,24 +1,46 @@
 package com.lzb.args;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+import java.util.stream.Stream;
 
 /**
- * 参数<br/>
+ * 参数:-l -p 8080 -d /usr/logs <br/>
  * Created on : 2022-04-18 19:34
  *
  * @author lizebin
  */
+@Getter
 @AllArgsConstructor
 public class Args {
 
-    private char input;
+    private static final String LOGGING = "-l";
+
+    private Args() {}
 
     /**
-     *
-     * @param c
+     * 是否记录日志
+     */
+    private boolean logging;
+    /**
+     * 端口号
+     */
+    private Integer port;
+    /**
+     * 文件目录
+     */
+    private String[] dirs;
+
+    /**
+     * 解析命令，按照空格分开
+     * @param input
      * @return
      */
-    public boolean getBoolean(char c) {
-        return false;
+    public static Args parse(String input) {
+        Stream<String> commands = Stream.of(input.split(" "));
+        boolean logging = commands.anyMatch(item -> item.equals(LOGGING));
+        return new Args(logging, null, null);
     }
 }
