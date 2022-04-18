@@ -13,7 +13,7 @@ public class ArgsTest {
 
     // happy path:正常边界
     // 单个参数解析
-    // TODO:lizebin l-Boolean
+    // TODO:lizebin =-l->true/false
     @Test
     public void test_parse_l_true() {
         String input = "-l";
@@ -28,7 +28,14 @@ public class ArgsTest {
         assertFalse(args.isLogging());
     }
 
-    // TODO:lizebin p#-
+    // TODO:lizebin =-p 8080
+    @Test
+    public void test_parse_p_is_8080() {
+        String input = "-p 8080";
+        Args args = Args.parse(input);
+        assertEquals(8080, args.getPort().intValue());
+    }
+
     // TODO:lizebin d*
 
     // 多个参数解析

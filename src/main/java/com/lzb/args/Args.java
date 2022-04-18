@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 /**
@@ -17,6 +18,7 @@ import java.util.stream.Stream;
 public class Args {
 
     private static final String LOGGING = "-l";
+    private static final String PORT = "-p";
 
     private Args() {}
 
@@ -39,8 +41,16 @@ public class Args {
      * @return
      */
     public static Args parse(String input) {
-        Stream<String> commands = Stream.of(input.split(" "));
-        boolean logging = commands.anyMatch(item -> item.equals(LOGGING));
-        return new Args(logging, null, null);
+        String[] inputs = input.split(" ");
+
+        boolean logging = Arrays.asList(inputs).contains(LOGGING);
+
+        Integer port = null;
+        int pIndex = Arrays.binarySearch(inputs, PORT);
+        if (pIndex >= 0) {
+            port = Integer.parseInt(inputs[pIndex + 1]);
+        }
+
+        return new Args(logging, port, null);
     }
 }
