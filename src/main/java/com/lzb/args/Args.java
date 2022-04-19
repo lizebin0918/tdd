@@ -57,18 +57,26 @@ public class Args {
         return new Args(logging, port, dirs);
     }
 
+    /**
+     * 文件目录
+     *
+     * @param inputs
+     * @return
+     */
     private static String[] dirs(String[] inputs) {
         int dIndex = Arrays.binarySearch(inputs, DIR);
         if (dIndex >= 0) {
-//            List<String> dirs = new ArrayList<>();
-//            for (int i = dIndex + 1; i < inputs.length - dIndex; i++) {
-//                dirs.add(inputs[i]);
-//            }
             return Stream.of(inputs).skip(dIndex + 1L).toArray(String[]::new);
         }
         return new String[0];
     }
 
+    /**
+     * 端口
+     *
+     * @param inputs
+     * @return
+     */
     private static Integer port(String[] inputs) {
         Integer port = null;
         int pIndex = Arrays.binarySearch(inputs, PORT);
@@ -80,14 +88,15 @@ public class Args {
 
     /**
      * 日志
+     *
      * @param inputs
      * @return
      */
     private static boolean logging(String[] inputs) {
         return Arrays.asList(inputs).contains(LOGGING);
     }
-    
-    
+
+
 }
 
 
