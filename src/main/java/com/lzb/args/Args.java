@@ -19,6 +19,7 @@ public class Args {
     private static final String LOGGING = "-l";
     private static final String PORT = "-p";
     private static String DIR = "-d";
+    private static String SPACE = " ";
 
     private Args() {
     }
@@ -43,7 +44,7 @@ public class Args {
      * @return
      */
     public static Args parse(String input) {
-        String[] inputs = input.split(" ");
+        String[] inputs = input.split(SPACE);
         if (Objects.isNull(inputs) || inputs.length == 0) {
             return new Args(false, null, null);
         }
