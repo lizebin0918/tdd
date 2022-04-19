@@ -3,6 +3,8 @@ package com.lzb.args;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 public class ArgsTest {
@@ -36,13 +38,22 @@ public class ArgsTest {
         assertEquals(8080, args.getPort().intValue());
     }
 
-    // TODO:lizebin d*
+    // TODO:lizebin =-d 1
     @Test
     public void test_parse_d_single_param() {
         String input = "-d 1";
         Args args = Args.parse(input);
         assertTrue(args.getDirs().length > 0);
         assertEquals("1", args.getDirs()[0]);
+    }
+
+    // TODO:lizebin =-d 1 2 3 a b c
+    @Test
+    public void test_parse_d_multiple_param() {
+        String input = "-d 1 2 3 a b c";
+        Args args = Args.parse(input);
+        assertTrue(args.getDirs().length > 0);
+        assertTrue(Arrays.equals(new String[]{"1", "2", "3", "a", "b", "c"}, args.getDirs()));
     }
 
     // 多个参数解析
