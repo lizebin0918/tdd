@@ -2,10 +2,10 @@ package com.lzb.args;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.stream.Stream;
+import java.util.List;
 
 /**
  * 参数:-l -p 8080 -d /usr/logs <br/>
@@ -51,6 +51,14 @@ public class Args {
             port = Integer.parseInt(inputs[pIndex + 1]);
         }
 
-        return new Args(logging, port, null);
+        int dIndex = Arrays.binarySearch(inputs, "-d");
+        List<String> dirs = new ArrayList<>();
+        if (dIndex >= 0) {
+            for (int i = dIndex + 1; i < inputs.length - dIndex; i++) {
+                dirs.add(inputs[i]);
+            }
+        }
+
+        return new Args(logging, port, dirs.toArray(new String[]{}));
     }
 }

@@ -37,6 +37,13 @@ public class ArgsTest {
     }
 
     // TODO:lizebin d*
+    @Test
+    public void test_parse_d_single_param() {
+        String input = "-d 1";
+        Args args = Args.parse(input);
+        assertTrue(args.getDirs().length > 0);
+        assertEquals("1", args.getDirs()[0]);
+    }
 
     // 多个参数解析
     // TODO:lizebin l,p#,d*
