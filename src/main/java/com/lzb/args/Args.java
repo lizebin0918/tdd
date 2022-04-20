@@ -2,8 +2,12 @@ package com.lzb.args;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -65,9 +69,11 @@ public class Args {
      * @return
      */
     private static String[] dirs(String[] inputs) {
-        int dIndex = Arrays.binarySearch(inputs, DIR);
+        int dIndex = ArrayUtils.indexOf(inputs, DIR);
         if (dIndex >= 0) {
-            return Stream.of(inputs).skip(dIndex + 1L).toArray(String[]::new);
+            Predicate<String> notContains = Predicate.not(item -> Set.of(LOGGING, PORT).contains(item));
+            // 截取最长子串
+            return Stream.of(inputs).skip(dIndex + 1L).takeWhile(notContains).toArray(String[]::new);
         }
         return new String[0];
     }
@@ -80,7 +86,7 @@ public class Args {
      */
     private static Integer port(String[] inputs) {
         Integer port = null;
-        int pIndex = Arrays.binarySearch(inputs, PORT);
+        int pIndex = ArrayUtils.indexOf(inputs, PORT);
         if (pIndex >= 0) {
             port = Integer.parseInt(inputs[pIndex + 1]);
         }
@@ -96,7 +102,6 @@ public class Args {
     private static boolean logging(String[] inputs) {
         return Arrays.asList(inputs).contains(LOGGING);
     }
-
 
 }
 
