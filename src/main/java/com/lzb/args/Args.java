@@ -1,9 +1,14 @@
 package com.lzb.args;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -41,18 +46,29 @@ public class Args {
      */
     private static Object parseObject(List<String> arguments, Parameter parameter) {
         Option option = parameter.getAnnotation(Option.class);
-        String optionValue = option.value();
         Object value = null;
         if (parameter.getType() == boolean.class) {
-            value = arguments.contains("-" + optionValue);
+            value = arguments.contains("-" + option.value());
         }
         if (parameter.getType() == int.class) {
-            int index = arguments.indexOf("-" + optionValue);
+            int index = arguments.indexOf("-" + option.value());
             value = Integer.parseInt(arguments.get(index + 1));
         }
         if (parameter.getType() == String.class) {
-            int index = arguments.indexOf("-" + optionValue);
+            int index = arguments.indexOf("-" + option.value());
             value = arguments.get(index + 1);
+        }
+        if (parameter.getType().componentType() == String.class) {
+            int index = arguments.indexOf("-" + option.value());
+            Predicate<String> notContains = Predicate.not(item -> Objects.equals("-d", item));
+            // 截取最长子串
+            value = arguments.stream().skip(index + 1L).takeWhile(notContains).toArray(String[]::new);
+        }
+        if (parameter.getType().componentType() == int.class) {
+            int index = arguments.indexOf("-" + option.value());
+            Predicate<String> notContains = Predicate.not(item -> Objects.equals("-l", item));
+            // 截取最长子串
+            value = arguments.stream().skip(index + 1L).takeWhile(notContains).mapToInt(Integer::valueOf).toArray();
         }
         return value;
     }
