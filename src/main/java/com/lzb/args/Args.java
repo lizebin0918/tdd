@@ -4,8 +4,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -61,51 +59,5 @@ public class Args {
             String[].class, new StringArrayParser(),
             int[].class, new IntArrayParser()
     );
-
-    static class IntArrayParser implements Parser {
-
-        @Override
-        public Object parse(List<String> arguments, Option option) {
-            int index = arguments.indexOf("-" + option.value());
-            Predicate<String> notContains = Predicate.not(item -> Objects.equals("-l", item));
-            return arguments.stream().skip(index + 1L).takeWhile(notContains).mapToInt(Integer::valueOf).toArray();
-        }
-    }
-
-    static class StringArrayParser implements Parser {
-
-        @Override
-        public Object parse(List<String> arguments, Option option) {
-            int index = arguments.indexOf("-" + option.value());
-            Predicate<String> notContains = Predicate.not(item -> Objects.equals("-d", item));
-            return arguments.stream().skip(index + 1L).takeWhile(notContains).toArray(String[]::new);
-        }
-    }
-
-    static class StringParser implements Parser {
-
-        @Override
-        public Object parse(List<String> arguments, Option option) {
-            int index = arguments.indexOf("-" + option.value());
-            return arguments.get(index + 1);
-        }
-    }
-
-    static class IntParser implements Parser {
-
-        @Override
-        public Object parse(List<String> arguments, Option option) {
-            int index = arguments.indexOf("-" + option.value());
-            return Integer.parseInt(arguments.get(index + 1));
-        }
-    }
-
-    static class BooleanParser implements Parser {
-
-        @Override
-        public Object parse(List<String> arguments, Option option) {
-            return arguments.contains("-" + option.value());
-        }
-    }
 
 }
