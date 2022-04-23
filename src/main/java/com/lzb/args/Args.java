@@ -49,29 +49,26 @@ public class Args {
      * @return
      */
     private static Object parseObject(List<String> arguments, Parameter parameter) {
+
         Option option = parameter.getAnnotation(Option.class);
-        Object value = null;
+        Parser parser = null;
+
         if (parameter.getType() == boolean.class) {
-            Parser parser = new BooleanParser();
-            value = parser.parse(arguments, option);
+            parser = new BooleanParser();
         }
         if (parameter.getType() == int.class) {
-            Parser parser = new IntParser();
-            value = parser.parse(arguments, option);
+            parser = new IntParser();
         }
         if (parameter.getType() == String.class) {
-            Parser parser = new StringParser();
-            value = parser.parse(arguments, option);
+            parser = new StringParser();
         }
         if (parameter.getType().componentType() == String.class) {
-            Parser parser = new StringArrayParser();
-            value = parser.parse(arguments, option);
+            parser = new StringArrayParser();
         }
         if (parameter.getType().componentType() == int.class) {
-            Parser parser = new IntArrayParser();
-            value = parser.parse(arguments, option);
+            parser = new IntArrayParser();
         }
-        return value;
+        return parser.parse(arguments, option);
     }
 
     static class IntArrayParser implements Parser {
