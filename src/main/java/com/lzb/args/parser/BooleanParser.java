@@ -1,4 +1,6 @@
-package com.lzb.args;
+package com.lzb.args.parser;
+
+import com.lzb.args.option.Option;
 
 import java.util.List;
 
@@ -8,7 +10,7 @@ import java.util.List;
  *
  * @author lizebin
  */
-class BooleanParser implements Parser {
+public class BooleanParser implements Parser {
 
     @Override
     public Object parse(List<String> arguments, Option option) {

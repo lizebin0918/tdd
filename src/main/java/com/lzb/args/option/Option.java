@@ -1,4 +1,4 @@
-package com.lzb.args;
+package com.lzb.args.option;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

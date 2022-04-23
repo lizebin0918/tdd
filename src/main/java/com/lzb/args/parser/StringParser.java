@@ -1,4 +1,6 @@
-package com.lzb.args;
+package com.lzb.args.parser;
+
+import com.lzb.args.option.Option;
 
 import java.util.List;
 
@@ -8,11 +10,11 @@ import java.util.List;
  *
  * @author lizebin
  */
-class IntParser implements Parser {
+public class StringParser implements Parser {
 
     @Override
     public Object parse(List<String> arguments, Option option) {
         int index = arguments.indexOf("-" + option.value());
-        return Integer.parseInt(arguments.get(index + 1));
+        return arguments.get(index + 1);
     }
 }

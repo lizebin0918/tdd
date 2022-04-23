@@ -1,5 +1,6 @@
 package com.lzb.args;
 
+import com.lzb.args.option.*;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -62,15 +63,15 @@ public class ArgsTest {
 
     @Test
     public void should_example_1() {
-        MultipleOptions multipleOptions = Args.parse(MultipleOptions.class, "-l", "-p", "8080", "-d", "/usr/logs");
-        assertTrue(multipleOptions.logging());
-        Assert.assertEquals(8080, multipleOptions.port());
-        Assert.assertEquals("/usr/logs", multipleOptions.directory());
+        MultipleOption multipleOption = Args.parse(MultipleOption.class, "-l", "-p", "8080", "-d", "/usr/logs");
+        assertTrue(multipleOption.logging());
+        Assert.assertEquals(8080, multipleOption.port());
+        Assert.assertEquals("/usr/logs", multipleOption.directory());
     }
 
     @Test
     public void should_example_2() {
-        ListOptions options = Args.parse(ListOptions.class, "-g", "this", "is", "a", "list", "-d", "1", "2", "3");
+        ListOption options = Args.parse(ListOption.class, "-g", "this", "is", "a", "list", "-d", "1", "2", "3");
         Assert.assertArrayEquals(new String[]{"this", "is", "a", "list"}, options.group());
         Assert.assertArrayEquals(new int[]{1, 2, 3}, options.decimals());
     }

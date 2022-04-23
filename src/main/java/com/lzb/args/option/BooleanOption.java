@@ -1,4 +1,4 @@
-package com.lzb.args;
+package com.lzb.args.option;
 
 /**
  * 布尔值
