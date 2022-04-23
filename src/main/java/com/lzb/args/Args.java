@@ -41,6 +41,7 @@ public class Args {
      * 2.所有方法都有共同的入参，可以抽取公共接口
      * 3.每个方法的返回值，可以直接inline变量
      * 4.新建BooleanParser内部类，引用外部方法，再inline进来，外部方法可以删掉
+     * 5.提取同类型Parser本地变量，把所有子类的变量，重构成对应的Parser类型
      *
      * @param arguments
      * @param parameter
@@ -51,19 +52,24 @@ public class Args {
         Option option = parameter.getAnnotation(Option.class);
         Object value = null;
         if (parameter.getType() == boolean.class) {
-            value = new BooleanParser().parse(arguments, option);
+            Parser parser = new BooleanParser();
+            value = parser.parse(arguments, option);
         }
         if (parameter.getType() == int.class) {
-            value = new IntParser().parse(arguments, option);
+            Parser parser = new IntParser();
+            value = parser.parse(arguments, option);
         }
         if (parameter.getType() == String.class) {
-            value = new StringParser().parse(arguments, option);
+            Parser parser = new StringParser();
+            value = parser.parse(arguments, option);
         }
         if (parameter.getType().componentType() == String.class) {
-            value = new StringArrayParser().parse(arguments, option);
+            Parser parser = new StringArrayParser();
+            value = parser.parse(arguments, option);
         }
         if (parameter.getType().componentType() == int.class) {
-            value = new IntArrayParser().parse(arguments, option);
+            Parser parser = new IntArrayParser();
+            value = parser.parse(arguments, option);
         }
         return value;
     }
