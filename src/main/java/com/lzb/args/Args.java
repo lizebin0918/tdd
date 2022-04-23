@@ -1,108 +1,60 @@
 package com.lzb.args;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import org.apache.commons.lang3.ArrayUtils;
-
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.Predicate;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Parameter;
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * 参数:-l -p 8080 -d /usr/logs <br/>
- * Created on : 2022-04-18 19:34
+ * <br/>
+ * Created on : 2022-04-23 15:14
  *
  * @author lizebin
  */
-@Getter
-@AllArgsConstructor
 public class Args {
 
-    private static final String LOGGING = "-l";
-    private static final String PORT = "-p";
-    private static String DIR = "-d";
-    private static String SPACE = " ";
+    public static <T> T parse(Class<T> optionsClass, String... args) {
 
-    private Args() {
-    }
+        Constructor<?> constructor = optionsClass.getDeclaredConstructors()[0];
+        // 应该是用到才声明
+        /*Parameter parameter = constructor.getParameters()[0];
+        Option option = parameter.getAnnotation(Option.class);
+        String optionValue = option.value();*/
+        List<String> arguments = List.of(args);
 
-    /**
-     * 是否记录日志
-     */
-    private boolean logging;
-    /**
-     * 端口号
-     */
-    private Integer port;
-    /**
-     * 文件目录
-     */
-    private String[] dirs;
-
-    /**
-     * 解析命令，按照空格分开
-     *
-     * @param input
-     * @return
-     */
-    public static Args parse(String input) {
-        String[] inputs = input.split(SPACE);
-        if (Objects.isNull(inputs) || inputs.length == 0) {
-            return new Args(false, null, null);
+        try {
+            Object[] values = Stream.of(constructor.getParameters()).map(p -> parseObject(arguments, p)).toArray();
+            return (T) constructor.newInstance(values);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        boolean logging = logging(inputs);
-
-        Integer port = port(inputs);
-
-        String[] dirs = dirs(inputs);
-
-        return new Args(logging, port, dirs);
+        return null;
     }
 
     /**
-     * 文件目录
-     *
-     * @param inputs
+     * 重构的原则："符合最少知道原则"
+     * @param arguments
+     * @param parameter
+     * @param <T>
      * @return
      */
-    private static String[] dirs(String[] inputs) {
-        int dIndex = ArrayUtils.indexOf(inputs, DIR);
-        if (dIndex >= 0) {
-            Predicate<String> notContains = Predicate.not(item -> Set.of(LOGGING, PORT).contains(item));
-            // 截取最长子串
-            return Stream.of(inputs).skip(dIndex + 1L).takeWhile(notContains).toArray(String[]::new);
+    private static Object parseObject(List<String> arguments, Parameter parameter) {
+        Option option = parameter.getAnnotation(Option.class);
+        String optionValue = option.value();
+        Object value = null;
+        if (parameter.getType() == boolean.class) {
+            value = arguments.contains("-" + optionValue);
         }
-        return new String[0];
-    }
-
-    /**
-     * 端口
-     *
-     * @param inputs
-     * @return
-     */
-    private static Integer port(String[] inputs) {
-        Integer port = null;
-        int pIndex = ArrayUtils.indexOf(inputs, PORT);
-        if (pIndex >= 0) {
-            port = Integer.parseInt(inputs[pIndex + 1]);
+        if (parameter.getType() == int.class) {
+            int index = arguments.indexOf("-" + optionValue);
+            value = Integer.parseInt(arguments.get(index + 1));
         }
-        return port;
-    }
-
-    /**
-     * 日志
-     *
-     * @param inputs
-     * @return
-     */
-    private static boolean logging(String[] inputs) {
-        return Arrays.asList(inputs).contains(LOGGING);
+        if (parameter.getType() == String.class) {
+            int index = arguments.indexOf("-" + optionValue);
+            value = arguments.get(index + 1);
+        }
+        return value;
     }
 
 }
-
-

@@ -1,89 +1,78 @@
 package com.lzb.args;
 
-import org.junit.Before;
+import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
+/**
+ * 先设计API
+ * 先写一个失败的测试用例，通过之后，再写这个测试用例的反例
+ *
+ * <br/>
+ * Created on : 2022-04-23 13:35
+ *
+ * @author lizebin
+ */
 public class ArgsTest {
 
-    @Before
-    public void setUp() throws Exception {
-    }
+    // -l -p 8080 -d /usr/logs
+    // 实际是一个字符数组: [-l], [-p,8080], [-d, /usr/logs]，通过index来获取
+    // 任务分解
+    /*
+    - happy path
+    - 单参数解析
+        TODO:- Boolean(done)
+        TODO:- Integer
+        TODO:- String
+    - 多参数解析
+        TODO:- -l -p 8080 -d /usr/logs
+    - sad path
+    - 异常参数
+    - default value
+        TODO:- Boolean false
+        TODO:- Integer 0
+        TODO:- Sstring ""
+    */
 
-    ///////////////////////////////////////////////////////////////////////////
-    // 正常情况
-    ///////////////////////////////////////////////////////////////////////////
-
-    // 单个参数解析
-    // TODO:lizebin =-l->true/false
     @Test
-    public void test_parse_l_true() {
-        String input = "-l";
-        Args args = Args.parse(input);
-        assertTrue(args.isLogging());
-    }
-
-    @Test
-    public void test_parse_l_false() {
-        String emptyString = "";
-        Args args = Args.parse(emptyString);
-        assertFalse(args.isLogging());
-    }
-
-    // TODO:lizebin =-p 8080
-    @Test
-    public void test_parse_p_is_8080() {
-        String input = "-p 8080";
-        Args args = Args.parse(input);
-        assertEquals(8080, args.getPort().intValue());
-    }
-
-    // TODO:lizebin =-d 1
-    @Test
-    public void test_parse_d_single_param() {
-        String input = "-d 1";
-        Args args = Args.parse(input);
-        assertTrue(args.getDirs().length > 0);
-        assertEquals("1", args.getDirs()[0]);
-    }
-
-    // TODO:lizebin =-d 1 2 3 a b c
-    @Test
-    public void test_parse_d_multiple_param() {
-        String input = "-d 1 2 3 a b c";
-        Args args = Args.parse(input);
-        assertTrue(args.getDirs().length > 0);
-        assertArrayEquals(new String[]{"1", "2", "3", "a", "b", "c"}, args.getDirs());
-    }
-
-    // 多个参数解析
-    // TODO:lizebin l,p#,d*
-    @Test
-    public void test_parse_l_p_d_param() {
-        String input = "-l -p 90 -d a";
-        Args args = Args.parse(input);
-        assertTrue(args.isLogging());
-        assertEquals(90, args.getPort().intValue());
-        assertArrayEquals(new String[]{"a"}, args.getDirs());
+    public void should_set_boolean_option_to_true_if_flag_present() {
+        BooleanOption parse = Args.parse(BooleanOption.class, "-l");
+        assertTrue(parse.logging());
     }
 
     @Test
-    public void test_parse_l_p_d_disorder_param() {
-        String input = "-l -d a -p 90";
-        Args args = Args.parse(input);
-        assertTrue(args.isLogging());
-        assertEquals(90, args.getPort().intValue());
-        assertArrayEquals(new String[]{"a"}, args.getDirs());
+    public void should_set_boolean_option_to_true_if_flag_not_present() {
+        BooleanOption parse = Args.parse(BooleanOption.class, "");
+        assertFalse(parse.logging());
     }
 
     @Test
-    public void test_parse_l_p_d_disorder_dir() {
-        String input = "-l -d a -p 90";
-        Args args = Args.parse(input);
-        assertArrayEquals(new String[]{"a"}, args.getDirs());
+    public void should_set_integer_option_to_8080() {
+        IntOption parse = Args.parse(IntOption.class, "-p", "8080");
+        assertEquals(8080, parse.port());
+    }
+
+    @Test
+    public void should_set_string_option() {
+        String dir = "/usr/logs";
+        StringOption parse = Args.parse(StringOption.class, "-d", dir);
+        assertEquals(dir, parse.dir());
+    }
+
+    @Test
+    public void should_example_1() {
+        MultipleOptions multipleOptions = Args.parse(MultipleOptions.class, "-l", "-p", "8080", "-d", "/usr/logs");
+        assertTrue(multipleOptions.logging());
+        Assert.assertEquals(8080, multipleOptions.port());
+        Assert.assertEquals("/usr/logs", multipleOptions.directory());
+    }
+
+    @Test
+    public void should_example_2() {
+        ListOptions options = Args.parse(ListOptions.class, "-g", "this", "is", "a", "list", "-d", "1", "2", "3");
+        Assert.assertArrayEquals(new String[]{"this", "is", "a", "list"}, options.group());
+        Assert.assertArrayEquals(new int[]{1, 2, 3}, options.decimals());
     }
 
 }
