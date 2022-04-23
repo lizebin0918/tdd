@@ -1,13 +1,9 @@
 package com.lzb.args;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -39,6 +35,13 @@ public class Args {
 
     /**
      * 重构的原则："符合最少知道原则"
+     *
+     * 开始重构
+     * 1.抽取方法
+     * 2.所有方法都有共同的入参，可以抽取公共接口
+     * 3.每个方法的返回值，可以直接inline变量
+     * 4.新建BooleanParser内部类，引用外部方法，再inline进来，外部方法可以删掉
+     *
      * @param arguments
      * @param parameter
      * @param <T>
@@ -48,29 +51,67 @@ public class Args {
         Option option = parameter.getAnnotation(Option.class);
         Object value = null;
         if (parameter.getType() == boolean.class) {
-            value = arguments.contains("-" + option.value());
+            value = new BooleanParser().parse(arguments, option);
         }
         if (parameter.getType() == int.class) {
-            int index = arguments.indexOf("-" + option.value());
-            value = Integer.parseInt(arguments.get(index + 1));
+            value = new IntParser().parse(arguments, option);
         }
         if (parameter.getType() == String.class) {
-            int index = arguments.indexOf("-" + option.value());
-            value = arguments.get(index + 1);
+            value = new StringParser().parse(arguments, option);
         }
         if (parameter.getType().componentType() == String.class) {
-            int index = arguments.indexOf("-" + option.value());
-            Predicate<String> notContains = Predicate.not(item -> Objects.equals("-d", item));
-            // 截取最长子串
-            value = arguments.stream().skip(index + 1L).takeWhile(notContains).toArray(String[]::new);
+            value = new StringArrayParser().parse(arguments, option);
         }
         if (parameter.getType().componentType() == int.class) {
-            int index = arguments.indexOf("-" + option.value());
-            Predicate<String> notContains = Predicate.not(item -> Objects.equals("-l", item));
-            // 截取最长子串
-            value = arguments.stream().skip(index + 1L).takeWhile(notContains).mapToInt(Integer::valueOf).toArray();
+            value = new IntArrayParser().parse(arguments, option);
         }
         return value;
+    }
+
+    static class IntArrayParser implements Parser {
+
+        @Override
+        public Object parse(List<String> arguments, Option option) {
+            int index = arguments.indexOf("-" + option.value());
+            Predicate<String> notContains = Predicate.not(item -> Objects.equals("-l", item));
+            return arguments.stream().skip(index + 1L).takeWhile(notContains).mapToInt(Integer::valueOf).toArray();
+        }
+    }
+
+    static class StringArrayParser implements Parser {
+
+        @Override
+        public Object parse(List<String> arguments, Option option) {
+            int index = arguments.indexOf("-" + option.value());
+            Predicate<String> notContains = Predicate.not(item -> Objects.equals("-d", item));
+            return arguments.stream().skip(index + 1L).takeWhile(notContains).toArray(String[]::new);
+        }
+    }
+
+    static class StringParser implements Parser {
+
+        @Override
+        public Object parse(List<String> arguments, Option option) {
+            int index = arguments.indexOf("-" + option.value());
+            return arguments.get(index + 1);
+        }
+    }
+
+    static class IntParser implements Parser {
+
+        @Override
+        public Object parse(List<String> arguments, Option option) {
+            int index = arguments.indexOf("-" + option.value());
+            return Integer.parseInt(arguments.get(index + 1));
+        }
+    }
+
+    static class BooleanParser implements Parser {
+
+        @Override
+        public Object parse(List<String> arguments, Option option) {
+            return arguments.contains("-" + option.value());
+        }
     }
 
 }
