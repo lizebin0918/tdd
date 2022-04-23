@@ -3,6 +3,7 @@ package com.lzb.args;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -35,7 +36,7 @@ public class Args {
 
     /**
      * 重构的原则："符合最少知道原则"
-     *
+     * <p>
      * 开始重构
      * 1.抽取方法
      * 2.所有方法都有共同的入参，可以抽取公共接口
@@ -50,28 +51,16 @@ public class Args {
      */
     private static Object parseObject(List<String> arguments, Parameter parameter) {
         Option option = parameter.getAnnotation(Option.class);
-        return getParser(parameter).parse(arguments, option);
+        return PARSERS.get(parameter.getType()).parse(arguments, option);
     }
 
-    private static Parser getParser(Parameter parameter) {
-        Parser parser = null;
-        if (parameter.getType() == boolean.class) {
-            parser = new BooleanParser();
-        }
-        if (parameter.getType() == int.class) {
-            parser = new IntParser();
-        }
-        if (parameter.getType() == String.class) {
-            parser = new StringParser();
-        }
-        if (parameter.getType().componentType() == String.class) {
-            parser = new StringArrayParser();
-        }
-        if (parameter.getType().componentType() == int.class) {
-            parser = new IntArrayParser();
-        }
-        return parser;
-    }
+    private static Map<Class<?>, Parser> PARSERS = Map.of(
+            boolean.class, new BooleanParser(),
+            int.class, new IntParser(),
+            String.class, new StringParser(),
+            String[].class, new StringArrayParser(),
+            int[].class, new IntArrayParser()
+    );
 
     static class IntArrayParser implements Parser {
 
