@@ -55,10 +55,10 @@ public class Args {
         return PARSERS.get(parameter.getType()).parse(arguments, option);
     }
 
-    private static Map<Class<?>, Parser> PARSERS = Map.of(
+    private static Map<Class<?>, Parser<?>> PARSERS = Map.of(
             boolean.class, new BooleanParser(),
-            int.class, IntParser.createIntParser(Integer::parseInt),
-            String.class, IntParser.createIntParser(String::valueOf),
+            int.class, new SingleValueParser<>(Integer::parseInt),
+            String.class, new SingleValueParser<>(String::valueOf),
             String[].class, new StringArrayParser(),
             int[].class, new IntArrayParser()
     );

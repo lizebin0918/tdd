@@ -4,7 +4,6 @@ import com.lzb.args.option.Option;
 
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.ToIntFunction;
 
 /**
  * <br/>
@@ -12,26 +11,22 @@ import java.util.function.ToIntFunction;
  *
  * @author lizebin
  */
-public class IntParser implements Parser {
+public class SingleValueParser<T> implements Parser<T> {
 
-    Function<String, Object> valueParser = Integer::parseInt;
+    private final Function<String, T> valueParser;
 
-    private IntParser(Function<String, Object> valueParser) {
+    public SingleValueParser(Function<String, T> valueParser) {
         this.valueParser = valueParser;
     }
 
-    public static Parser createIntParser(Function<String, Object> valueParser) {
-        return new IntParser(valueParser);
-    }
-
     @Override
-    public Object parse(List<String> arguments, Option option) {
+    public T parse(List<String> arguments, Option option) {
         int index = arguments.indexOf("-" + option.value());
         String value = arguments.get(index + 1);
         return parseValue(value);
     }
 
-    protected Object parseValue(String value) {
+    protected T parseValue(String value) {
         return valueParser.apply(value);
     }
 }

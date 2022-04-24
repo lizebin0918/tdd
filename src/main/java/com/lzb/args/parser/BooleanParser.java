@@ -10,10 +10,10 @@ import java.util.List;
  *
  * @author lizebin
  */
-public class BooleanParser implements Parser {
+public class BooleanParser implements Parser<Boolean> {
 
     @Override
-    public Object parse(List<String> arguments, Option option) {
+    public Boolean parse(List<String> arguments, Option option) {
         return arguments.contains("-" + option.value());
     }
 }

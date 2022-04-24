@@ -10,8 +10,8 @@ import java.util.List;
  *
  * @author lizebin
  */
-public interface Parser {
+public interface Parser<T> {
 
-    Object parse(List<String> arguments, Option option);
+    T parse(List<String> arguments, Option option);
 
 }

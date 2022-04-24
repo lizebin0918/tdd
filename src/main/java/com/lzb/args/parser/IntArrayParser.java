@@ -12,10 +12,10 @@ import java.util.function.Predicate;
  *
  * @author lizebin
  */
-public class IntArrayParser implements Parser {
+public class IntArrayParser implements Parser<int[]> {
 
     @Override
-    public Object parse(List<String> arguments, Option option) {
+    public int[] parse(List<String> arguments, Option option) {
         int index = arguments.indexOf("-" + option.value());
         Predicate<String> notContains = Predicate.not(item -> Objects.equals("-l", item));
         return arguments.stream().skip(index + 1L).takeWhile(notContains).mapToInt(Integer::valueOf).toArray();
