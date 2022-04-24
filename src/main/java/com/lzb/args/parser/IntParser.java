@@ -16,11 +16,13 @@ public class IntParser implements Parser {
 
     Function<String, Object> valueParser = Integer::parseInt;
 
-    public IntParser(Function<String, Object> valueParser) {
+    private IntParser(Function<String, Object> valueParser) {
         this.valueParser = valueParser;
     }
 
-    public IntParser() {}
+    public static Parser createIntParser(Function<String, Object> valueParser) {
+        return new IntParser(valueParser);
+    }
 
     @Override
     public Object parse(List<String> arguments, Option option) {
