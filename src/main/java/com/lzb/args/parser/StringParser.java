@@ -15,6 +15,11 @@ public class StringParser implements Parser {
     @Override
     public Object parse(List<String> arguments, Option option) {
         int index = arguments.indexOf("-" + option.value());
-        return arguments.get(index + 1);
+        String value = arguments.get(index + 1);
+        return parseValue(value);
+    }
+
+    private String parseValue(String value) {
+        return String.valueOf(value);
     }
 }
