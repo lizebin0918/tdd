@@ -13,18 +13,18 @@ import java.util.function.Predicate;
  *
  * @author lizebin
  */
-public class StringArrayParser implements Parser<Object> {
+public class ArrayParser implements Parser<String[]> {
 
     private final IntFunction<String[]> arrayFunction;
     private final String end;
 
-    public StringArrayParser(String end) {
-        this.arrayFunction = String[]::new;
+    public ArrayParser(String end, IntFunction<String[]> arrayFunction) {
+        this.arrayFunction = arrayFunction;
         this.end = end;
     }
 
     @Override
-    public Object parse(List<String> arguments, Option option) {
+    public String[] parse(List<String> arguments, Option option) {
         int index = arguments.indexOf("-" + option.value());
         Predicate<String> notContains = Predicate.not(item -> Objects.equals(end, item));
         return arguments.stream().skip(index + 1L).takeWhile(notContains).toArray(arrayFunction);
