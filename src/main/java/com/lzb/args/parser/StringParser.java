@@ -1,9 +1,5 @@
 package com.lzb.args.parser;
 
-import com.lzb.args.option.Option;
-
-import java.util.List;
-
 /**
  * <br/>
  * Created on : 2022-04-23 23:11
@@ -12,8 +8,12 @@ import java.util.List;
  */
 public class StringParser extends IntParser implements Parser {
 
-    public StringParser() {
+    private StringParser() {
         super(String::valueOf);
+    }
+
+    public static Parser createStringParser() {
+        return new StringParser();
     }
 
 }
