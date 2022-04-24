@@ -17,7 +17,7 @@ public class StringArrayParser implements Parser<String[]> {
     @Override
     public String[] parse(List<String> arguments, Option option) {
         int index = arguments.indexOf("-" + option.value());
-        Predicate<String> notContains = Predicate.not(item -> Objects.equals("-d", item));
+        Predicate<String> notContains = Predicate.not(item -> Objects.equals(NUMBER_ARRAY_SIGN, item));
         return arguments.stream().skip(index + 1L).takeWhile(notContains).toArray(String[]::new);
     }
 }
