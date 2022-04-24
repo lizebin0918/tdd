@@ -3,6 +3,8 @@ package com.lzb.args.parser;
 import com.lzb.args.option.Option;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.ToIntFunction;
 
 /**
  * <br/>
@@ -12,6 +14,14 @@ import java.util.List;
  */
 public class IntParser implements Parser {
 
+    Function<String, Object> valueParser = Integer::parseInt;
+
+    public IntParser(Function<String, Object> valueParser) {
+        this.valueParser = valueParser;
+    }
+
+    public IntParser() {}
+
     @Override
     public Object parse(List<String> arguments, Option option) {
         int index = arguments.indexOf("-" + option.value());
@@ -20,6 +30,6 @@ public class IntParser implements Parser {
     }
 
     protected Object parseValue(String value) {
-        return Integer.parseInt(value);
+        return valueParser.apply(value);
     }
 }

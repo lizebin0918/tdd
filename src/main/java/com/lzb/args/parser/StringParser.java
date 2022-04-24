@@ -12,8 +12,8 @@ import java.util.List;
  */
 public class StringParser extends IntParser implements Parser {
 
-    @Override
-    public Object parseValue(String value) {
-        return String.valueOf(value);
+    public StringParser() {
+        super(String::valueOf);
     }
+
 }
