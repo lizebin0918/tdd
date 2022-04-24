@@ -74,14 +74,14 @@ public class ArgsTest {
     public void should_example_2() {
         ListOption options = Args.parse(ListOption.class, "-g", "this", "is", "a", "list", "-d", "1", "2", "3");
         Assert.assertArrayEquals(new String[]{"this", "is", "a", "list"}, options.group());
-        Assert.assertArrayEquals(new int[]{1, 2, 3}, options.decimals());
+        Assert.assertArrayEquals(new Integer[]{1, 2, 3}, options.decimals());
     }
 
     @Test
     public void should_example_3() {
         ListOption options = Args.parse(ListOption.class, "-d", "1", "2", "3", "-g", "this", "is", "a", "list");
         Assert.assertArrayEquals(new String[]{"this", "is", "a", "list"}, options.group());
-        Assert.assertArrayEquals(new int[]{1, 2, 3}, options.decimals());
+        Assert.assertArrayEquals(new Integer[]{1, 2, 3}, options.decimals());
     }
 
 }

@@ -4,6 +4,7 @@ import com.lzb.args.option.Option;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
@@ -13,20 +14,14 @@ import java.util.function.Predicate;
  *
  * @author lizebin
  */
-public class ArrayParser implements Parser<String[]> {
-
-    private final IntFunction<String[]> arrayFunction;
-    private final String end;
-
-    public ArrayParser(String end, IntFunction<String[]> arrayFunction) {
-        this.arrayFunction = arrayFunction;
-        this.end = end;
-    }
+public record ArrayParser(String end,
+                          IntFunction<Object[]> arrayFunction,
+                          Function<String, Object> mapper) implements Parser<Object[]> {
 
     @Override
-    public String[] parse(List<String> arguments, Option option) {
+    public Object[] parse(List<String> arguments, Option option) {
         int index = arguments.indexOf("-" + option.value());
         Predicate<String> notContains = Predicate.not(item -> Objects.equals(end, item));
-        return arguments.stream().skip(index + 1L).takeWhile(notContains).toArray(arrayFunction);
+        return arguments.stream().skip(index + 1L).takeWhile(notContains).map(mapper).toArray(arrayFunction);
     }
 }
