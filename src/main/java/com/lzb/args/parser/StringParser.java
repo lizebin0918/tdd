@@ -8,8 +8,4 @@ package com.lzb.args.parser;
  */
 public class StringParser extends IntParser implements Parser {
 
-    public static Parser createStringParser() {
-        return new IntParser(String::valueOf);
-    }
-
 }

@@ -58,7 +58,7 @@ public class Args {
     private static Map<Class<?>, Parser> PARSERS = Map.of(
             boolean.class, new BooleanParser(),
             int.class, new IntParser(),
-            String.class, StringParser.createStringParser(),
+            String.class, new IntParser(String::valueOf),
             String[].class, new StringArrayParser(),
             int[].class, new IntArrayParser()
     );
