@@ -59,7 +59,7 @@ public class Args {
             boolean.class, new BooleanParser(),
             int.class, new SingleValueParser<>(Integer::parseInt),
             String.class, new SingleValueParser<>(String::valueOf),
-            String[].class, new StringArrayParser(),
+            String[].class, new StringArrayParser(Parser.NUMBER_ARRAY_SIGN),
             int[].class, new IntArrayParser()
     );
 
