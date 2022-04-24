@@ -10,16 +10,10 @@ import java.util.List;
  *
  * @author lizebin
  */
-public class StringParser implements Parser {
+public class StringParser extends IntParser implements Parser {
 
     @Override
-    public Object parse(List<String> arguments, Option option) {
-        int index = arguments.indexOf("-" + option.value());
-        String value = arguments.get(index + 1);
-        return parseValue(value);
-    }
-
-    private String parseValue(String value) {
+    public Object parseValue(String value) {
         return String.valueOf(value);
     }
 }

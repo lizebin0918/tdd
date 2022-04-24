@@ -19,7 +19,7 @@ public class IntParser implements Parser {
         return parseValue(value);
     }
 
-    private int parseValue(String value) {
+    protected Object parseValue(String value) {
         return Integer.parseInt(value);
     }
 }
