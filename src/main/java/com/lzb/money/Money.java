@@ -13,8 +13,21 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
-public class Money {
+public abstract class Money {
 
     protected int amount;
+    protected String currency;
+
+    public static Dollar dollar(int amount) {
+        return new Dollar(amount);
+    }
+
+    abstract Money times(int multiplier);
+
+    /**
+     * 币种
+     * @return
+     */
+    abstract String currency();
 
 }

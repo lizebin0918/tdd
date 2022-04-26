@@ -19,28 +19,29 @@ public class DollarTest {
         money.times(3);
         assertEquals(15, money.getAmount());*/
 
-        Dollar money = new Dollar(5);
-        Dollar ten = money.times(2);
+        Money money = Money.dollar(5);
+        Money ten = money.times(2);
         assertEquals(10, ten.getAmount());
-        Dollar fifthteen = money.times(3);
+        Money fifthteen = money.times(3);
         assertEquals(15, fifthteen.getAmount());
 
     }
 
     @Test
     public void test1() {
-        Dollar five = new Dollar(5);
-        assertEquals(new Dollar(10), five.times(2));
-        assertEquals(new Dollar(15), five.times(3));
+        Money five = Money.dollar(5);
+        assertEquals(Money.dollar(10), five.times(2));
+        assertEquals(Money.dollar(15), five.times(3));
     }
 
     @Test
     public void test_equals() {
-        Dollar five = new Dollar(5);
-        Dollar five1 = five.times(1);
+        Money five = Money.dollar(5);
+        Money five1 = five.times(1);
         assertEquals(five, five1);
-        Dollar five2 = new Dollar(5);
+        Money five2 = Money.dollar(5);
         assertEquals(five, five2);
+        Franc franc = new Franc(5);
     }
 
 }

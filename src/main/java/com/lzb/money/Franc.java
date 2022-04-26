@@ -13,12 +13,18 @@ import lombok.Getter;
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class Franc extends Money {
+
     public Franc(int amount) {
-        super(amount);
+        super(amount, "CHF");
     }
 
-    public Franc times(int multiplier) {
+    Franc times(int multiplier) {
         return new Franc(amount * multiplier);
+    }
+
+    @Override
+    public String currency() {
+        return currency;
     }
 
 }

@@ -13,10 +13,15 @@ import lombok.Getter;
 @EqualsAndHashCode(callSuper = true)
 public class Dollar extends Money {
     public Dollar(int amount) {
-        super(amount);
+        super(amount, "USD");
     }
 
-    public Dollar times(int multiplier) {
+    Dollar times(int multiplier) {
         return new Dollar(amount * multiplier);
+    }
+
+    @Override
+    String currency() {
+        return currency;
     }
 }
