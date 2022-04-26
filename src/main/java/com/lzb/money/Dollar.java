@@ -10,13 +10,10 @@ import lombok.Getter;
  * @author lizebin
  */
 @Getter
-@EqualsAndHashCode
-public class Dollar {
-
-    private final int amount;
-
+@EqualsAndHashCode(callSuper = true)
+public class Dollar extends Money {
     public Dollar(int amount) {
-        this.amount = amount;
+        super(amount);
     }
 
     public Dollar times(int multiplier) {

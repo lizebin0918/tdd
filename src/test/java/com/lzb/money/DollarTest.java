@@ -34,4 +34,13 @@ public class DollarTest {
         assertEquals(new Dollar(15), five.times(3));
     }
 
+    @Test
+    public void test_equals() {
+        Dollar five = new Dollar(5);
+        Dollar five1 = five.times(1);
+        assertEquals(five, five1);
+        Dollar five2 = new Dollar(5);
+        assertEquals(five, five2);
+    }
+
 }

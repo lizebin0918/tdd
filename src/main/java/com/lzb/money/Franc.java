@@ -11,11 +11,11 @@ import lombok.Getter;
  * @author lizebin
  */
 @Getter
-@EqualsAndHashCode
-@AllArgsConstructor
-public class Franc {
-
-    private int amount;
+@EqualsAndHashCode(callSuper = true)
+public class Franc extends Money {
+    public Franc(int amount) {
+        super(amount);
+    }
 
     public Franc times(int multiplier) {
         return new Franc(amount * multiplier);
