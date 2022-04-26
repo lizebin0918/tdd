@@ -1,6 +1,5 @@
 package com.lzb.money;
 
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -14,17 +13,12 @@ import lombok.Getter;
 @EqualsAndHashCode(callSuper = true)
 public class Franc extends Money {
 
-    public Franc(int amount) {
-        super(amount, "CHF");
+    public Franc(int amount, String currency) {
+        super(amount, currency);
     }
 
     Franc times(int multiplier) {
-        return new Franc(amount * multiplier);
-    }
-
-    @Override
-    public String currency() {
-        return currency;
+        return new Franc(amount * multiplier, currency);
     }
 
 }

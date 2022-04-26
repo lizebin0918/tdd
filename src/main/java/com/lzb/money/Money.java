@@ -19,15 +19,13 @@ public abstract class Money {
     protected String currency;
 
     public static Dollar dollar(int amount) {
-        return new Dollar(amount);
+        return new Dollar(amount, "USD");
+    }
+
+    public static Franc franc(int amount) {
+        return new Franc(amount, "CHF");
     }
 
     abstract Money times(int multiplier);
-
-    /**
-     * 币种
-     * @return
-     */
-    abstract String currency();
 
 }
