@@ -41,8 +41,6 @@ public class DollarTest {
         assertEquals(five, five1);
         Money five2 = Money.dollar(5);
         assertEquals(five, five2);
-        Franc franc = Money.franc(5);
-        assertNotEquals(five, franc);
     }
 
 }
