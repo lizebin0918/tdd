@@ -43,4 +43,42 @@ public class DollarTest {
         assertEquals(five, five2);
     }
 
+    /**
+     * 5美元 + 5美元 = 10美元
+     */
+    @Test
+    public void test_five_plus_five() {
+        Money five = Money.dollar(5);
+        Money five2 = Money.dollar(5);
+        Money ten = Money.dollar(10);
+        assertEquals(ten, five.plus(five2));
+    }
+
+    /**
+     * 5美元+10瑞士法郎=10美元
+     */
+    @Test
+    public void test_five_plus_ten_chf() {
+        Money fiveDollar = Money.dollar(5);
+        Money tenFranc = Money.franc(10);
+        Money ten = Money.dollar(10);
+        assertEquals(ten, fiveDollar.plus(tenFranc));
+    }
+
+    @Test
+    public void test_five_plus_ten_chf_1() {
+        Money fiveFranc = Money.franc(5);
+        Money tenFranc = Money.franc(10);
+        Money franc = Money.franc(15);
+        assertEquals(franc, fiveFranc.plus(tenFranc));
+    }
+
+    @Test
+    public void test_five_plus_ten_chf_2() {
+        Money fiveFranc = Money.franc(5);
+        Money tenDollar = Money.dollar(10);
+        Money franc = Money.franc(25);
+        assertEquals(franc, fiveFranc.plus(tenDollar));
+    }
+
 }
