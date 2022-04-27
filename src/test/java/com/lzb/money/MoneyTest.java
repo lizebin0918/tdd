@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class DollarTest {
+public class MoneyTest {
 
     @Test
     public void testMultiplication() {
@@ -79,6 +79,14 @@ public class DollarTest {
         Money tenDollar = Money.dollar(10);
         Money franc = Money.franc(25);
         assertEquals(franc, fiveFranc.plus(tenDollar));
+    }
+
+    @Test
+    public void test_addition() {
+        Money five = Money.dollar(5);
+        Expression result = five.add(five);
+        assertEquals(five, ((Sum)result).getAddend());
+        assertEquals(five, ((Sum)result).getAddend());
     }
 
 }

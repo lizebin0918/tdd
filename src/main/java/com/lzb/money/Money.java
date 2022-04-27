@@ -15,7 +15,7 @@ import java.util.Objects;
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
-public class Money {
+public class Money implements Expression {
 
     public static final String USD = "USD";
     public static final String CHF = "CHF";
@@ -35,25 +35,6 @@ public class Money {
     }
 
     public Money plus(Money money) {
-        return plus1(money);
-        /*if (USD.equals(currency)) {
-            if (USD.equals(money.getCurrency())) {
-                return Money.dollar(amount + money.getAmount());
-            }
-            return Money.dollar(amount + (money.getAmount() / 2));
-        }
-
-        if (CHF.equals(currency)) {
-            if (USD.equals(money.getCurrency())) {
-                return Money.franc(amount + money.getAmount() * 2);
-            }
-            return Money.franc(amount + money.getAmount());
-        }
-
-        return money;*/
-    }
-
-    public Money plus1(Money money) {
 
         // 同币种
         if (Objects.equals(currency, money.getCurrency())) {
@@ -75,5 +56,9 @@ public class Money {
         }
 
         return money;
+    }
+
+    public Expression add(Money addMoney) {
+        return new Sum(this, addMoney);
     }
 }
