@@ -1,5 +1,6 @@
 package com.lzb.args;
 
+import com.lzb.args.exception.IllegalOptionException;
 import com.lzb.args.option.*;
 import org.junit.jupiter.api.Test;
 
@@ -81,6 +82,16 @@ public class ArgsTest {
         ListOption options = Args.parse(ListOption.class, "-d", "1", "2", "3", "-g", "this", "is", "a", "list");
         assertArrayEquals(new String[]{"this", "is", "a", "list"}, options.group());
         assertArrayEquals(new Integer[]{1, 2, 3}, options.decimals());
+    }
+
+    @Test
+    public void should_present_option() {
+        IllegalOptionException e = assertThrows(IllegalOptionException.class, () -> Args.parse(OptionWithoutAnnotation.class, "-a", "-p", "8080"));
+        assertEquals("参数非法", e.getMessage());
+    }
+
+    record OptionWithoutAnnotation(@Option("l") boolean logging, int port, @Option("d") String dir) {
+
     }
 
 }

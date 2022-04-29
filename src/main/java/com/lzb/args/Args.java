@@ -1,5 +1,7 @@
 package com.lzb.args;
 
+import com.lzb.args.exception.IllegalOptionException;
+import com.lzb.args.exception.TooManyArgumentException;
 import com.lzb.args.option.Option;
 import com.lzb.args.parser.*;
 
@@ -31,6 +33,8 @@ public class Args {
         try {
             Object[] values = Stream.of(constructor.getParameters()).map(p -> parseObject(arguments, p)).toArray();
             return (T) constructor.newInstance(values);
+        } catch (IllegalOptionException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -53,6 +57,7 @@ public class Args {
      * @return
      */
     private static Object parseObject(List<String> arguments, Parameter parameter) {
+        if (!parameter.isAnnotationPresent(Option.class)) throw new IllegalOptionException("参数非法");
         Option option = parameter.getAnnotation(Option.class);
         return PARSERS.get(parameter.getType()).parse(arguments, option);
     }
