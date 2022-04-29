@@ -12,9 +12,6 @@ import java.util.List;
  */
 public interface Parser<T> {
 
-    String STRING_ARRAY_SIGN = "-g";
-    String NUMBER_ARRAY_SIGN = "-d";
-
     T parse(List<String> arguments, Option option);
 
 }
