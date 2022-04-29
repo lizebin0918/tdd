@@ -21,7 +21,6 @@ public record ArrayParser(String end,
     @Override
     public Object[] parse(List<String> arguments, Option option) {
         int index = arguments.indexOf("-" + option.value());
-        Predicate<String> notContains = Predicate.not(item -> Objects.equals(end, item));
-        return arguments.stream().skip(index + 1L).takeWhile(notContains).map(mapper).toArray(arrayFunction);
+        return arguments.stream().skip(index + 1L).takeWhile(Predicate.not(end::equals)).map(mapper).toArray(arrayFunction);
     }
 }
