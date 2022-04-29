@@ -1,13 +1,10 @@
 package com.lzb.args;
 
-import com.alibaba.fastjson.JSON;
 import com.lzb.args.option.*;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
+import static org.junit.jupiter.api.Assertions.*;
 
-import static org.junit.Assert.*;
 
 /**
  * 先设计API
@@ -68,22 +65,22 @@ public class ArgsTest {
     public void should_example_1() {
         MultipleOption multipleOption = Args.parse(MultipleOption.class, "-l", "-p", "8080", "-d", "/usr/logs");
         assertTrue(multipleOption.logging());
-        Assert.assertEquals(8080, multipleOption.port());
-        Assert.assertEquals("/usr/logs", multipleOption.directory());
+        assertEquals(8080, multipleOption.port());
+        assertEquals("/usr/logs", multipleOption.directory());
     }
 
     @Test
     public void should_example_2() {
         ListOption options = Args.parse(ListOption.class, "-g", "this", "is", "a", "list", "-d", "1", "2", "3");
-        Assert.assertArrayEquals(new String[]{"this", "is", "a", "list"}, options.group());
-        Assert.assertArrayEquals(new Integer[]{1, 2, 3}, options.decimals());
+        assertArrayEquals(new String[]{"this", "is", "a", "list"}, options.group());
+        assertArrayEquals(new Integer[]{1, 2, 3}, options.decimals());
     }
 
     @Test
     public void should_example_3() {
         ListOption options = Args.parse(ListOption.class, "-d", "1", "2", "3", "-g", "this", "is", "a", "list");
-        Assert.assertArrayEquals(new String[]{"this", "is", "a", "list"}, options.group());
-        Assert.assertArrayEquals(new Integer[]{1, 2, 3}, options.decimals());
+        assertArrayEquals(new String[]{"this", "is", "a", "list"}, options.group());
+        assertArrayEquals(new Integer[]{1, 2, 3}, options.decimals());
     }
 
 }

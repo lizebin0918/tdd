@@ -1,15 +1,14 @@
-package com.lzb.args;
+package com.lzb.args.parser;
 
 import com.lzb.args.exception.TooManyArgumentException;
 import com.lzb.args.option.Option;
-import com.lzb.args.parser.BooleanParser;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * <br/>
@@ -49,7 +48,7 @@ public class BooleanOptionParserTest {
         assertEquals("l", e.getOption());
     }*/
 
-    private Option option(String value) {
+    public static Option option(String value) {
 
         return new Option() {
 

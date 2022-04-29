@@ -3,10 +3,12 @@ package com.lzb.args;
 import com.lzb.args.option.Option;
 import com.lzb.args.parser.*;
 
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -57,8 +59,8 @@ public class Args {
 
     private static Map<Class<?>, Parser<?>> PARSERS = Map.of(
             boolean.class, new BooleanParser(),
-            int.class, new SingleValueParser<>(Integer::parseInt),
-            String.class, new SingleValueParser<>(String::valueOf),
+            int.class, new SingleValueParser<>(Integer::parseInt, 0),
+            String.class, new SingleValueParser<>(String::valueOf, "0"),
             String[].class, new ArrayParser(Parser.NUMBER_ARRAY_SIGN, String[]::new, String::valueOf),
             Integer[].class, new ArrayParser(Parser.STRING_ARRAY_SIGN, Integer[]::new, Integer::valueOf)
     );
