@@ -5,6 +5,8 @@ import com.lzb.args.option.*;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static org.junit.Assert.*;
 
 /**
