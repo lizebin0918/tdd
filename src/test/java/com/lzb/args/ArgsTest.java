@@ -2,6 +2,7 @@ package com.lzb.args;
 
 import com.lzb.args.exception.IllegalOptionException;
 import com.lzb.args.option.*;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -91,6 +92,16 @@ public class ArgsTest {
     }
 
     record OptionWithoutAnnotation(@Option("l") boolean logging, int port, @Option("d") String dir) {
+
+    }
+
+    @Nested
+    class NestedTest {
+
+        @Test
+        public void test() {
+            System.out.println("this is a nested test");
+        }
 
     }
 
