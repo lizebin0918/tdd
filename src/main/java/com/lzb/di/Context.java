@@ -16,8 +16,7 @@ public class Context {
     private Map<Class<?>, Provider<?>> providers = new HashMap<>();
 
     public <T> void bind(Class<T> type, T instance) {
-        // 还能这样转
-        providers.put(type, (Provider<T>) () -> instance);
+        providers.put(type, () -> instance);
     }
 
     public <T> T get(Class<T> type) {
