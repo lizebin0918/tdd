@@ -32,8 +32,7 @@ public class Context {
         }
     }
 
-    public <ComponentType, ComponentTypeImplementation extends ComponentType> void bind(Class<ComponentType> componentType,
-                                                                                        Class<ComponentTypeImplementation> implementation) {
-        providers.put(componentType, (Provider<ComponentType>) () -> getComponentType(implementation));
+    public <T, I extends T> void bind(Class<T> componentType, Class<I> implementation) {
+        providers.put(componentType, (Provider<T>) () -> getComponentType(implementation));
     }
 }
