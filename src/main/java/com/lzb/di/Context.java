@@ -1,9 +1,14 @@
 package com.lzb.di;
 
+import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
+
+import static java.util.Arrays.stream;
 
 /**
  * <br/>
@@ -23,15 +28,27 @@ public class Context {
         return (T) providers.get(type).get();
     }
 
-    private <T> T getComponentType(Class<?> implementation) {
-        try {
-            return (T) implementation.getConstructor().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public <T, I extends T> void bind(Class<T> componentType, Class<I> implementation) {
+        providers.put(componentType, (Provider<T>) () -> {
+            try {
+                Constructor<?> injectConstructor = getInjectConstructor(implementation);
+                Object[] dependencies = stream(injectConstructor.getParameters()).map(p -> get(p.getType())).toArray(Object[]::new);
+                return (T) injectConstructor.newInstance(dependencies);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
-    public <T, I extends T> void bind(Class<T> componentType, Class<I> implementation) {
-        providers.put(componentType, (Provider<T>) () -> getComponentType(implementation));
+    private <T> Constructor<T> getInjectConstructor(Class<T> implementation) {
+        Stream<Constructor<?>> constructorStream = stream(implementation.getConstructors())
+                .filter(c -> c.isAnnotationPresent(Inject.class));
+        return (Constructor<T>) constructorStream.findFirst().orElseGet(() -> {
+            try {
+                return implementation.getConstructor();
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }
