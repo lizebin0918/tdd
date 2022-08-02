@@ -29,11 +29,11 @@ public class Context {
     }
 
     public <T, I extends T> void bind(Class<T> componentType, Class<I> implementation) {
-        providers.put(componentType, (Provider<T>) () -> {
+        providers.put(componentType, () -> {
             try {
                 Constructor<?> injectConstructor = getInjectConstructor(implementation);
                 Object[] dependencies = stream(injectConstructor.getParameters()).map(p -> get(p.getType())).toArray(Object[]::new);
-                return (T) injectConstructor.newInstance(dependencies);
+                return injectConstructor.newInstance(dependencies);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
