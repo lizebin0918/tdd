@@ -4,9 +4,10 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import static java.util.Arrays.stream;
 
@@ -29,35 +30,28 @@ public class Context {
     }
 
     public <T, I extends T> void bind(Class<T> componentType, Class<I> implementation) {
-
-        Constructor<?>[] injectConstructors = stream(implementation.getConstructors()).filter(c -> c.isAnnotationPresent(Inject.class)).toArray(Constructor<?>[]::new);
-        if (injectConstructors.length > 1) {
-            throw new IllegalComponentException();
-        }
-
-        if (injectConstructors.length == 0 && stream(implementation.getConstructors()).noneMatch(c -> c.getParameters().length == 0)) {
-            throw new IllegalComponentException();
-        }
-
+        Constructor<?> injectConstructor = getInjectConstructor(implementation);
         providers.put(componentType, () -> {
             try {
-                Constructor<?> injectConstructor = getInjectConstructor(implementation);
                 Object[] dependencies = stream(injectConstructor.getParameters()).map(p -> get(p.getType())).toArray(Object[]::new);
                 return injectConstructor.newInstance(dependencies);
-            } catch (Exception e) {
+            } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         });
     }
 
     private <T> Constructor<T> getInjectConstructor(Class<T> implementation) {
-        Stream<Constructor<?>> constructorStream = stream(implementation.getConstructors())
-                .filter(c -> c.isAnnotationPresent(Inject.class));
-        return (Constructor<T>) constructorStream.findFirst().orElseGet(() -> {
+        List<Constructor<?>> injectConstructors = stream(implementation.getConstructors())
+                .filter(c -> c.isAnnotationPresent(Inject.class)).toList();
+
+        if (injectConstructors.size() > 1) throw new IllegalComponentException();
+
+        return (Constructor<T>) injectConstructors.stream().findFirst().orElseGet(() -> {
             try {
                 return implementation.getConstructor();
             } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
+                throw new IllegalComponentException();
             }
         });
     }
