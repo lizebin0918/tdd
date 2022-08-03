@@ -76,6 +76,17 @@ public class ContainerTest {
 
                 assertEquals(hello, ((DependencyWithInjectConstructor) dependency).getDependency());
             }
+
+            //TODO: multi inject constructors
+            @Test
+            void should_throw_exception_if_multi_inject_constructors_inject() {
+                assertThrows(IllegalComponentException.class, () -> context.bind(Component.class, ComponentWithMultiInjectConstructors.class));
+            }
+
+            @Test
+            void should_throw_exception_if_no_inject_nor_default_constructors_provided() {
+                assertThrows(IllegalComponentException.class, () -> context.bind(Component.class, ComponentWithNoInjectConstructorsNorDefaultConstructor.class));
+            }
         }
 
         @Nested
@@ -99,6 +110,22 @@ public class ContainerTest {
     public class LifecycleManagement {
 
     }
+
+}
+
+class ComponentWithMultiInjectConstructors implements Component {
+
+    @Inject
+    public ComponentWithMultiInjectConstructors(String name, Double value) {}
+
+    @Inject
+    public ComponentWithMultiInjectConstructors(String name) {}
+
+}
+
+class ComponentWithNoInjectConstructorsNorDefaultConstructor implements Component {
+
+    public ComponentWithNoInjectConstructorsNorDefaultConstructor(String name) {}
 
 }
 
