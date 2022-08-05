@@ -5,9 +5,7 @@ import jakarta.inject.Provider;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Arrays.stream;
 
@@ -25,15 +23,11 @@ public class Context {
         providers.put(type, () -> instance);
     }
 
-    public <T> T get(Class<T> type) {
-        return (T) providers.get(type).get();
-    }
-
     public <T, I extends T> void bind(Class<T> componentType, Class<I> implementation) {
         Constructor<?> injectConstructor = getInjectConstructor(implementation);
         providers.put(componentType, () -> {
             try {
-                Object[] dependencies = stream(injectConstructor.getParameters()).map(p -> get(p.getType())).toArray(Object[]::new);
+                Object[] dependencies = stream(injectConstructor.getParameters()).map(p -> get(p.getType()).orElseThrow(DependencyNotFoundException::new)).toArray(Object[]::new);
                 return injectConstructor.newInstance(dependencies);
             } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);
@@ -54,5 +48,9 @@ public class Context {
                 throw new IllegalComponentException();
             }
         });
+    }
+
+    public <T> Optional<T> get(Class<T> componentClass) {
+        return Optional.ofNullable(providers.get(componentClass)).map(provider -> (T) provider.get());
     }
 }
