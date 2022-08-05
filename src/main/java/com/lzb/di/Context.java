@@ -27,7 +27,9 @@ public class Context {
         Constructor<?> injectConstructor = getInjectConstructor(implementation);
         providers.put(componentType, () -> {
             try {
-                Object[] dependencies = stream(injectConstructor.getParameters()).map(p -> get(p.getType()).orElseThrow(DependencyNotFoundException::new)).toArray(Object[]::new);
+                Object[] dependencies = stream(injectConstructor.getParameters())
+                        .map(p -> get(p.getType()).orElseThrow(DependencyNotFoundException::new))
+                        .toArray(Object[]::new);
                 return injectConstructor.newInstance(dependencies);
             } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);

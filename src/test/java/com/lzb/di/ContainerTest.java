@@ -2,6 +2,7 @@ package com.lzb.di;
 
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -112,6 +113,15 @@ public class ContainerTest {
                 context.bind(Component.class, ComponentWithInjectConstructor.class);
                 assertThrows(DependencyNotFoundException.class, () -> context.get(ComponentWithInjectConstructor.class).orElseThrow(DependencyNotFoundException::new));
             }
+
+            @Test
+            @DisplayName("循环依赖抛异常")
+            void should_throw_exception_if_cyclic_dependency() {
+                context.bind(Component.class, ComponentWithInjectConstructor.class);
+                context.bind(Dependency.class, DependencyDependedOnComponent.class);
+
+                assertThrows(CyclicDependenciesFoundException.class, () -> context.get(Component.class));
+            }
         }
 
         @Nested
@@ -191,5 +201,19 @@ class DependencyWithInjectConstructor implements Dependency {
 
     public String getDependency() {
         return dependency;
+    }
+}
+
+class DependencyDependedOnComponent implements Dependency {
+
+    private final Component component;
+
+    @Inject
+    public DependencyDependedOnComponent(Component component) {
+        this.component = component;
+    }
+
+    public Component getComponent() {
+        return component;
     }
 }
