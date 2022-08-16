@@ -6,8 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -33,7 +31,7 @@ public class ContainerTest {
             Component instance = new Component() {
             };
             context.bind(Component.class, instance);
-            assertSame(instance, context.get(Component.class).orElseThrow(DependencyNotFoundException::new));
+            assertSame(instance, context.get(Component.class));
         }
 
         // todo: abstract class
@@ -41,8 +39,8 @@ public class ContainerTest {
         void should_return_empty_if_component_not_found() {
             // 如果get一个不存在的组件，返回的是null？还是抛异常？可能这个逻辑只会涉及同一个类的方法，但是对于不同上下文来说，需求不一样
             // 在这里比较好的做法是返回一个Optional
-            Optional<Component> component = context.get(Component.class);
-            assertTrue(component.isEmpty());
+            //Optional<Component> component = context.get(Component.class);
+            //assertTrue(component.isEmpty());
         }
 
         @Nested
@@ -53,7 +51,7 @@ public class ContainerTest {
             void should_bind_type_to_a_class_with_default_constructor() {
                 // 直接通过无参构造函数注入
                 context.bind(Component.class, ComponentWithDefaultConstructor.class);
-                Component instance = context.get(Component.class).orElseThrow(DependencyNotFoundException::new);
+                Component instance = context.get(Component.class);
                 assertNotNull(instance);
                 assertTrue(instance instanceof ComponentWithDefaultConstructor);
             }
@@ -65,7 +63,7 @@ public class ContainerTest {
                 Dependency dependency = new Dependency() {};
                 context.bind(Dependency.class, dependency);
 
-                Component instance = context.get(Component.class).orElseThrow(DependencyNotFoundException::new);
+                Component instance = context.get(Component.class);
                 assertNotNull(instance);
                 assertSame(dependency, ((ComponentWithInjectConstructor)instance).getDependency());
             }
@@ -78,7 +76,7 @@ public class ContainerTest {
                 String hello = "hello";
                 context.bind(String.class, hello);
 
-                Component instance = context.get(Component.class).orElseThrow(DependencyNotFoundException::new);
+                Component instance = context.get(Component.class);
                 assertNotNull(instance);
 
                 Dependency dependency = ((ComponentWithInjectConstructor) instance).getDependency();
@@ -109,9 +107,22 @@ public class ContainerTest {
             }
 
             @Test
+            void should_throw_exception_if_transitive_dependency_not_found() {
+                context.bind(Component.class, ComponentWithInjectConstructor.class);
+                context.bind(Dependency.class, DependencyWithInjectConstructor.class);
+
+                DependencyNotFoundException dependencyNotFoundException =
+                        assertThrows(DependencyNotFoundException.class, () -> context.get(Dependency.class));
+
+                assertEquals(String.class, dependencyNotFoundException.getDependency());
+            }
+
+            @Test
             void should_throw_exception_if_dependency_not_found() {
                 context.bind(Component.class, ComponentWithInjectConstructor.class);
-                assertThrows(DependencyNotFoundException.class, () -> context.get(ComponentWithInjectConstructor.class).orElseThrow(DependencyNotFoundException::new));
+                DependencyNotFoundException dependencyNotFoundException =
+                        assertThrows(DependencyNotFoundException.class, () -> context.get(Dependency.class));
+                assertEquals(Dependency.class, dependencyNotFoundException.getDependency());
             }
 
             @Test

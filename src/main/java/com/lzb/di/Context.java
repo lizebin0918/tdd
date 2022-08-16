@@ -25,19 +25,17 @@ public class Context {
 
     public <T, I extends T> void bind(Class<T> componentType, Class<I> implementation) {
         Constructor<I> injectConstructor = getInjectConstructor(implementation);
-        providers.put(componentType, getTypeProvider(injectConstructor));
-    }
-
-    private <T> Provider<T> getTypeProvider(Constructor<T> injectConstructor) {
-        return new ConstructorInjectionProvider<>(injectConstructor);
+        providers.put(componentType, new ConstructorInjectionProvider<>(componentType, injectConstructor));
     }
 
     class ConstructorInjectionProvider<T> implements Provider<T> {
 
+        private final Class<?> componentType;
         private final Constructor<T> injectConstructor;
         private boolean constructing = false;
 
-        public ConstructorInjectionProvider(Constructor<T> injectConstructor) {
+        public ConstructorInjectionProvider(Class<?> componentType, Constructor<T> injectConstructor) {
+            this.componentType = componentType;
             this.injectConstructor = injectConstructor;
         }
 
@@ -47,7 +45,7 @@ public class Context {
             try {
                 constructing = true;
                 Object[] dependencies = stream(injectConstructor.getParameters())
-                        .map(p -> Context.this.get(p.getType()).orElseThrow(DependencyNotFoundException::new))
+                        .map(p -> Optional.ofNullable(Context.this.get(p.getType())).orElseThrow(() -> new DependencyNotFoundException(componentType, p.getType())))
                         .toArray(Object[]::new);
                 return injectConstructor.newInstance(dependencies);
             } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
@@ -73,7 +71,7 @@ public class Context {
         });
     }
 
-    public <T> Optional<T> get(Class<T> componentClass) {
-        return Optional.ofNullable(providers.get(componentClass)).map(provider -> (T) provider.get());
+    public <T> T get(Class<T> componentClass) {
+        return Optional.ofNullable(providers.get(componentClass)).map(provider -> (T) provider.get()).orElseThrow(() -> new DependencyNotFoundException(componentClass));
     }
 }
