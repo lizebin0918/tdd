@@ -6,6 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -131,7 +133,11 @@ public class ContainerTest {
                 context.bind(Component.class, ComponentWithInjectConstructor.class);
                 context.bind(Dependency.class, DependencyDependedOnComponent.class);
 
-                assertThrows(CyclicDependenciesFoundException.class, () -> context.get(Component.class));
+                CyclicDependenciesFoundException exception = assertThrows(CyclicDependenciesFoundException.class, () -> context.get(Component.class));
+                Set<Class<?>> components = Set.of(exception.getComponents());
+                assertEquals(2, components.size());
+                assertTrue(components.contains(Component.class));
+                assertTrue(components.contains(Dependency.class));
             }
 
             @Test
