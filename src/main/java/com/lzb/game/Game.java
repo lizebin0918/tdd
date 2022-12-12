@@ -44,14 +44,34 @@ public class Game {
 	/**
 	 * 输入字符
 	 *
-	 * @param input
+	 * @param c
 	 */
-	void type(char input) {
+	void type(char c) {
+		decreaseTries(c);
+		appendToUsed(c);
+	}
+
+	private void decreaseTries(char c) {
+		if (isUsed(c) || isCharContained(c)) {
+			--tries;
+		}
+	}
+
+	/**
+	 * todo:lizebin 这个方法名有误
+	 *
+	 * @param c
+	 * @return
+	 */
+	private boolean isCharContained(char c) {
+		return word.indexOf(c) == -1;
+	}
+
+	private void appendToUsed(char input) {
 		// 是否为辅音
 		if (!isUsed(input)) {
 			used += input;
 		}
-		--tries;
 	}
 
 	/**
