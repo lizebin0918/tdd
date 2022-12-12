@@ -3,6 +3,9 @@ package com.lzb.game;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static com.lzb.game.GameForTest.ALL_VOWELS;
+import static com.lzb.game.GameForTest.VOWEL;
+import static com.lzb.game.GameForTest.CONSONANT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -12,9 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class TestGameUsed {
 
-	private final String ALL_VOWELS = "aeiou";
-	private final char consonant = 'b';
-	private final char vowel = 'a';
 	Game game = new Game("lizebin");
 
 	@Test
@@ -26,23 +26,23 @@ class TestGameUsed {
 	@Test
 	@DisplayName("输入元音字母")
 	void used_when_type_a_vowel() {
-		game.type(vowel);
+		game.type(VOWEL);
 		assertEquals(ALL_VOWELS, game.used());
 	}
 
 	@Test
 	@DisplayName("输入辅音")
 	void used_when_type_a_consonant() {
-		game.type(consonant);
-		assertEquals(ALL_VOWELS + consonant, game.used());
+		game.type(CONSONANT);
+		assertEquals(ALL_VOWELS + CONSONANT, game.used());
 	}
 
 	@Test
 	@DisplayName("输入相同辅音")
 	void used_when_type_a_repeat_consonant() {
-		game.type(consonant);
-		game.type(consonant);
-		assertEquals(ALL_VOWELS + consonant, game.used());
+		game.type(CONSONANT);
+		game.type(CONSONANT);
+		assertEquals(ALL_VOWELS + CONSONANT, game.used());
 	}
 
 }

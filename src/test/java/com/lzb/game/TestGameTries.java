@@ -2,6 +2,10 @@ package com.lzb.game;
 
 import org.junit.jupiter.api.Test;
 
+import static com.lzb.game.GameForTest.CONTAINED_CONSONANT;
+import static com.lzb.game.GameForTest.MAX_TRIES;
+import static com.lzb.game.GameForTest.NOT_CONTAINED_CONSONANT;
+import static com.lzb.game.GameForTest.VOWEL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -10,16 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author mac
  */
 class TestGameTries {
-
-	private static final int MAX_TRIES = 12;
-
-	/**
-	 * 包含的辅音
-	 */
-	private final char CONTAINED_CONSONANT = 'w';
-
 	Game game = new Game("word");
-	private char NOT_CONTAINED_CONSONANT = 'z';
 
 	@Test
 	void tries_when_game_start() {
@@ -31,7 +26,7 @@ class TestGameTries {
 	 */
 	@Test
 	void tries_when_type_a_vowel() {
-		game.type('a');
+		game.type(VOWEL);
 		assertEquals(MAX_TRIES - 1, game.tries());
 	}
 
