@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author mac
  */
 class TestGameTries {
-	Game game = new Game("word");
+	GameForTest game = new GameForTest("word");
 
 	@Test
 	void tries_when_game_start() {
@@ -36,24 +36,20 @@ class TestGameTries {
 	 */
 	@Test
 	void tries_when_type_a_contained_consonant() {
-		game.type(CONTAINED_CONSONANT, () -> {
-		});
+		game.typeWithoutCheckGameOver(CONTAINED_CONSONANT);
 		assertEquals(MAX_TRIES, game.tries());
 	}
 
 	@Test
 	void tries_when_type_the_same_contained_consonant_again() {
-		game.type(CONTAINED_CONSONANT, () -> {
-		});
-		game.type(CONTAINED_CONSONANT, () -> {
-		});
+		game.typeWithoutCheckGameOver(CONTAINED_CONSONANT);
+		game.typeWithoutCheckGameOver(CONTAINED_CONSONANT);
 		assertEquals(MAX_TRIES - 1, game.tries());
 	}
 
 	@Test
 	void tries_when_type_a_not_contained_consonant() {
-		game.type(NOT_CONTAINED_CONSONANT, () -> {
-		});
+		game.typeWithoutCheckGameOver(NOT_CONTAINED_CONSONANT);
 		assertEquals(MAX_TRIES - 1, game.tries());
 	}
 

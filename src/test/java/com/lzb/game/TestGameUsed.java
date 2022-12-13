@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class TestGameUsed {
 
-	Game game = new Game("lizebin");
+	GameForTest game = new GameForTest("lizebin");
 
 	@Test
 	@DisplayName("默认元音")
@@ -26,23 +26,22 @@ class TestGameUsed {
 	@Test
 	@DisplayName("输入元音字母")
 	void used_when_type_a_vowel() {
-		game.type(VOWEL, () -> {
-		});
+		game.typeWithoutCheckGameOver(VOWEL);
 		assertEquals(ALL_VOWELS, game.used());
 	}
 
 	@Test
 	@DisplayName("输入辅音")
 	void used_when_type_a_consonant() {
-		game.type(CONSONANT, () -> {});
+		game.typeWithoutCheckGameOver(CONSONANT);
 		assertEquals(ALL_VOWELS + CONSONANT, game.used());
 	}
 
 	@Test
 	@DisplayName("输入相同辅音")
 	void used_when_type_a_repeat_consonant() {
-		game.type(CONSONANT, () -> { });
-		game.type(CONSONANT, () -> { });
+		game.typeWithoutCheckGameOver(CONSONANT);
+		game.typeWithoutCheckGameOver(CONSONANT);
 		assertEquals(ALL_VOWELS + CONSONANT, game.used());
 	}
 

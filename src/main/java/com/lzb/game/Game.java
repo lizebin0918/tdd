@@ -53,7 +53,7 @@ public class Game {
 		checkGameOver(afterGameOver);
 	}
 
-	private void checkGameOver(Runnable afterGameOver) {
+	protected void checkGameOver(Runnable afterGameOver) {
 		if (isAllTriesUsed()) {
 			afterGameOver.run();
 		}

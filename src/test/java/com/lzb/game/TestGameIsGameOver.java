@@ -4,6 +4,7 @@ import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
 
+import static com.lzb.game.GameForTest.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -21,20 +22,19 @@ class TestGameIsGameOver {
 
 	private static final char ANY_CHAR = 'a';
 
+	GameForTest game = new GameForTest("word");
+	Runnable mockAfterGameOver = mock(Runnable.class);
+
 	@Test
 	void game_not_over_when_game_start() {
-		Game game = new Game("word");
-		Runnable mockAfterGameOver = mock(Runnable.class);
 		game.type(ANY_CHAR, mockAfterGameOver);
 		verify(mockAfterGameOver, never()).run();
 	}
 
 	@Test
 	void game_over_when_last_try_failed() {
-		Game game = new Game("word");
-		Runnable mockAfterGameOver = mock(Runnable.class);
-		IntStream.range(-0, 11).forEach(i -> {
-			game.type(ANY_CHAR, () -> {});
+		IntStream.range(0, MAX_TRIES - 1).forEach(i -> {
+			game.typeWithoutCheckGameOver(ANY_CHAR);
 		});
 		game.type(ANY_CHAR, mockAfterGameOver);
 		verify(mockAfterGameOver).run();

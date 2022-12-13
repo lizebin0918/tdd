@@ -5,7 +5,7 @@ package com.lzb.game;
  * Created on : 2022-12-12 23:01
  * @author mac
  */
-public class GameForTest {
+public class GameForTest extends Game {
 
 	static final char VOWEL = 'a';
 
@@ -28,4 +28,11 @@ public class GameForTest {
 	 */
 	static final char CONSONANT = 'b';
 
+	public GameForTest(String word) {
+		super(word);
+	}
+
+	public void typeWithoutCheckGameOver(char c) {
+		super.type(c, () -> {});
+	}
 }
