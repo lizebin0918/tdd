@@ -45,10 +45,22 @@ public class Game {
 	 * 输入字符
 	 *
 	 * @param c
+	 * @param afterGameOver
 	 */
-	void type(char c) {
+	void type(char c, Runnable afterGameOver) {
 		decreaseTries(c);
 		appendToUsed(c);
+		checkGameOver(afterGameOver);
+	}
+
+	private void checkGameOver(Runnable afterGameOver) {
+		if (isAllTriesUsed()) {
+			afterGameOver.run();
+		}
+	}
+
+	private boolean isAllTriesUsed() {
+		return tries == 0;
 	}
 
 	private void decreaseTries(char c) {

@@ -26,7 +26,8 @@ class TestGameTries {
 	 */
 	@Test
 	void tries_when_type_a_vowel() {
-		game.type(VOWEL);
+		game.type(VOWEL, () -> {
+		});
 		assertEquals(MAX_TRIES - 1, game.tries());
 	}
 
@@ -35,20 +36,24 @@ class TestGameTries {
 	 */
 	@Test
 	void tries_when_type_a_contained_consonant() {
-		game.type(CONTAINED_CONSONANT);
+		game.type(CONTAINED_CONSONANT, () -> {
+		});
 		assertEquals(MAX_TRIES, game.tries());
 	}
 
 	@Test
 	void tries_when_type_the_same_contained_consonant_again() {
-		game.type(CONTAINED_CONSONANT);
-		game.type(CONTAINED_CONSONANT);
+		game.type(CONTAINED_CONSONANT, () -> {
+		});
+		game.type(CONTAINED_CONSONANT, () -> {
+		});
 		assertEquals(MAX_TRIES - 1, game.tries());
 	}
 
 	@Test
 	void tries_when_type_a_not_contained_consonant() {
-		game.type(NOT_CONTAINED_CONSONANT);
+		game.type(NOT_CONTAINED_CONSONANT, () -> {
+		});
 		assertEquals(MAX_TRIES - 1, game.tries());
 	}
 
