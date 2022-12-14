@@ -23,21 +23,23 @@ class TestGameIsGameOver {
 	private static final char ANY_CHAR = 'a';
 
 	GameForTest game = new GameForTest("word");
-	Runnable mockAfterGameOver = mock(Runnable.class);
+	Runnable afterGameOver = mock(Runnable.class);
 
 	@Test
 	void game_not_over_when_game_start() {
-		game.type(ANY_CHAR, mockAfterGameOver, mockAfterGameOver);
-		verify(mockAfterGameOver, never()).run();
+		Judge judge = game.type(ANY_CHAR);
+		judge.checkGameOver(afterGameOver);
+		verify(afterGameOver, never()).run();
 	}
 
 	@Test
 	void game_over_when_last_try_failed() {
 		IntStream.range(0, MAX_TRIES - 1).forEach(i -> {
-			game.typeWithoutCheckGameOverAndGameWin(ANY_CHAR);
+			game.type(ANY_CHAR);
 		});
-		game.type(ANY_CHAR, mockAfterGameOver, mockAfterGameOver);
-		verify(mockAfterGameOver).run();
+		Judge judge = game.type(ANY_CHAR);
+		judge.checkGameOver(afterGameOver);
+		verify(afterGameOver).run();
 	}
 
 }

@@ -20,10 +20,13 @@ public class Game {
 	private final String word;
 
 	private String used = ALL_VOWELS;
-	private String PLACE_HOLDER = "_";
+	private final String PLACE_HOLDER = "_";
+
+	private final Judge judge;
 
 	public Game(String word) {
 		this.word = word;
+		this.judge = new Judge(this);
 	}
 
 	/**
@@ -47,35 +50,20 @@ public class Game {
 	/**
 	 * 输入字符
 	 *
+	 * 这里有个问题：回调函数会原来越多，不好扩展
+	 *
 	 * @param c
-	 * @param afterGameOver
-	 * @param afterGameWin
 	 */
-	void type(char c, Runnable afterGameOver, Runnable afterGameWin) {
+	Judge type(char c) {
 		decreaseTries(c);
 		appendToUsed(c);
-		checkGameOver(afterGameOver);
-		checkGameWin(afterGameWin);
-	}
-
-	private void checkGameWin(Runnable afterGameWin) {
-		if (word.equals(discovered())) {
-			afterGameWin.run();
-		}
-	}
-
-	protected void checkGameOver(Runnable afterGameOver) {
-		if (isAllTriesUsed()) {
-			afterGameOver.run();
-		}
-	}
-
-	private boolean isAllTriesUsed() {
-		return tries == 0;
+		// checkGameOver(afterGameOver);
+		// checkGameWin(afterGameWin);
+		return judge;
 	}
 
 	private void decreaseTries(char c) {
-		if (isUsed(c) || isCharContained(c)) {
+		if (isUsed(c) || !isCharContained(c)) {
 			--tries;
 		}
 	}
@@ -87,7 +75,7 @@ public class Game {
 	 * @return
 	 */
 	private boolean isCharContained(char c) {
-		return word.indexOf(c) == -1;
+		return word.indexOf(c) != -1;
 	}
 
 	private void appendToUsed(char input) {
@@ -142,6 +130,10 @@ public class Game {
 			return String.valueOf(i);
 		}
 		return PLACE_HOLDER;
+	}
+
+	public String getWord() {
+		return word;
 	}
 
 }

@@ -40,7 +40,7 @@ class TestGameDiscovered {
 	@Test
 	void discovered_when_type_a_contained_consonant() {
 		GameForTest game = new GameForTest("word");
-		game.typeWithoutCheckGameOverAndGameWin('w');
+		game.type('w');
 		assertEquals("wo__", game.discovered());
 	}
 }

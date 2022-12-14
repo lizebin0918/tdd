@@ -20,13 +20,15 @@ class TestGameIsGameWin {
 
 	@Test
 	void game_win_when_game_start() {
-		game.typeWithoutCheckGameOver(ANY_CONSONANT, afterGameWin);
+		Judge judge = game.type(ANY_CONSONANT);
+		judge.checkGameWin(afterGameWin);
 		verify(afterGameWin, never()).run();
 	}
 
 	@Test
 	void game_win_when_type_last_consonant() {
-		game.typeWithoutCheckGameOver(LAST_CONSONANT, afterGameWin);
+		Judge judge = game.type(LAST_CONSONANT);
+		judge.checkGameWin(afterGameWin);
 		verify(afterGameWin).run();
 	}
 
