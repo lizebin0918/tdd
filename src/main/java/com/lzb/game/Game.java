@@ -1,5 +1,7 @@
 package com.lzb.game;
 
+import static java.util.stream.Collectors.joining;
+
 /**
  * <br/>
  * Created on : 2022-12-10 21:43
@@ -18,6 +20,7 @@ public class Game {
 	private final String word;
 
 	private String used = ALL_VOWELS;
+	private String PLACE_HOLDER = "_";
 
 	public Game(String word) {
 		this.word = word;
@@ -46,11 +49,19 @@ public class Game {
 	 *
 	 * @param c
 	 * @param afterGameOver
+	 * @param afterGameWin
 	 */
-	void type(char c, Runnable afterGameOver) {
+	void type(char c, Runnable afterGameOver, Runnable afterGameWin) {
 		decreaseTries(c);
 		appendToUsed(c);
 		checkGameOver(afterGameOver);
+		checkGameWin(afterGameWin);
+	}
+
+	private void checkGameWin(Runnable afterGameWin) {
+		if (word.equals(discovered())) {
+			afterGameWin.run();
+		}
 	}
 
 	protected void checkGameOver(Runnable afterGameOver) {
@@ -104,4 +115,33 @@ public class Game {
 	int tries() {
 		return tries;
 	}
+
+	/**
+	 * 辅音替换成占位符，元音则显示
+	 *
+	 * @return
+	 */
+	String discovered() {
+		// 我的实现版本
+		/*
+		StringBuilder sb = new StringBuilder();
+		for (char c : word.toCharArray()) {
+			if (isVowel(c)) {
+				sb.append(c);
+				continue;
+			}
+			sb.append(PLACE_HOLDER);
+		}
+		return sb.toString();
+		*/
+		return word.chars().mapToObj(i -> discoveredChar((char)i)).collect(joining());
+	}
+
+	private String discoveredChar(char i) {
+		if (isUsed(i)) {
+			return String.valueOf(i);
+		}
+		return PLACE_HOLDER;
+	}
+
 }

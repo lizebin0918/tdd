@@ -32,7 +32,11 @@ public class GameForTest extends Game {
 		super(word);
 	}
 
-	public void typeWithoutCheckGameOver(char c) {
-		super.type(c, () -> {});
+	public void typeWithoutCheckGameOverAndGameWin(char c) {
+		super.type(c, () -> {}, () -> {});
+	}
+
+	public void typeWithoutCheckGameOver(char c, Runnable afterGameWin) {
+		super.type(c,() -> {}, afterGameWin);
 	}
 }

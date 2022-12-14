@@ -27,16 +27,16 @@ class TestGameIsGameOver {
 
 	@Test
 	void game_not_over_when_game_start() {
-		game.type(ANY_CHAR, mockAfterGameOver);
+		game.type(ANY_CHAR, mockAfterGameOver, mockAfterGameOver);
 		verify(mockAfterGameOver, never()).run();
 	}
 
 	@Test
 	void game_over_when_last_try_failed() {
 		IntStream.range(0, MAX_TRIES - 1).forEach(i -> {
-			game.typeWithoutCheckGameOver(ANY_CHAR);
+			game.typeWithoutCheckGameOverAndGameWin(ANY_CHAR);
 		});
-		game.type(ANY_CHAR, mockAfterGameOver);
+		game.type(ANY_CHAR, mockAfterGameOver, mockAfterGameOver);
 		verify(mockAfterGameOver).run();
 	}
 
