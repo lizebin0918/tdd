@@ -21,41 +21,14 @@ public record UnitChange(int value, Unit unit) {
     }
 
     int toInch() {
-        if (unit == Unit.YARD) {
-            return value * 36;
-        }
-        if (unit == Unit.INCH) {
-            return value;
-        }
-        if (unit == Unit.FOOT) {
-            return value * 12;
-        }
-        return 0;
+        return unit.toInch(value);
     }
 
     int toYard() {
-        if (unit == Unit.INCH) {
-            return value / 36;
-        }
-        if (unit == Unit.YARD) {
-            return value;
-        }
-        if (unit == Unit.FOOT) {
-            return value / 3;
-        }
-        return 0;
+        return unit.toYard(value);
     }
 
     int toFoot() {
-        if (unit == Unit.INCH) {
-            return value / 12;
-        }
-        if (unit == Unit.YARD) {
-            return value * 3;
-        }
-        if (unit == Unit.FOOT) {
-            return value;
-        }
-        return 0;
+        return unit.toFoot(value);
     }
 }
