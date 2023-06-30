@@ -7,30 +7,44 @@ import lombok.Getter;
  * Created on : 2023-06-29 23:11
  * @author mac
  */
-@Getter
-public class UnitChange {
-
-    private final int value;
-
-    private final Unit unit;
-
-    public UnitChange(int value, Unit unit) {
-        this.value = value;
-        this.unit = unit;
-    }
+public record UnitChange(int value, Unit unit) {
 
     int toInch() {
-        return value * 12;
+        if (unit == Unit.YARD) {
+            return value * 36;
+        }
+        if (unit == Unit.INCH) {
+            return value;
+        }
+        if (unit == Unit.FOOT) {
+            return value * 12;
+        }
+        throw new IllegalArgumentException("无法转换");
     }
 
     int toYard() {
-        return value / 3;
+        if (unit == Unit.INCH) {
+            return value / 36;
+        }
+        if (unit == Unit.YARD) {
+            return value;
+        }
+        if (unit == Unit.FOOT) {
+            return value / 3;
+        }
+        throw new IllegalArgumentException("无法转换");
     }
 
     int toFoot() {
         if (unit == Unit.INCH) {
             return value / 12;
         }
-        return value;
+        if (unit == Unit.YARD) {
+            return value * 3;
+        }
+        if (unit == Unit.FOOT) {
+            return value;
+        }
+        throw new IllegalArgumentException("无法转换");
     }
 }
