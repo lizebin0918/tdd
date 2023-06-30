@@ -10,32 +10,27 @@ import lombok.Getter;
 @Getter
 public class UnitChange {
 
-    private final int foot;
+    private final int value;
 
     private final Unit unit;
 
-    public UnitChange(int foot) {
-        this.foot = foot;
-        this.unit = Unit.FOOT;
-    }
-
-    public UnitChange(int foot, Unit unit) {
-        this.foot = foot;
+    public UnitChange(int value, Unit unit) {
+        this.value = value;
         this.unit = unit;
     }
 
     int toInch() {
-        return foot * 12;
+        return value * 12;
     }
 
     int toYard() {
-        return foot / 3;
+        return value / 3;
     }
 
     int toFoot() {
         if (unit == Unit.INCH) {
-            return foot / 12;
+            return value / 12;
         }
-        return foot;
+        return value;
     }
 }

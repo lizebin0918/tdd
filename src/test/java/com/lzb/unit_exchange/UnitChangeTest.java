@@ -12,19 +12,19 @@ class UnitChangeTest {
 
     @Test
     void should_foot_to_inch() {
-        UnitChange unitChange = new UnitChange(1);
+        UnitChange unitChange = new UnitChange(1, Unit.FOOT);
         Assertions.assertEquals(12, unitChange.toInch());
     }
 
     @Test
     void should_foot_to_yard() {
-        UnitChange unitChange = new UnitChange(3);
+        UnitChange unitChange = new UnitChange(3, Unit.FOOT);
         Assertions.assertEquals(1, unitChange.toYard());
     }
 
     @Test
     void should_foot_to_foot() {
-        UnitChange unitChange = new UnitChange(1);
+        UnitChange unitChange = new UnitChange(1, Unit.FOOT);
         Assertions.assertEquals(1, unitChange.toFoot());
     }
 
