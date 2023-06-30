@@ -1,6 +1,6 @@
 package com.lzb.unit_exchange;
 
-import lombok.Getter;
+import java.util.Objects;
 
 /**
  * <br/>
@@ -8,6 +8,17 @@ import lombok.Getter;
  * @author mac
  */
 public record UnitChange(int value, Unit unit) {
+
+
+    /*public UnitChange(int value, Unit unit) {
+        Objects.requireNonNull(unit);
+        this.value = value;
+        this.unit = unit;
+    }*/
+
+    public UnitChange {
+        Objects.requireNonNull(unit);
+    }
 
     int toInch() {
         if (unit == Unit.YARD) {
@@ -19,7 +30,7 @@ public record UnitChange(int value, Unit unit) {
         if (unit == Unit.FOOT) {
             return value * 12;
         }
-        throw new IllegalArgumentException("无法转换");
+        return 0;
     }
 
     int toYard() {
@@ -32,7 +43,7 @@ public record UnitChange(int value, Unit unit) {
         if (unit == Unit.FOOT) {
             return value / 3;
         }
-        throw new IllegalArgumentException("无法转换");
+        return 0;
     }
 
     int toFoot() {
@@ -45,6 +56,6 @@ public record UnitChange(int value, Unit unit) {
         if (unit == Unit.FOOT) {
             return value;
         }
-        throw new IllegalArgumentException("无法转换");
+        return 0;
     }
 }
