@@ -7,7 +7,7 @@ import java.util.Objects;
  * Created on : 2023-06-29 23:11
  * @author mac
  */
-public record UnitChange(int value, Unit unit) {
+public record Length(int value, Unit unit) {
 
 
     /*public UnitChange(int value, Unit unit) {
@@ -16,7 +16,7 @@ public record UnitChange(int value, Unit unit) {
         this.unit = unit;
     }*/
 
-    public UnitChange {
+    public Length {
         Objects.requireNonNull(unit);
     }
 
