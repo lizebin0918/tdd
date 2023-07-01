@@ -20,15 +20,16 @@ public record Length(int value, Unit unit) {
         Objects.requireNonNull(unit);
     }
 
-    int toInch() {
+    Length toInch() {
         return unit.toInch(value);
     }
 
-    int toYard() {
+    Length toYard() {
         return unit.toYard(value);
     }
 
-    int toFoot() {
+    Length toFoot() {
         return unit.toFoot(value);
     }
+
 }

@@ -45,55 +45,54 @@ class LengthTest {
     @Test
     void should_foot_to_inch() {
         Length length = new Length(1, Unit.FOOT);
-        Assertions.assertEquals(12, length.toInch());
+        Assertions.assertEquals(new Length(12, Unit.INCH), length.toInch());
     }
 
     @Test
     void should_foot_to_yard() {
         Length length = new Length(3, Unit.FOOT);
-        Assertions.assertEquals(1, length.toYard());
+        Assertions.assertEquals(new Length(1, Unit.YARD), length.toYard());
     }
 
     @Test
     void should_foot_to_foot() {
         Length length = new Length(1, Unit.FOOT);
-        Assertions.assertEquals(1, length.toFoot());
+        Assertions.assertEquals(new Length(1, Unit.FOOT), length.toFoot());
     }
 
     @Test
     void should_inch_to_foot() {
-        Length length = new Length(12, Unit.INCH);
-        Assertions.assertEquals(1, length.toFoot());
+        Assertions.assertEquals(new Length(1, Unit.FOOT), new Length(12, Unit.INCH).toFoot());
     }
 
     @Test
     void should_inch_to_yard() {
         Length length = new Length(36, Unit.INCH);
-        Assertions.assertEquals(1, length.toYard());
+        Assertions.assertEquals(new Length(1, Unit.YARD), length.toYard());
     }
 
     @Test
     void should_inch_to_inch() {
-        Length length = new Length(1, Unit.INCH);
-        Assertions.assertEquals(1, length.toInch());
+        Length inch = new Length(1, Unit.INCH);
+        Assertions.assertEquals(inch, new Length(1, Unit.INCH));
     }
 
     @Test
     void should_yard_to_inch() {
         Length length = new Length(1, Unit.YARD);
-        Assertions.assertEquals(36, length.toInch());
+        Assertions.assertEquals(new Length(36, Unit.INCH), length.toInch());
     }
 
     @Test
     void should_yard_to_foot() {
         Length length = new Length(1, Unit.YARD);
-        Assertions.assertEquals(3, length.toFoot());
+        Assertions.assertEquals(new Length(3, Unit.FOOT), length.toFoot());
     }
 
     @Test
     void should_yard_to_yard() {
         Length length = new Length(1, Unit.YARD);
-        Assertions.assertEquals(1, length.toYard());
+        Assertions.assertEquals(new Length(1, Unit.YARD), length.toYard());
     }
 
 }

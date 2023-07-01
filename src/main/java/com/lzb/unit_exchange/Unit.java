@@ -12,54 +12,57 @@ public enum Unit {
      */
     FOOT {
         @Override
-        int toYard(int value) {
-            return value / 3;
+        Length toYard(int value) {
+            return new Length(value / 3, YARD);
         }
 
         @Override
-        int toInch(int value) {
-            return value * 12;
+        Length toInch(int value) {
+            return new Length(value * 12, INCH);
         }
 
         @Override
-        int toFoot(int value) {
-            return value;
+        Length toFoot(int value) {
+            return new Length(value, FOOT);
         }
-    }, INCH {
+    },
+    INCH {
         @Override
-        int toYard(int value) {
-            return value / 36;
-        }
-
-        @Override
-        int toInch(int value) {
-            return value;
+        Length toYard(int value) {
+            return new Length(value / 36, YARD);
         }
 
         @Override
-        int toFoot(int value) {
-            return value / 12;
-        }
-    }, YARD {
-        @Override
-        int toYard(int value) {
-            return value;
+        Length toInch(int value) {
+            return new Length(value, INCH);
         }
 
         @Override
-        int toInch(int value) {
-            return value * 36;
+        Length toFoot(int value) {
+            return new Length(value / 12, FOOT);
+        }
+    },
+    YARD {
+        @Override
+        Length toYard(int value) {
+            return new Length(value, YARD);
         }
 
         @Override
-        int toFoot(int value) {
-            return value * 3;
+        Length toInch(int value) {
+            return new Length(value * 36, INCH);
+        }
+
+        @Override
+        Length toFoot(int value) {
+            return new Length(value * 3, FOOT);
         }
     };
 
-    abstract int toYard(int value);
+    abstract Length toYard(int value);
 
-    abstract int toInch(int value);
-    abstract int toFoot(int value);
+    abstract Length toInch(int value);
+
+    abstract Length toFoot(int value);
 
 }
