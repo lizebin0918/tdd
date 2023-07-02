@@ -28,9 +28,18 @@ class UnitChangeTest1 {
         Assertions.assertEquals(foot, new Length1(1, Unit1.Foot));
     }
 
+    @Test
     void test_yard_to_inch() {
         Length1 yard = new Length1(1, Unit1.Yard);
+        Assertions.assertEquals(yard, new Length1(36, Unit1.Inch));
     }
+
+    @Test
+    void test_foot_to_inch() {
+        Length1 foot = new Length1(1, Unit1.Foot);
+        Assertions.assertEquals(foot, new Length1(12, Unit1.Inch));
+    }
+
 
     /*@Test
     void test_foot_to_inch() {
