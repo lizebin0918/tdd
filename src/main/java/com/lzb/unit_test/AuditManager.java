@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-import com.alibaba.fastjson.JSON;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,23 +35,18 @@ public class AuditManager {
     }
 
     Path visit(String visitor, LocalDateTime visitDateTime) {
-        int fileSize = getFileSize();
-        Path lastFilePath = Paths.get(dir + PREFIX + StringUtils.leftPad(Objects.toString(fileSize), 2, '0') + SUFFIX);
-        int size = listVisitors(lastFilePath).size();
-        if (size == maxPerFile) {
-            lastFilePath = Paths.get(dir + PREFIX + StringUtils.leftPad(Objects.toString(fileSize + 1), 2, '0') + SUFFIX);
-            fileSystem.createFile(lastFilePath);
+        Path filePath = Paths.get(dir + PREFIX + StringUtils.leftPad(Objects.toString(Math.max(1, fileSystem.getFileCount())), 2, '0') + SUFFIX);
+        int lineCount = fileSystem.readAllLines(filePath).size();
+        if (lineCount >= maxPerFile) {
+            filePath = Paths.get(dir + PREFIX + StringUtils.leftPad(Objects.toString(fileSystem.getFileCount() + 1), 2, '0') + SUFFIX);
         }
-        fileSystem.writeLine(lastFilePath, visitor + "; " + visitDateTime);
-        System.out.println(fileSystem);
-        return lastFilePath;
+        String line = visitor + "; " + visitDateTime;
+        fileSystem.writeLine(filePath, line);
+        return filePath;
     }
 
     List<String> listVisitors(Path filePath) {
         return fileSystem.readAllLines(filePath);
     }
 
-    int getFileSize() {
-        return fileSystem.readAllFiles(Paths.get(dir)).size();
-    }
 }

@@ -1,19 +1,12 @@
 package com.lzb.unit_test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -22,57 +15,36 @@ import lombok.Getter;
  * @author lizebin
  */
 public class FileSystemInMemory implements FileSystem {
-
-    private static final ConcurrentHashMap<String, List<FileInMemory>> dir2Paths = new ConcurrentHashMap<>();
+    private final List<FileInMemory> files = new ArrayList<>();
 
     @Override
     public List<String> readAllLines(Path filePath) {
-        if (filePath.toFile().isFile()) {
-            try {
-                return Files.readAllLines(filePath);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return Collections.emptyList();
+        for (FileInMemory file : files) {
+            if (Objects.equals(file.getName(), filePath.getFileName().toString())) {
+                return file.getLines();
             }
         }
-        return Optional.ofNullable(dir2Paths.get(filePath.getParent().toString()))
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(FileInMemory::getLines)
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void createFile(Path filePath) {
-        dir2Paths.computeIfAbsent(filePath.getParent().toString(), k -> new ArrayList<>())
-                .add(new FileInMemory(filePath.getFileName().toString()));
+        return Collections.emptyList();
     }
 
     @Override
     public void writeLine(Path filePath, String line) {
-        String dir = filePath.getParent().toString();
-        List<FileInMemory> files = dir2Paths.get(dir);
-        if (Objects.isNull(files)) {
-            createFile(filePath);
-            files = dir2Paths.get(dir);
-        }
-        String fileName = filePath.getFileName().toString();
-        files.forEach(file -> {
-            if (Objects.equals(file.getName(), fileName)) {
-                file.getLines().add(line);
+        for (FileInMemory file : files) {
+            if (Objects.equals(file.getName(), filePath.getFileName().toString())) {
+                file.addLine(line);
+                return;
             }
-        });
+        }
+        FileInMemory file = new FileInMemory(filePath.getFileName().toString());
+        file.addLine(line);
+        files.add(file);
     }
 
     @Override
-    public List<Path> readAllFiles(Path dir) {
-        return Optional.ofNullable(dir2Paths.get(dir.toString()))
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(f -> f.getPath(dir))
-                .toList();
+    public int getFileCount() {
+        return files.size();
     }
+
 
     @Getter
     private static class FileInMemory {
@@ -82,21 +54,21 @@ public class FileSystemInMemory implements FileSystem {
 
         FileInMemory(String name, List<String> lines) {
             this.name = name;
-            this.lines = lines;
+            this.lines = Objects.requireNonNullElseGet(lines, ArrayList::new);
         }
 
         FileInMemory(String name) {
-            this(name, new ArrayList<>());
+            this(name, null);
         }
 
-        public Path getPath(Path dir) {
-            return Paths.get(dir.toString(), name);
+        void addLine(String line) {
+            this.lines.add(line);
         }
     }
 
     @Override
     public String toString() {
-        return JSON.toJSONString(dir2Paths);
+        return JSON.toJSONString(files);
     }
 
 }

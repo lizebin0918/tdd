@@ -12,9 +12,7 @@ public interface FileSystem {
 
     List<String> readAllLines(Path filePath);
 
-    void createFile(Path path);
-
     void writeLine(Path path, String line);
 
-    List<Path> readAllFiles(Path dir);
+    int getFileCount();
 }

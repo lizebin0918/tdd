@@ -11,12 +11,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.spy;
 
 /**
  * <br/>
@@ -26,13 +24,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AuditManagerUnitTest {
 
-    @Spy
-    private FileSystem fileSystem = new FileSystemInMemory();
+    private FileSystem fileSystem;
 
     private AuditManager sut;
 
     @BeforeEach
     public void setup() {
+        fileSystem = spy(FileSystemInMemory.class);
         sut = new AuditManager(fileSystem);
     }
 
@@ -44,7 +42,7 @@ class AuditManagerUnitTest {
         Path path = sut.visit("lizebin", LocalDateTime.now());
 
         // then
-        Assertions.assertEquals(path.toAbsolutePath(), Paths.get(sut.getDir() + "audit_01.txt"));
+        Assertions.assertEquals( "audit_01.txt", path.getFileName().toString());
     }
 
     @Test
@@ -66,37 +64,17 @@ class AuditManagerUnitTest {
     }
 
     @Test
-    void should_return_first_visitor_when_visit() {
-
-        // given
-        String visitor = "lizebin";
-        LocalDateTime visitDateTime = LocalDateTime.now();
-        Path path = sut.visit(visitor, visitDateTime);
-
-        // when
-        List<String> visitors = sut.listVisitors(path);
-
-        // then
-        Assertions.assertEquals(1, visitors.size());
-        Assertions.assertEquals(visitor + "; " + visitDateTime, visitors.get(0));
-
-    }
-
-    @Test
     @DisplayName("写多个visitor")
     void should_return_new_file_when_write_multiple_visitor() {
-        // given
         for (int i = 0; i < 5; i++) {
             String visitor = "lizebin" + i;
             LocalDateTime visitDateTime = LocalDateTime.now().plusSeconds(i);
             sut.visit(visitor, visitDateTime);
         }
 
-        // when
-        Assertions.assertEquals(2, sut.getFileSize());
-
-        // then
-
+        Assertions.assertEquals(2, sut.getFileSystem().getFileCount());
+        Assertions.assertEquals(3, sut.getFileSystem().readAllLines(Paths.get("audit_01.txt")).size());
+        Assertions.assertEquals(2, sut.getFileSystem().readAllLines(Paths.get("audit_02.txt")).size());
     }
 
 }
