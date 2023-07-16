@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface FileSystem {
 
-    List<String> readAllLines(Path path);
+    List<String> readAllLines(Path filePath);
 
     void createFile(Path path);
 

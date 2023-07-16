@@ -27,6 +27,14 @@ public class FileSystemInMemory implements FileSystem {
 
     @Override
     public List<String> readAllLines(Path filePath) {
+        if (filePath.toFile().isFile()) {
+            try {
+                return Files.readAllLines(filePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return Collections.emptyList();
+            }
+        }
         return Optional.ofNullable(dir2Paths.get(filePath.getParent().toString()))
                 .orElse(Collections.emptyList())
                 .stream()
@@ -45,6 +53,10 @@ public class FileSystemInMemory implements FileSystem {
     public void writeLine(Path filePath, String line) {
         String dir = filePath.getParent().toString();
         List<FileInMemory> files = dir2Paths.get(dir);
+        if (Objects.isNull(files)) {
+            createFile(filePath);
+            files = dir2Paths.get(dir);
+        }
         String fileName = filePath.getFileName().toString();
         files.forEach(file -> {
             if (Objects.equals(file.getName(), fileName)) {
@@ -80,6 +92,11 @@ public class FileSystemInMemory implements FileSystem {
         public Path getPath(Path dir) {
             return Paths.get(dir.toString(), name);
         }
+    }
+
+    @Override
+    public String toString() {
+        return JSON.toJSONString(dir2Paths);
     }
 
 }

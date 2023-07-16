@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import com.alibaba.fastjson.JSON;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,10 +36,16 @@ public class AuditManager {
     }
 
     Path visit(String visitor, LocalDateTime visitDateTime) {
-        Path path = Paths.get(dir + PREFIX + StringUtils.leftPad(Objects.toString(getFileSize()), 2, '0') + SUFFIX);
-        fileSystem.createFile(path);
-        fileSystem.writeLine(path, visitor + "; " + visitDateTime);
-        return path;
+        int fileSize = getFileSize();
+        Path lastFilePath = Paths.get(dir + PREFIX + StringUtils.leftPad(Objects.toString(fileSize), 2, '0') + SUFFIX);
+        int size = listVisitors(lastFilePath).size();
+        if (size == maxPerFile) {
+            lastFilePath = Paths.get(dir + PREFIX + StringUtils.leftPad(Objects.toString(fileSize + 1), 2, '0') + SUFFIX);
+            fileSystem.createFile(lastFilePath);
+        }
+        fileSystem.writeLine(lastFilePath, visitor + "; " + visitDateTime);
+        System.out.println(fileSystem);
+        return lastFilePath;
     }
 
     List<String> listVisitors(Path filePath) {

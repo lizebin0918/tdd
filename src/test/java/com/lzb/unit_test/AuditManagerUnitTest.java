@@ -72,7 +72,6 @@ class AuditManagerUnitTest {
         String visitor = "lizebin";
         LocalDateTime visitDateTime = LocalDateTime.now();
         Path path = sut.visit(visitor, visitDateTime);
-        System.out.println(path);
 
         // when
         List<String> visitors = sut.listVisitors(path);
@@ -80,6 +79,23 @@ class AuditManagerUnitTest {
         // then
         Assertions.assertEquals(1, visitors.size());
         Assertions.assertEquals(visitor + "; " + visitDateTime, visitors.get(0));
+
+    }
+
+    @Test
+    @DisplayName("写多个visitor")
+    void should_return_new_file_when_write_multiple_visitor() {
+        // given
+        for (int i = 0; i < 5; i++) {
+            String visitor = "lizebin" + i;
+            LocalDateTime visitDateTime = LocalDateTime.now().plusSeconds(i);
+            sut.visit(visitor, visitDateTime);
+        }
+
+        // when
+        Assertions.assertEquals(2, sut.getFileSize());
+
+        // then
 
     }
 
