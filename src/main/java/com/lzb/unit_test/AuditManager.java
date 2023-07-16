@@ -35,14 +35,24 @@ public class AuditManager {
     }
 
     Path visit(String visitor, LocalDateTime visitDateTime) {
-        Path filePath = Paths.get(dir + PREFIX + StringUtils.leftPad(Objects.toString(Math.max(1, fileSystem.getFileCount())), 2, '0') + SUFFIX);
-        int lineCount = fileSystem.readAllLines(filePath).size();
-        if (lineCount >= maxPerFile) {
-            filePath = Paths.get(dir + PREFIX + StringUtils.leftPad(Objects.toString(fileSystem.getFileCount() + 1), 2, '0') + SUFFIX);
-        }
+        Path filePath = getFilePath();
         String line = visitor + "; " + visitDateTime;
         fileSystem.writeLine(filePath, line);
         return filePath;
+    }
+
+    private Path getFilePath() {
+        int current = Math.max(1, fileSystem.getFileCount());
+        Path currentPath = getFilePath(current);
+        int lineCount = fileSystem.readAllLines(currentPath).size();
+        if (lineCount < maxPerFile) {
+            return currentPath;
+        }
+        return getFilePath(current + 1);
+    }
+
+    private Path getFilePath(int current) {
+        return Paths.get(dir + PREFIX + StringUtils.leftPad(Objects.toString(current), 2, '0') + SUFFIX);
     }
 
     List<String> listVisitors(Path filePath) {
