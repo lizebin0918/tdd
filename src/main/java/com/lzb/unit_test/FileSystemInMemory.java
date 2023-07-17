@@ -15,6 +15,7 @@ import lombok.Getter;
  * @author lizebin
  */
 public class FileSystemInMemory implements FileSystem {
+
     private final List<FileInMemory> files = new ArrayList<>();
 
     @Override
@@ -28,7 +29,9 @@ public class FileSystemInMemory implements FileSystem {
     }
 
     @Override
-    public void writeLine(Path filePath, String line) {
+    public void applyUpdateFile(UpdateFile updateFile) {
+        Path filePath = updateFile.filePath();
+        String line = updateFile.line();
         for (FileInMemory file : files) {
             if (Objects.equals(file.getName(), filePath.getFileName().toString())) {
                 file.addLine(line);

@@ -11,6 +11,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.Mockito.doReturn;
@@ -26,23 +29,28 @@ class AuditManagerUnitTest {
 
     private FileSystem fileSystem;
 
-    private AuditManager sut;
+    private AuditManager auditManager;
+
+    @InjectMocks
+    private AuditAppService auditAppService;
 
     @BeforeEach
     public void setup() {
         fileSystem = spy(FileSystemInMemory.class);
-        sut = new AuditManager(fileSystem);
+        auditManager = spy(new AuditManager());
+        auditAppService = new AuditAppService(auditManager, fileSystem);
     }
+
 
     @Test
     @DisplayName("第一个访问者创建第一个文件")
     void should_append_one_line_when_first_file_created() {
 
         // when
-        Path path = sut.visit("lizebin", LocalDateTime.now());
+        UpdateFile file = auditManager.visit("lizebin", LocalDateTime.now(), fileSystem);
 
         // then
-        Assertions.assertEquals( "audit_01.txt", path.getFileName().toString());
+        Assertions.assertEquals( "audit_01.txt", file.filePath().getFileName().toString());
     }
 
     @Test
@@ -52,15 +60,12 @@ class AuditManagerUnitTest {
         // given
         String visitor = "lizebin";
         LocalDateTime visitDateTime = LocalDateTime.now();
-        Path path = Paths.get("");
-        doReturn(List.of(visitor + "; " + visitDateTime)).when(fileSystem).readAllLines(path);
 
         // when
-        List<String> visitors = sut.listVisitors(path);
+        auditAppService.visit(visitor, visitDateTime);
 
         // then
-        Assertions.assertEquals(1, visitors.size());
-        Assertions.assertEquals(visitor + "; " + visitDateTime, visitors.get(0));
+        Assertions.assertEquals(1, fileSystem.getFileCount());
     }
 
     @Test
@@ -69,12 +74,12 @@ class AuditManagerUnitTest {
         for (int i = 0; i < 5; i++) {
             String visitor = "lizebin" + i;
             LocalDateTime visitDateTime = LocalDateTime.now().plusSeconds(i);
-            sut.visit(visitor, visitDateTime);
+            auditAppService.visit(visitor, visitDateTime);
         }
 
-        Assertions.assertEquals(2, sut.getFileSystem().getFileCount());
-        Assertions.assertEquals(3, sut.getFileSystem().readAllLines(Paths.get("audit_01.txt")).size());
-        Assertions.assertEquals(2, sut.getFileSystem().readAllLines(Paths.get("audit_02.txt")).size());
+        Assertions.assertEquals(2, fileSystem.getFileCount());
+        Assertions.assertEquals(3, fileSystem.readAllLines(Paths.get("audit_01.txt")).size());
+        Assertions.assertEquals(2, fileSystem.readAllLines(Paths.get("audit_02.txt")).size());
     }
 
 }

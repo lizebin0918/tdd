@@ -22,26 +22,23 @@ public class AuditManager {
 
     private final int maxPerFile;
     private final String dir;
-    private final FileSystem fileSystem;
 
-    private AuditManager(String dir, int maxPerFile, FileSystem fileSystem) {
+    public AuditManager(String dir, int maxPerFile) {
         this.dir = dir;
         this.maxPerFile = maxPerFile;
-        this.fileSystem = fileSystem;
     }
 
-    public AuditManager(FileSystem fileSystem) {
-        this("/Users/lizebin/Desktop/", 3, fileSystem);
+    public AuditManager() {
+        this("/Users/lizebin/Desktop/", 3);
     }
 
-    Path visit(String visitor, LocalDateTime visitDateTime) {
-        Path filePath = getFilePath();
+    UpdateFile visit(String visitor, LocalDateTime visitDateTime, FileSystem fileSystem) {
+        Path filePath = getFilePath(fileSystem);
         String line = visitor + "; " + visitDateTime;
-        fileSystem.writeLine(filePath, line);
-        return filePath;
+        return new UpdateFile(filePath, line);
     }
 
-    private Path getFilePath() {
+    private Path getFilePath(FileSystem fileSystem) {
         int current = Math.max(1, fileSystem.getFileCount());
         Path currentPath = getFilePath(current);
         int lineCount = fileSystem.readAllLines(currentPath).size();
@@ -53,10 +50,6 @@ public class AuditManager {
 
     private Path getFilePath(int current) {
         return Paths.get(dir + PREFIX + StringUtils.leftPad(Objects.toString(current), 2, '0') + SUFFIX);
-    }
-
-    List<String> listVisitors(Path filePath) {
-        return fileSystem.readAllLines(filePath);
     }
 
 }
