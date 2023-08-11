@@ -24,4 +24,8 @@ public record FizzBuzzWhizz(int fizzNum, int buzzNum, int whizzNum) {
     boolean isBuzzTimes(int input) {
         return input % buzzNum == 0;
     }
+
+    boolean isContains(int input) {
+        return Objects.toString(input).contains(Objects.toString(fizzNum));
+    }
 }

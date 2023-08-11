@@ -54,25 +54,34 @@ class FizzBuzzWhizzUnitTest {
     }
 
     @Test
-    void should_print_Whizz() {
+    void should_is_Whizz() {
         assertTrue(fizzBuzzWhizz.isWhizzTimes(3));
         assertFalse(fizzBuzzWhizz.isWhizzTimes(4));
         assertFalse(fizzBuzzWhizz.isWhizzTimes(5));
     }
 
     @Test
-    void should_print_Fizz() {
+    void should_is_Fizz() {
         assertTrue(fizzBuzzWhizz.isFizzTimes(1));
         assertTrue(fizzBuzzWhizz.isFizzTimes(2));
         assertTrue(fizzBuzzWhizz.isFizzTimes(3));
     }
 
     @Test
-    void should_print_Buzz() {
+    void should_is_Buzz() {
         assertFalse(fizzBuzzWhizz.isBuzzTimes(1));
         assertTrue(fizzBuzzWhizz.isBuzzTimes(2));
         assertFalse(fizzBuzzWhizz.isBuzzTimes(3));
         assertTrue(fizzBuzzWhizz.isBuzzTimes(4));
+    }
+
+    @Test
+    void should_contains() {
+        assertTrue(fizzBuzzWhizz.isContains(21));
+        assertTrue(fizzBuzzWhizz.isContains(31));
+        assertTrue(fizzBuzzWhizz.isContains(101));
+        assertTrue(fizzBuzzWhizz.isContains(11));
+        assertFalse(fizzBuzzWhizz.isContains(22));
     }
 
 }
