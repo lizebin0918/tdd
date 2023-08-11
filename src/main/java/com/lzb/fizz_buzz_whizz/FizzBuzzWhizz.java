@@ -9,8 +9,26 @@ import java.util.Objects;
  */
 public record FizzBuzzWhizz(int fizzNum, int buzzNum, int whizzNum) {
 
+    public static final String WHIZZ = "whizz";
+    public static final String BUZZ = "buzz";
+    public static final String FIZZ = "fizz";
+
+
     String print(int input) {
-        return Objects.toString(input);
+        if (isContains(input)) {
+            return FIZZ;
+        }
+        StringBuilder sb = new StringBuilder();
+        if (isFizzTimes(input)) {
+            sb.append(FIZZ);
+        }
+        if (isBuzzTimes(input)) {
+            sb.append(BUZZ);
+        }
+        if (isWhizzTimes(input)) {
+            sb.append(WHIZZ);
+        }
+        return sb.toString();
     }
 
     boolean isWhizzTimes(int input) {

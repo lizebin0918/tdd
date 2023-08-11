@@ -50,7 +50,7 @@ class FizzBuzzWhizzUnitTest {
         String r = fizzBuzzWhizz.print(i);
 
         // then
-        assertEquals("3", r);
+        assertEquals("fizzwhizz", r);
     }
 
     @Test
