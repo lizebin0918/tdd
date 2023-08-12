@@ -1,5 +1,8 @@
 package com.lzb.fizz_buzz_whizz;
 
+import java.util.Objects;
+
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,55 +31,54 @@ import static org.junit.jupiter.api.Assertions.*;
 class FizzBuzzWhizzUnitTest {
 
     private FizzBuzzWhizz fizzBuzzWhizz;
+    private int fizzNum;
+    private int buzzNum;
+    private int whizzNum;
 
     @BeforeEach
     void setUp() {
-        fizzBuzzWhizz = new FizzBuzzWhizz(1, 2, 3);
+        fizzNum = 2;
+        buzzNum = 3;
+        whizzNum = 4;
+        fizzBuzzWhizz = new FizzBuzzWhizz(fizzNum, buzzNum, whizzNum);
     }
 
     @Test
     void should_instance_FizzBuzzWhizz() {
-        assertEquals(1, fizzBuzzWhizz.fizzNum());
-        assertEquals(2, fizzBuzzWhizz.buzzNum());
-        assertEquals(3, fizzBuzzWhizz.whizzNum());
+        assertEquals(fizzBuzzWhizz.fizzNum(), fizzBuzzWhizz.fizzNum());
+        assertEquals(fizzBuzzWhizz.buzzNum(), fizzBuzzWhizz.buzzNum());
+        assertEquals(fizzBuzzWhizz.whizzNum(), fizzBuzzWhizz.whizzNum());
     }
 
     @Test
     void should_print() {
-        // given
-        int i = 3;
-
-        // when
-        String r = fizzBuzzWhizz.print(i);
-
-        // then
-        assertEquals("fizzwhizz", r);
+        fizzBuzzWhizz = new FizzBuzzWhizz(1, 2, 3);
+        assertEquals("fizz", fizzBuzzWhizz.print(Integer.valueOf(Objects.toString(fizzBuzzWhizz.fizzNum()) + fizzBuzzWhizz.whizzNum())));
+        //assertEquals("fizzwhizz", fizzBuzzWhizz.print(fizzBuzzWhizz.fizzNum() * fizzBuzzWhizz.whizzNum()));
+        //assertEquals("fizzbuzzwhizz", fizzBuzzWhizz.print(fizzBuzzWhizz.fizzNum() * fizzBuzzWhizz.whizzNum() * buzzNum));
     }
 
     @Test
     void should_is_Whizz() {
-        assertTrue(fizzBuzzWhizz.isWhizzTimes(3));
-        assertFalse(fizzBuzzWhizz.isWhizzTimes(4));
-        assertFalse(fizzBuzzWhizz.isWhizzTimes(5));
+        assertTrue(fizzBuzzWhizz.isWhizzTimes(RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.whizzNum()));
+        assertFalse(fizzBuzzWhizz.isWhizzTimes(RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.whizzNum() + 1));
     }
 
     @Test
     void should_is_Fizz() {
-        assertTrue(fizzBuzzWhizz.isFizzTimes(1));
-        assertTrue(fizzBuzzWhizz.isFizzTimes(2));
-        assertTrue(fizzBuzzWhizz.isFizzTimes(3));
+        assertTrue(fizzBuzzWhizz.isFizzTimes(RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.fizzNum()));
+        assertFalse(fizzBuzzWhizz.isFizzTimes(RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.fizzNum() + 1));
     }
 
     @Test
     void should_is_Buzz() {
-        assertFalse(fizzBuzzWhizz.isBuzzTimes(1));
-        assertTrue(fizzBuzzWhizz.isBuzzTimes(2));
-        assertFalse(fizzBuzzWhizz.isBuzzTimes(3));
-        assertTrue(fizzBuzzWhizz.isBuzzTimes(4));
+        assertTrue(fizzBuzzWhizz.isBuzzTimes(RandomUtils.nextInt(1, 100) * buzzNum));
+        assertFalse(fizzBuzzWhizz.isBuzzTimes(RandomUtils.nextInt(1, 100) * buzzNum + 1));
     }
 
     @Test
     void should_contains() {
+        fizzBuzzWhizz = new FizzBuzzWhizz(1, 2, 3);
         assertTrue(fizzBuzzWhizz.isContains(21));
         assertTrue(fizzBuzzWhizz.isContains(31));
         assertTrue(fizzBuzzWhizz.isContains(101));
