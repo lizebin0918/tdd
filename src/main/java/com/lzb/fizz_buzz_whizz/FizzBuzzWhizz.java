@@ -28,6 +28,9 @@ public record FizzBuzzWhizz(int fizzNum, int buzzNum, int whizzNum) {
         if (isWhizzTimes(input)) {
             sb.append(WHIZZ);
         }
+        if (sb.length() == 0) {
+            sb.append(input);
+        }
         return sb.toString();
     }
 
