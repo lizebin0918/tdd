@@ -18,6 +18,7 @@ public record FizzBuzzWhizz() {
     static String print(int input, List<Rule> containsRules, List<Rule> timesRules) {
         StringBuilder sb = new StringBuilder();
 
+        // contains
         containsRules.stream()
                 .map(rule -> isContains(input, rule))
                 .filter(Optional::isPresent).map(Optional::get)
@@ -27,13 +28,17 @@ public record FizzBuzzWhizz() {
             return sb.toString();
         }
 
+        // times
         timesRules.stream()
                 .map(rule -> isTimes(input, rule))
                 .filter(Optional::isPresent).map(Optional::get)
                 .forEach(sb::append);
+
+        // default
         if (sb.length() == 0) {
             sb.append(input);
         }
+
         return sb.toString();
     }
 
