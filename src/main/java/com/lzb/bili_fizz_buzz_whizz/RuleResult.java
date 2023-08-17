@@ -9,8 +9,11 @@ public class RuleResult {
 
     private final StringBuilder result = new StringBuilder();
 
-    public void append(String word) {
-        result.append(word);
+    public boolean append(boolean isMatch, String word) {
+        if (isMatch) {
+            result.append(word);
+        }
+        return isMatch;
     }
 
     public String getResult() {
