@@ -5,7 +5,7 @@ package com.lzb.bili_fizz_buzz_whizz;
  * Created on : 2023-08-17 18:19
  * @author mac
  */
-public class Contains {
+public class Contains implements Rule {
 
     private final int number;
     private final String word;
@@ -15,6 +15,7 @@ public class Contains {
         this.word = word;
     }
 
+    @Override
     public boolean apply(int x, RuleResult ruleResult) {
         return ruleResult.append(String.valueOf(x).contains(String.valueOf(number)), word);
     }

@@ -19,7 +19,7 @@ class RuleUnitTest {
     @ValueSource(ints = {9, 3, 123})
     @DisplayName("3的倍数，返回Fizz")
     void should_return_fizz_when_3_times() {
-        Times rule = new Times(3, "Fizz");
+        Rule rule = new Times(3, "Fizz");
         RuleResult ruleResult = new RuleResult();
         Assertions.assertTrue(rule.apply(6, ruleResult));
         Assertions.assertEquals("Fizz", ruleResult.getResult());
@@ -29,7 +29,7 @@ class RuleUnitTest {
     @ValueSource(ints = {13, 3, 103})
     @DisplayName("contains 3, return Fizz")
     void should_return_fizz_when_3_contains(int input) {
-        Contains rule = new Contains(3, "Fizz");
+        Rule rule = new Contains(3, "Fizz");
         RuleResult ruleResult = new RuleResult();
         Assertions.assertTrue(rule.apply(input, ruleResult));
         Assertions.assertEquals("Fizz", ruleResult.getResult());
@@ -39,7 +39,7 @@ class RuleUnitTest {
     @ValueSource(ints = {2, 13})
     @DisplayName("默认规则，什么都不匹配，直接输出")
     void should_return_default(int input) {
-        Default rule = new Default();
+        Rule rule = new Default();
         RuleResult ruleResult = new RuleResult();
         Assertions.assertTrue(rule.apply(input, ruleResult));
         Assertions.assertEquals(Objects.toString(input), ruleResult.getResult());
@@ -48,7 +48,7 @@ class RuleUnitTest {
     @Test
     @DisplayName("测试组合规则，3的倍数，返回Fizz，5的倍数，返回Buzz")
     void should_return_fizz_or_buzz() {
-        AnyOf rule = new AnyOf(new Times(3, "Fizz"), new Times(5, "Buzz"));
+        Rule rule = new AnyOf(new Times(3, "Fizz"), new Times(5, "Buzz"));
 
         RuleResult ruleResult = new RuleResult();
         Assertions.assertTrue(rule.apply(9, ruleResult));
@@ -63,7 +63,7 @@ class RuleUnitTest {
     @DisplayName("测试组合规则，3个数的倍数")
     void should_return_fizzbuzzwhizz() {
         // given
-        AllOf rule = new AllOf(
+        Rule rule = new AllOf(
                 new Times(3, "Fizz"),
                 new Times(5, "Buzz"),
                 new Times(7, "Whizz")
@@ -77,7 +77,7 @@ class RuleUnitTest {
     @Test
     @DisplayName("测试组合规则，2个数的倍数")
     void should_return_fizzbuzz() {
-        AllOf rule = new AllOf(
+        Rule rule = new AllOf(
                 new Times(3, "Fizz"),
                 new Times(5, "Buzz")
         );

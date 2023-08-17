@@ -5,7 +5,7 @@ package com.lzb.bili_fizz_buzz_whizz;
  * Created on : 2023-08-17 15:30
  * @author mac
  */
-public class Times {
+public class Times implements Rule {
 
     private final int number;
     private final String word;
@@ -15,6 +15,7 @@ public class Times {
         this.word = word;
     }
 
+    @Override
     public boolean apply(int x, RuleResult ruleResult) {
         return ruleResult.append(x % number == 0, word);
     }

@@ -7,16 +7,17 @@ import java.util.stream.Stream;
  * Created on : 2023-08-17 21:34
  * @author mac
  */
-public class AllOf {
+public class AllOf implements Rule {
 
-    private final Times[] times;
+    private final Rule[] rules;
 
-    public AllOf(Times... times) {
-        this.times = times;
+    public AllOf(Rule... rules) {
+        this.rules = rules;
     }
 
 
-    boolean apply(int input, RuleResult ruleResult) {
-        return Stream.of(times).allMatch(rule -> rule.apply(input, ruleResult));
+    @Override
+    public boolean apply(int input, RuleResult ruleResult) {
+        return Stream.of(rules).allMatch(rule -> rule.apply(input, ruleResult));
     }
 }

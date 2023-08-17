@@ -7,15 +7,16 @@ import java.util.stream.Stream;
  * Created on : 2023-08-17 21:13
  * @author mac
  */
-public class AnyOf {
+public class AnyOf implements Rule {
 
-    private final Times[] rules;
+    private final Rule[] rules;
 
-    public AnyOf(Times... rules) {
+    public AnyOf(Rule... rules) {
         this.rules = rules;
     }
 
-    boolean apply(int input, RuleResult ruleResult) {
+    @Override
+    public boolean apply(int input, RuleResult ruleResult) {
         return Stream.of(rules).anyMatch(rule -> rule.apply(input, ruleResult));
     }
 }

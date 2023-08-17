@@ -7,8 +7,10 @@ import java.util.Objects;
  * Created on : 2023-08-17 21:08
  * @author mac
  */
-public class Default {
-    boolean apply(int input, RuleResult ruleResult) {
+public class Default implements Rule {
+
+    @Override
+    public boolean apply(int input, RuleResult ruleResult) {
         return ruleResult.append(true, Objects.toString(input));
     }
 }
