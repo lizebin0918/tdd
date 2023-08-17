@@ -1,11 +1,13 @@
 package com.lzb.fizz_buzz_whizz;
 
-import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * https://www.bilibili.com/video/BV1xs411X7iv/?spm_id_from=333.788.recommend_more_video.11&vd_source=a8ffd7af1e5eb1765c32f637267c1ef0
@@ -56,32 +58,38 @@ class FizzBuzzWhizzUnitTest {
     @Test
     void should_is_Whizz() {
         FizzBuzzWhizz fizzBuzzWhizz = new FizzBuzzWhizz(1, 2, 3);
-        assertTrue(fizzBuzzWhizz.isWhizzTimes(RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.whizzNum()));
-        assertFalse(fizzBuzzWhizz.isWhizzTimes(RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.whizzNum() + 1));
+        int input1 = RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.whizzNum();
+        assertTrue(FizzBuzzWhizz.isTimes(input1, new Rule(fizzBuzzWhizz.whizzNum(), FizzBuzzWhizz.WHIZZ)).isPresent());
+        int input = RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.whizzNum() + 1;
+        assertFalse(FizzBuzzWhizz.isTimes(input, new Rule(fizzBuzzWhizz.whizzNum(), FizzBuzzWhizz.WHIZZ)).isPresent());
     }
 
     @Test
     void should_is_Fizz() {
         FizzBuzzWhizz fizzBuzzWhizz = new FizzBuzzWhizz(2, 2, 3);
-        assertTrue(fizzBuzzWhizz.isFizzTimes(RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.fizzNum()));
-        assertFalse(fizzBuzzWhizz.isFizzTimes(RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.fizzNum() + 1));
+        int input1 = RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.fizzNum();
+        assertTrue(FizzBuzzWhizz.isTimes(input1, new Rule(fizzBuzzWhizz.fizzNum(), FizzBuzzWhizz.FIZZ)).isPresent());
+        int input = RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.fizzNum() + 1;
+        assertFalse(FizzBuzzWhizz.isTimes(input, new Rule(fizzBuzzWhizz.fizzNum(), FizzBuzzWhizz.FIZZ)).isPresent());
     }
 
     @Test
     void should_is_Buzz() {
         FizzBuzzWhizz fizzBuzzWhizz = new FizzBuzzWhizz(1, 2, 3);
-        assertTrue(fizzBuzzWhizz.isBuzzTimes(RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.buzzNum()));
-        assertFalse(fizzBuzzWhizz.isBuzzTimes(RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.buzzNum() + 1));
+        int input1 = RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.buzzNum();
+        assertTrue(FizzBuzzWhizz.isTimes(input1, new Rule(fizzBuzzWhizz.buzzNum(), FizzBuzzWhizz.BUZZ)).isPresent());
+        int input = RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.buzzNum() + 1;
+        assertFalse(FizzBuzzWhizz.isTimes(input, new Rule(fizzBuzzWhizz.buzzNum(), FizzBuzzWhizz.BUZZ)).isPresent());
     }
 
     @Test
     void should_contains() {
-        FizzBuzzWhizz fizzBuzzWhizz = new FizzBuzzWhizz(1, 2, 3);
-        assertTrue(fizzBuzzWhizz.isContains(21));
-        assertTrue(fizzBuzzWhizz.isContains(31));
-        assertTrue(fizzBuzzWhizz.isContains(101));
-        assertTrue(fizzBuzzWhizz.isContains(11));
-        assertFalse(fizzBuzzWhizz.isContains(22));
+        Optional<String> twentyMatchTwo = FizzBuzzWhizz.isContains(21, new Rule(2, FizzBuzzWhizz.FIZZ));
+        assertTrue(twentyMatchTwo.isPresent());
+        assertEquals(FizzBuzzWhizz.FIZZ, twentyMatchTwo.get());
+
+        Optional<String> eightMatchOne = FizzBuzzWhizz.isContains(8, new Rule(1, FizzBuzzWhizz.FIZZ));
+        assertFalse(eightMatchOne.isPresent());
     }
 
 }

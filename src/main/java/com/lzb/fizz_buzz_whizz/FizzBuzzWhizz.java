@@ -1,6 +1,7 @@
 package com.lzb.fizz_buzz_whizz;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * <br/>
@@ -15,38 +16,43 @@ public record FizzBuzzWhizz(int fizzNum, int buzzNum, int whizzNum) {
 
 
     String print(int input) {
-        if (isContains(input)) {
-            return FIZZ;
+
+        Optional<String> contains = isContains(input, new Rule(fizzNum(), FIZZ));
+        if (contains.isPresent()) {
+            return contains.get();
         }
+
         StringBuilder sb = new StringBuilder();
-        if (isFizzTimes(input)) {
-            sb.append(FIZZ);
-        }
-        if (isBuzzTimes(input)) {
-            sb.append(BUZZ);
-        }
-        if (isWhizzTimes(input)) {
-            sb.append(WHIZZ);
-        }
+
+        Optional<String> fizzTimes = isTimes(input, new Rule(fizzNum(), FIZZ));
+        fizzTimes.ifPresent(sb::append);
+
+        Optional<String> buzzTimes = isTimes(input, new Rule(buzzNum(), BUZZ));
+        buzzTimes.ifPresent(sb::append);
+
+        Optional<String> whizzTimes = isTimes(input, new Rule(whizzNum(), WHIZZ));
+        whizzTimes.ifPresent(sb::append);
+
         if (sb.length() == 0) {
             sb.append(input);
         }
+
         return sb.toString();
     }
 
-    boolean isWhizzTimes(int input) {
-        return input % whizzNum == 0;
+    static Optional<String> isContains(int input, Rule rule) {
+        String inputString = Objects.toString(input);
+        if (inputString.contains(Objects.toString(rule.number()))) {
+            return Optional.of(rule.word());
+        }
+        return Optional.empty();
     }
 
-    boolean isFizzTimes(int input) {
-        return input % fizzNum == 0;
+    static Optional<String> isTimes(int input, Rule rule) {
+        if (input % rule.number() == 0) {
+            return Optional.of(rule.word());
+        }
+        return Optional.empty();
     }
 
-    boolean isBuzzTimes(int input) {
-        return input % buzzNum == 0;
-    }
-
-    boolean isContains(int input) {
-        return Objects.toString(input).contains(Objects.toString(fizzNum));
-    }
 }
