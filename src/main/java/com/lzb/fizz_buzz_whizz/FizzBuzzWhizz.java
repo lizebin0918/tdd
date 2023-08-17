@@ -1,5 +1,6 @@
 package com.lzb.fizz_buzz_whizz;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -8,35 +9,31 @@ import java.util.Optional;
  * Created on : 2023-08-11 11:22
  * @author lizebin
  */
-public record FizzBuzzWhizz(int fizzNum, int buzzNum, int whizzNum) {
+public record FizzBuzzWhizz() {
 
     public static final String WHIZZ = "whizz";
     public static final String BUZZ = "buzz";
     public static final String FIZZ = "fizz";
 
-
-    String print(int input) {
-
-        Optional<String> contains = isContains(input, new Rule(fizzNum(), FIZZ));
-        if (contains.isPresent()) {
-            return contains.get();
-        }
-
+    static String print(int input, List<Rule> containsRules, List<Rule> timesRules) {
         StringBuilder sb = new StringBuilder();
 
-        Optional<String> fizzTimes = isTimes(input, new Rule(fizzNum(), FIZZ));
-        fizzTimes.ifPresent(sb::append);
+        containsRules.stream()
+                .map(rule -> isContains(input, rule))
+                .filter(Optional::isPresent).map(Optional::get)
+                .forEach(sb::append);
 
-        Optional<String> buzzTimes = isTimes(input, new Rule(buzzNum(), BUZZ));
-        buzzTimes.ifPresent(sb::append);
+        if (sb.length() > 0) {
+            return sb.toString();
+        }
 
-        Optional<String> whizzTimes = isTimes(input, new Rule(whizzNum(), WHIZZ));
-        whizzTimes.ifPresent(sb::append);
-
+        timesRules.stream()
+                .map(rule -> isTimes(input, rule))
+                .filter(Optional::isPresent).map(Optional::get)
+                .forEach(sb::append);
         if (sb.length() == 0) {
             sb.append(input);
         }
-
         return sb.toString();
     }
 

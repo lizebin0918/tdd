@@ -1,5 +1,6 @@
 package com.lzb.fizz_buzz_whizz;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.RandomUtils;
@@ -32,54 +33,47 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class FizzBuzzWhizzUnitTest {
 
     @Test
-    void should_instance_FizzBuzzWhizz() {
-        FizzBuzzWhizz fizzBuzzWhizz = new FizzBuzzWhizz(2, 3, 4);
-        assertEquals(fizzBuzzWhizz.fizzNum(), fizzBuzzWhizz.fizzNum());
-        assertEquals(fizzBuzzWhizz.buzzNum(), fizzBuzzWhizz.buzzNum());
-        assertEquals(fizzBuzzWhizz.whizzNum(), fizzBuzzWhizz.whizzNum());
-    }
-
-    @Test
     void should_print_when_num_is_not_one() {
-        FizzBuzzWhizz fizzBuzzWhizz = new FizzBuzzWhizz(2, 3, 5);
-        assertEquals("fizzwhizz", fizzBuzzWhizz.print(fizzBuzzWhizz.fizzNum() * fizzBuzzWhizz.whizzNum()));
-        assertEquals("fizzbuzzwhizz", fizzBuzzWhizz.print(fizzBuzzWhizz.fizzNum() * fizzBuzzWhizz.buzzNum() * fizzBuzzWhizz.whizzNum()));
+        int fizzNum = 2;
+        int buzzNum = 3;
+        int whizzNum = 5;
+        assertEquals("fizzwhizz", FizzBuzzWhizz.print(fizzNum * whizzNum, List.of(new Rule(fizzNum, FizzBuzzWhizz.FIZZ)), List.of(new Rule(fizzNum, FizzBuzzWhizz.FIZZ), new Rule(buzzNum, FizzBuzzWhizz.BUZZ), new Rule(whizzNum, FizzBuzzWhizz.WHIZZ))));
+        assertEquals("fizzbuzzwhizz", FizzBuzzWhizz.print(fizzNum * buzzNum * whizzNum, List.of(new Rule(fizzNum, FizzBuzzWhizz.FIZZ)), List.of(new Rule(fizzNum, FizzBuzzWhizz.FIZZ), new Rule(buzzNum, FizzBuzzWhizz.BUZZ), new Rule(whizzNum, FizzBuzzWhizz.WHIZZ))));
     }
 
     @Test
     void should_print_when_num_is_one() {
-        FizzBuzzWhizz fizzBuzzWhizz = new FizzBuzzWhizz(1, 1, 1);
-        assertEquals("fizzbuzzwhizz", fizzBuzzWhizz.print(200));
-        assertEquals("fizzbuzzwhizz", fizzBuzzWhizz.print(23));
-        assertEquals("fizz", fizzBuzzWhizz.print(1));
+        int number = 1;
+        assertEquals("fizzbuzzwhizz", FizzBuzzWhizz.print(200, List.of(new Rule(number, FizzBuzzWhizz.FIZZ)), List.of(new Rule(number, FizzBuzzWhizz.FIZZ), new Rule(number, FizzBuzzWhizz.BUZZ), new Rule(number, FizzBuzzWhizz.WHIZZ))));
+        assertEquals("fizzbuzzwhizz", FizzBuzzWhizz.print(23, List.of(new Rule(number, FizzBuzzWhizz.FIZZ)), List.of(new Rule(number, FizzBuzzWhizz.FIZZ), new Rule(number, FizzBuzzWhizz.BUZZ), new Rule(number, FizzBuzzWhizz.WHIZZ))));
+        assertEquals("fizz", FizzBuzzWhizz.print(number, List.of(new Rule(number, FizzBuzzWhizz.FIZZ)), List.of(new Rule(number, FizzBuzzWhizz.FIZZ), new Rule(number, FizzBuzzWhizz.BUZZ), new Rule(number, FizzBuzzWhizz.WHIZZ))));
 
     }
 
     @Test
     void should_is_Whizz() {
-        FizzBuzzWhizz fizzBuzzWhizz = new FizzBuzzWhizz(1, 2, 3);
-        int input1 = RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.whizzNum();
-        assertTrue(FizzBuzzWhizz.isTimes(input1, new Rule(fizzBuzzWhizz.whizzNum(), FizzBuzzWhizz.WHIZZ)).isPresent());
-        int input = RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.whizzNum() + 1;
-        assertFalse(FizzBuzzWhizz.isTimes(input, new Rule(fizzBuzzWhizz.whizzNum(), FizzBuzzWhizz.WHIZZ)).isPresent());
+        int whizzNum = 3;
+        int input1 = RandomUtils.nextInt(1, 100) * whizzNum;
+        assertTrue(FizzBuzzWhizz.isTimes(input1, new Rule(whizzNum, FizzBuzzWhizz.WHIZZ)).isPresent());
+        int input = RandomUtils.nextInt(1, 100) * whizzNum + 1;
+        assertFalse(FizzBuzzWhizz.isTimes(input, new Rule(whizzNum, FizzBuzzWhizz.WHIZZ)).isPresent());
     }
 
     @Test
     void should_is_Fizz() {
-        FizzBuzzWhizz fizzBuzzWhizz = new FizzBuzzWhizz(2, 2, 3);
-        int input1 = RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.fizzNum();
-        assertTrue(FizzBuzzWhizz.isTimes(input1, new Rule(fizzBuzzWhizz.fizzNum(), FizzBuzzWhizz.FIZZ)).isPresent());
-        int input = RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.fizzNum() + 1;
-        assertFalse(FizzBuzzWhizz.isTimes(input, new Rule(fizzBuzzWhizz.fizzNum(), FizzBuzzWhizz.FIZZ)).isPresent());
+        int input1 = RandomUtils.nextInt(1, 100) * 2;
+        assertTrue(FizzBuzzWhizz.isTimes(input1, new Rule(2, FizzBuzzWhizz.FIZZ)).isPresent());
+        int input = RandomUtils.nextInt(1, 100) * 2 + 1;
+        assertFalse(FizzBuzzWhizz.isTimes(input, new Rule(2, FizzBuzzWhizz.FIZZ)).isPresent());
     }
 
     @Test
     void should_is_Buzz() {
-        FizzBuzzWhizz fizzBuzzWhizz = new FizzBuzzWhizz(1, 2, 3);
-        int input1 = RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.buzzNum();
-        assertTrue(FizzBuzzWhizz.isTimes(input1, new Rule(fizzBuzzWhizz.buzzNum(), FizzBuzzWhizz.BUZZ)).isPresent());
-        int input = RandomUtils.nextInt(1, 100) * fizzBuzzWhizz.buzzNum() + 1;
-        assertFalse(FizzBuzzWhizz.isTimes(input, new Rule(fizzBuzzWhizz.buzzNum(), FizzBuzzWhizz.BUZZ)).isPresent());
+        int buzzNum = 2;
+        int input1 = RandomUtils.nextInt(1, 100) * buzzNum;
+        assertTrue(FizzBuzzWhizz.isTimes(input1, new Rule(buzzNum, FizzBuzzWhizz.BUZZ)).isPresent());
+        int input = RandomUtils.nextInt(1, 100) * buzzNum + 1;
+        assertFalse(FizzBuzzWhizz.isTimes(input, new Rule(buzzNum, FizzBuzzWhizz.BUZZ)).isPresent());
     }
 
     @Test
