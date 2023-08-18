@@ -1,10 +1,13 @@
 package com.lzb.bili_fizz_buzz_whizz;
 
+import lombok.ToString;
+
 /**
  * <br/>
  * Created on : 2023-08-17 18:19
  * @author mac
  */
+@ToString
 public class Contains implements Rule {
 
     private final int number;

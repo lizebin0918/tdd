@@ -1,10 +1,14 @@
 package com.lzb.bili_fizz_buzz_whizz;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -84,6 +88,48 @@ class RuleUnitTest {
         RuleResult ruleResult1 = new RuleResult();
         Assertions.assertTrue(rule.apply(3 * 5, ruleResult1));
         Assertions.assertEquals("FizzBuzz", ruleResult1.getResult());
+    }
+
+    @TestFactory
+    @DisplayName("fizz buzz whizz final test")
+    Collection<DynamicTest> should_final_test() {
+        Rule r1_3 = new Times(3, "Fizz");
+        Rule r1_5 = new Times(5, "Buzz");
+        Rule r1_7 = new Times(7, "Whizz");
+
+        // 任意倍数
+        Rule r1 = new AnyOf(r1_3, r1_5, r1_7);
+
+        // 乘积倍数
+        Rule r2 = new AnyOf(new AllOf(r1_3, r1_5, r1_7), new AllOf(r1_3, r1_5), new AllOf(r1_3, r1_7), new AllOf(r1_5, r1_7));
+
+        // 包含3
+        Rule r3 = new Contains(3, "Fizz");
+
+        // 默认规则
+        Rule rd = new Default();
+
+        Rule rule = new AnyOf(r3, r2, r1, rd);
+
+        return List.of(
+                DynamicTest.dynamicTest("3 return Fizz", () -> {
+                    RuleResult ruleResult = new RuleResult();
+                    Assertions.assertTrue(rule.apply(3, ruleResult));
+                    Assertions.assertEquals("Fizz", ruleResult.getResult());
+                }),
+
+                DynamicTest.dynamicTest("5 return Buzz", () -> {
+                    RuleResult ruleResult = new RuleResult();
+                    Assertions.assertTrue(rule.apply(5, ruleResult));
+                    Assertions.assertEquals("Buzz", ruleResult.getResult());
+                }),
+
+                DynamicTest.dynamicTest("7 return Whizz", () -> {
+                    RuleResult ruleResult = new RuleResult();
+                    Assertions.assertTrue(rule.apply(7, ruleResult));
+                    Assertions.assertEquals("Whizz", ruleResult.getResult());
+                })
+        );
     }
 
 }
