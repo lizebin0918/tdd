@@ -24,7 +24,7 @@ class RuleUnitTest {
     @ValueSource(ints = {9, 3, 123})
     @DisplayName("3的倍数，返回Fizz")
     void should_return_fizz_when_3_times() {
-        Rule rule = new Times(3, "Fizz");
+        Rule rule = Rules.times(3, "Fizz");
         RuleResult ruleResult = new RuleResult();
         Assertions.assertTrue(rule.apply(6, ruleResult));
         Assertions.assertEquals("Fizz", ruleResult.getResult());
@@ -34,7 +34,7 @@ class RuleUnitTest {
     @ValueSource(ints = {13, 3, 103})
     @DisplayName("contains 3, return Fizz")
     void should_return_fizz_when_3_contains(int input) {
-        Rule rule = new Contains(3, "Fizz");
+        Rule rule = Rules.contains(3, "Fizz");
         RuleResult ruleResult = new RuleResult();
         Assertions.assertTrue(rule.apply(input, ruleResult));
         Assertions.assertEquals("Fizz", ruleResult.getResult());
@@ -44,7 +44,7 @@ class RuleUnitTest {
     @ValueSource(ints = {2, 13})
     @DisplayName("默认规则，什么都不匹配，直接输出")
     void should_return_default(int input) {
-        Rule rule = new Default();
+        Rule rule = Rules.defaultRule();
         RuleResult ruleResult = new RuleResult();
         Assertions.assertTrue(rule.apply(input, ruleResult));
         Assertions.assertEquals(Objects.toString(input), ruleResult.getResult());
@@ -53,7 +53,7 @@ class RuleUnitTest {
     @Test
     @DisplayName("测试组合规则，3的倍数，返回Fizz，5的倍数，返回Buzz")
     void should_return_fizz_or_buzz() {
-        Rule rule = new AnyOf(new Times(3, "Fizz"), new Times(5, "Buzz"));
+        Rule rule = Rules.anyOf(Rules.times(3, "Fizz"), Rules.times(5, "Buzz"));
 
         RuleResult ruleResult = new RuleResult();
         Assertions.assertTrue(rule.apply(9, ruleResult));
@@ -68,10 +68,10 @@ class RuleUnitTest {
     @DisplayName("测试组合规则，3个数的倍数")
     void should_return_fizzbuzzwhizz() {
         // given
-        Rule rule = new AllOf(
-                new Times(3, "Fizz"),
-                new Times(5, "Buzz"),
-                new Times(7, "Whizz")
+        Rule rule = Rules.allOf(
+                Rules.times(3, "Fizz"),
+                Rules.times(5, "Buzz"),
+                Rules.times(7, "Whizz")
         );
 
         RuleResult ruleResult = new RuleResult();
@@ -82,9 +82,9 @@ class RuleUnitTest {
     @Test
     @DisplayName("测试组合规则，2个数的倍数")
     void should_return_fizzbuzz() {
-        Rule rule = new AllOf(
-                new Times(3, "Fizz"),
-                new Times(5, "Buzz")
+        Rule rule = Rules.allOf(
+                Rules.times(3, "Fizz"),
+                Rules.times(5, "Buzz")
         );
         RuleResult ruleResult1 = new RuleResult();
         Assertions.assertTrue(rule.apply(3 * 5, ruleResult1));
@@ -94,23 +94,23 @@ class RuleUnitTest {
     @TestFactory
     @DisplayName("fizz buzz whizz final test")
     Collection<DynamicTest> should_final_test() {
-        Rule r1_3 = new Times(3, "Fizz");
-        Rule r1_5 = new Times(5, "Buzz");
-        Rule r1_7 = new Times(7, "Whizz");
+        Rule r1_3 = Rules.times(3, "Fizz");
+        Rule r1_5 = Rules.times(5, "Buzz");
+        Rule r1_7 = Rules.times(7, "Whizz");
 
         // 任意倍数
-        Rule r1 = new AnyOf(r1_3, r1_5, r1_7);
+        Rule r1 = Rules.anyOf(r1_3, r1_5, r1_7);
 
         // 乘积倍数
-        Rule r2 = new AnyOf(new AllOf(r1_3, r1_5, r1_7), new AllOf(r1_3, r1_5), new AllOf(r1_3, r1_7), new AllOf(r1_5, r1_7));
+        Rule r2 = Rules.anyOf(Rules.allOf(r1_3, r1_5, r1_7), Rules.allOf(r1_3, r1_5), Rules.allOf(r1_3, r1_7), Rules.allOf(r1_5, r1_7));
 
         // 包含3
-        Rule r3 = new Contains(3, "Fizz");
+        Rule r3 = Rules.contains(3, "Fizz");
 
         // 默认规则
-        Rule rd = new Default();
+        Rule rd = Rules.defaultRule();
 
-        Rule rule = new AnyOf(r3, r2, r1, rd);
+        Rule rule = Rules.anyOf(r3, r2, r1, rd);
 
         return List.of(
                 DynamicTest.dynamicTest("3 return Fizz", () -> {
@@ -163,23 +163,23 @@ class RuleUnitTest {
     })
     @DisplayName("fizz buzz whizz final test 1")
     void should_final_test_1(int input, String result) {
-        Rule r1_3 = new Times(3, "Fizz");
-        Rule r1_5 = new Times(5, "Buzz");
-        Rule r1_7 = new Times(7, "Whizz");
+        Rule r1_3 = Rules.times(3, "Fizz");
+        Rule r1_5 = Rules.times(5, "Buzz");
+        Rule r1_7 = Rules.times(7, "Whizz");
 
         // 任意倍数
-        Rule r1 = new AnyOf(r1_3, r1_5, r1_7);
+        Rule r1 = Rules.anyOf(r1_3, r1_5, r1_7);
 
         // 乘积倍数
-        Rule r2 = new AnyOf(new AllOf(r1_3, r1_5, r1_7), new AllOf(r1_3, r1_5), new AllOf(r1_3, r1_7), new AllOf(r1_5, r1_7));
+        Rule r2 = Rules.anyOf(Rules.allOf(r1_3, r1_5, r1_7), Rules.allOf(r1_3, r1_5), Rules.allOf(r1_3, r1_7), Rules.allOf(r1_5, r1_7));
 
         // 包含3
-        Rule r3 = new Contains(3, "Fizz");
+        Rule r3 = Rules.contains(3, "Fizz");
 
         // 默认规则
-        Rule rd = new Default();
+        Rule rd = Rules.defaultRule();
 
-        Rule rule = new AnyOf(r3, r2, r1, rd);
+        Rule rule = Rules.anyOf(r3, r2, r1, rd);
         RuleResult ruleResult = new RuleResult();
 
         Assertions.assertTrue(rule.apply(input, ruleResult));
