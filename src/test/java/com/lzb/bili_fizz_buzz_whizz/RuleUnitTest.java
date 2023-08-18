@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
@@ -128,8 +129,62 @@ class RuleUnitTest {
                     RuleResult ruleResult = new RuleResult();
                     Assertions.assertTrue(rule.apply(7, ruleResult));
                     Assertions.assertEquals("Whizz", ruleResult.getResult());
+                }),
+
+                DynamicTest.dynamicTest("3*5*7 return FizzBuzzWhizz", () -> {
+                    RuleResult ruleResult = new RuleResult();
+                    Assertions.assertTrue(rule.apply(3 * 5 * 7, ruleResult));
+                    Assertions.assertEquals("FizzBuzzWhizz", ruleResult.getResult());
+                }),
+
+                DynamicTest.dynamicTest("3*5 return FizzBuzz", () -> {
+                    RuleResult ruleResult = new RuleResult();
+                    Assertions.assertTrue(rule.apply(3 * 5, ruleResult));
+                    Assertions.assertEquals("FizzBuzz", ruleResult.getResult());
+                }),
+
+                DynamicTest.dynamicTest("4 return 4", () -> {
+                    RuleResult ruleResult = new RuleResult();
+                    Assertions.assertTrue(rule.apply(4, ruleResult));
+                    Assertions.assertEquals("4", ruleResult.getResult());
                 })
         );
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "3,Fizz",
+            "5,Buzz",
+            "7,Whizz",
+            "105,FizzBuzzWhizz",
+            "35,Fizz",
+            "4,4",
+            "21,FizzWhizz"
+    })
+    @DisplayName("fizz buzz whizz final test 1")
+    void should_final_test_1(int input, String result) {
+        Rule r1_3 = new Times(3, "Fizz");
+        Rule r1_5 = new Times(5, "Buzz");
+        Rule r1_7 = new Times(7, "Whizz");
+
+        // 任意倍数
+        Rule r1 = new AnyOf(r1_3, r1_5, r1_7);
+
+        // 乘积倍数
+        Rule r2 = new AnyOf(new AllOf(r1_3, r1_5, r1_7), new AllOf(r1_3, r1_5), new AllOf(r1_3, r1_7), new AllOf(r1_5, r1_7));
+
+        // 包含3
+        Rule r3 = new Contains(3, "Fizz");
+
+        // 默认规则
+        Rule rd = new Default();
+
+        Rule rule = new AnyOf(r3, r2, r1, rd);
+        RuleResult ruleResult = new RuleResult();
+
+        Assertions.assertTrue(rule.apply(input, ruleResult));
+        Assertions.assertEquals(result, ruleResult.getResult());
+
     }
 
 }
