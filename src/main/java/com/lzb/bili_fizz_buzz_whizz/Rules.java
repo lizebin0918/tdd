@@ -1,5 +1,6 @@
 package com.lzb.bili_fizz_buzz_whizz;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -10,24 +11,48 @@ import java.util.stream.Stream;
 public final class Rules {
 
     public static Rule times(int number, String word) {
-        return (x, rr) -> rr.append(x % number == 0, word);
+        return x -> {
+            if (x % number == 0) {
+                return Optional.of(word);
+            }
+            return Optional.empty();
+        };
     }
 
     public static Rule contains(int number, String word) {
-        return (x, rr) -> rr.append(String.valueOf(x).contains(String.valueOf(number)), word);
+        return x -> {
+            if (String.valueOf(x).contains(String.valueOf(number))) {
+                return Optional.of(word);
+            }
+            return Optional.empty();
+        };
     }
 
     public static Rule defaultRule() {
-        return (x, rr) -> rr.append(true, String.valueOf(x));
+        return x -> Optional.of(String.valueOf(x));
     }
 
     public static Rule anyOf(Rule... rules) {
-        return (x, rr) -> Stream.of(rules).anyMatch(rule -> rule.apply(x, rr));
+        return x -> Stream.of(rules)
+                .map(rule -> rule.apply(x))
+                .filter(Optional::isPresent)
+                .map(Optional::get).findAny();
     }
 
     public static Rule allOf(Rule... rules) {
-        RuleResult temp = new RuleResult();
-        return (x, rr) -> rr.append(Stream.of(rules).allMatch(rule -> rule.apply(x, temp)), temp.getResult());
+        StringBuilder result = new StringBuilder();
+        return x -> {
+            boolean match = Stream.of(rules)
+                    .map(rule -> rule.apply(x))
+                    .allMatch(resultOpt -> {
+                        if (resultOpt.isPresent()) {
+                            result.append(resultOpt.get());
+                            return true;
+                        }
+                        return false;
+                    });
+            return match ? Optional.of(result.toString()) : Optional.empty();
+        };
     }
 
     private Rules() {}

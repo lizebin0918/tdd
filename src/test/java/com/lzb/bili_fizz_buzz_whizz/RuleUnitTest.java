@@ -3,6 +3,7 @@ package com.lzb.bili_fizz_buzz_whizz;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -25,9 +26,9 @@ class RuleUnitTest {
     @DisplayName("3的倍数，返回Fizz")
     void should_return_fizz_when_3_times() {
         Rule rule = Rules.times(3, "Fizz");
-        RuleResult ruleResult = new RuleResult();
-        Assertions.assertTrue(rule.apply(6, ruleResult));
-        Assertions.assertEquals("Fizz", ruleResult.getResult());
+        Optional<String> result = rule.apply(6);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals("Fizz", result.get());
     }
 
     @ParameterizedTest
@@ -35,33 +36,36 @@ class RuleUnitTest {
     @DisplayName("contains 3, return Fizz")
     void should_return_fizz_when_3_contains(int input) {
         Rule rule = Rules.contains(3, "Fizz");
-        RuleResult ruleResult = new RuleResult();
-        Assertions.assertTrue(rule.apply(input, ruleResult));
-        Assertions.assertEquals("Fizz", ruleResult.getResult());
+        Optional<String> result = rule.apply(input);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals("Fizz", result.get());
     }
+
 
     @ParameterizedTest
     @ValueSource(ints = {2, 13})
     @DisplayName("默认规则，什么都不匹配，直接输出")
     void should_return_default(int input) {
         Rule rule = Rules.defaultRule();
-        RuleResult ruleResult = new RuleResult();
-        Assertions.assertTrue(rule.apply(input, ruleResult));
-        Assertions.assertEquals(Objects.toString(input), ruleResult.getResult());
+        Optional<String> result = rule.apply(input);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(Objects.toString(input), result.get());
     }
+
+
 
     @Test
     @DisplayName("测试组合规则，3的倍数，返回Fizz，5的倍数，返回Buzz")
     void should_return_fizz_or_buzz() {
         Rule rule = Rules.anyOf(Rules.times(3, "Fizz"), Rules.times(5, "Buzz"));
 
-        RuleResult ruleResult = new RuleResult();
-        Assertions.assertTrue(rule.apply(9, ruleResult));
-        Assertions.assertEquals("Fizz", ruleResult.getResult());
+        Optional<String> result3Times = rule.apply(9);
+        Assertions.assertTrue(result3Times.isPresent());
+        Assertions.assertEquals("Fizz", result3Times.get());
 
-        RuleResult ruleResult1 = new RuleResult();
-        Assertions.assertTrue(rule.apply(25, ruleResult1));
-        Assertions.assertEquals("Buzz", ruleResult1.getResult());
+        Optional<String> result5Times = rule.apply(25);
+        Assertions.assertTrue(result5Times.isPresent());
+        Assertions.assertEquals("Buzz", result5Times.get());
     }
 
     @Test
@@ -74,9 +78,9 @@ class RuleUnitTest {
                 Rules.times(7, "Whizz")
         );
 
-        RuleResult ruleResult = new RuleResult();
-        Assertions.assertTrue(rule.apply(3 * 5 * 7, ruleResult));
-        Assertions.assertEquals("FizzBuzzWhizz", ruleResult.getResult());
+        Optional<String> result = rule.apply(3 * 5 * 7);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals("FizzBuzzWhizz", result.get());
     }
 
     @Test
@@ -86,9 +90,20 @@ class RuleUnitTest {
                 Rules.times(3, "Fizz"),
                 Rules.times(5, "Buzz")
         );
-        RuleResult ruleResult1 = new RuleResult();
-        Assertions.assertTrue(rule.apply(3 * 5, ruleResult1));
-        Assertions.assertEquals("FizzBuzz", ruleResult1.getResult());
+        Optional<String> result = rule.apply(3 * 5);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals("FizzBuzz", result.get());
+    }
+
+    @Test
+    @DisplayName("测试组合规则，3的倍数")
+    void should_return_fizz() {
+        Rule rule = Rules.allOf(
+                Rules.times(3, "Fizz"),
+                Rules.times(5, "Buzz")
+        );
+        Optional<String> result = rule.apply(12);
+        Assertions.assertFalse(result.isPresent());
     }
 
     @TestFactory
@@ -114,39 +129,39 @@ class RuleUnitTest {
 
         return List.of(
                 DynamicTest.dynamicTest("3 return Fizz", () -> {
-                    RuleResult ruleResult = new RuleResult();
-                    Assertions.assertTrue(rule.apply(3, ruleResult));
-                    Assertions.assertEquals("Fizz", ruleResult.getResult());
+                    Optional<String> result = rule.apply(3);
+                    Assertions.assertTrue(result.isPresent());
+                    Assertions.assertEquals("Fizz", result.get());
                 }),
 
                 DynamicTest.dynamicTest("5 return Buzz", () -> {
-                    RuleResult ruleResult = new RuleResult();
-                    Assertions.assertTrue(rule.apply(5, ruleResult));
-                    Assertions.assertEquals("Buzz", ruleResult.getResult());
+                    Optional<String> result = rule.apply(5);
+                    Assertions.assertTrue(result.isPresent());
+                    Assertions.assertEquals("Buzz", result.get());
                 }),
 
                 DynamicTest.dynamicTest("7 return Whizz", () -> {
-                    RuleResult ruleResult = new RuleResult();
-                    Assertions.assertTrue(rule.apply(7, ruleResult));
-                    Assertions.assertEquals("Whizz", ruleResult.getResult());
+                    Optional<String> result = rule.apply(7);
+                    Assertions.assertTrue(result.isPresent());
+                    Assertions.assertEquals("Whizz", result.get());
                 }),
 
                 DynamicTest.dynamicTest("3*5*7 return FizzBuzzWhizz", () -> {
-                    RuleResult ruleResult = new RuleResult();
-                    Assertions.assertTrue(rule.apply(3 * 5 * 7, ruleResult));
-                    Assertions.assertEquals("FizzBuzzWhizz", ruleResult.getResult());
+                    Optional<String> result = rule.apply(3 * 5 * 7);
+                    Assertions.assertTrue(result.isPresent());
+                    Assertions.assertEquals("FizzBuzzWhizz", result.get());
                 }),
 
                 DynamicTest.dynamicTest("3*5 return FizzBuzz", () -> {
-                    RuleResult ruleResult = new RuleResult();
-                    Assertions.assertTrue(rule.apply(3 * 5, ruleResult));
-                    Assertions.assertEquals("FizzBuzz", ruleResult.getResult());
+                    Optional<String> result = rule.apply(3 * 5);
+                    Assertions.assertTrue(result.isPresent());
+                    Assertions.assertEquals("FizzBuzz", result.get());
                 }),
 
                 DynamicTest.dynamicTest("4 return 4", () -> {
-                    RuleResult ruleResult = new RuleResult();
-                    Assertions.assertTrue(rule.apply(4, ruleResult));
-                    Assertions.assertEquals("4", ruleResult.getResult());
+                    Optional<String> result = rule.apply(4);
+                    Assertions.assertTrue(result.isPresent());
+                    Assertions.assertEquals("4", result.get());
                 })
         );
     }
@@ -180,10 +195,10 @@ class RuleUnitTest {
         Rule rd = Rules.defaultRule();
 
         Rule rule = Rules.anyOf(r3, r2, r1, rd);
-        RuleResult ruleResult = new RuleResult();
 
-        Assertions.assertTrue(rule.apply(input, ruleResult));
-        Assertions.assertEquals(result, ruleResult.getResult());
+        Optional<String> resultOpt = rule.apply(input);
+        Assertions.assertTrue(resultOpt.isPresent());
+        Assertions.assertEquals(result, resultOpt.get());
 
     }
 
