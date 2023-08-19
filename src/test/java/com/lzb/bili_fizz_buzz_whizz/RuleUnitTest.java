@@ -174,7 +174,8 @@ class RuleUnitTest {
             "105,FizzBuzzWhizz",
             "35,Fizz",
             "4,4",
-            "21,FizzWhizz"
+            "21,FizzWhizz",
+            "8,Whizz"
     })
     @DisplayName("fizz buzz whizz final test 1")
     void should_final_test_1(int input, String result) {
@@ -188,8 +189,8 @@ class RuleUnitTest {
         // 乘积倍数
         Rule r2 = Rules.anyOf(Rules.allOf(r1_3, r1_5, r1_7), Rules.allOf(r1_3, r1_5), Rules.allOf(r1_3, r1_7), Rules.allOf(r1_5, r1_7));
 
-        // 包含3
-        Rule r3 = Rules.contains(3, "Fizz");
+        // 包含3 或者 包含8
+        Rule r3 = Rules.anyOf(Rules.contains(3, "Fizz"), Rules.contains(8, "Whizz"));
 
         // 默认规则
         Rule rd = Rules.defaultRule();
