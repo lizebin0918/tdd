@@ -1,4 +1,4 @@
-package com.lzb.di;
+package com.lzb.container;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

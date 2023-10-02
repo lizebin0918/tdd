@@ -1,8 +1,6 @@
-package com.lzb.di;
+package com.lzb.container;
 
 import java.lang.annotation.Annotation;
-
-import javax.annotation.Resource;
 
 /**
  * 可行：xxx.withAnnotation(new NamedLiteral())
