@@ -1,10 +1,13 @@
 package com.lzb.container;
 
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -38,16 +41,16 @@ public class Context {
         });
     }
 
+    @SneakyThrows
     private static <T, I extends T> Constructor<?> getConstructor(Class<I> implementationClass) {
-        return implementationClass.getConstructors()[0];
+        Constructor<?>[] constructors = implementationClass.getConstructors();
+        return Arrays.stream(constructors)
+                .filter(constructor -> constructor.isAnnotationPresent(Inject.class))
+                .findFirst()
+                .orElse(constructors[0]);
     }
 
     private Object[] getInjectDependencies(Constructor<?> constructor) {
-        Class<?>[] parameterTypes = constructor.getParameterTypes();
-        Object[] parameters = new Object[parameterTypes.length];
-        for (int i = 0; i < parameterTypes.length; i++) {
-            parameters[i] = get(parameterTypes[i]);
-        }
-        return parameters;
+        return Arrays.stream(constructor.getParameterTypes()).map(this::get).toArray();
     }
 }
