@@ -1,5 +1,6 @@
 package com.lzb.container;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,13 +22,24 @@ public class Context {
     }
 
     <T> T get(Class<T> componentClass) {
-        return (T) newComponents.get(componentClass).get();
+        return (T) newComponents.get(componentClass)
+                .get();
     }
 
-    <Component, ComponentImpl extends Component> void bind(Class<Component> componentClass, Class<ComponentImpl> implementationClass) {
+    <Component, ComponentImpl extends Component> void bind(Class<Component> componentClass,
+            Class<ComponentImpl> implementationClass) {
         newComponents.put(componentClass, () -> {
             try {
-                return implementationClass.getConstructors()[0].newInstance();
+                Constructor<?> constructor = implementationClass.getConstructors()[0];
+                if (constructor.getParameterCount() == 0) {
+                    return constructor.newInstance();
+                }
+                Class<?>[] parameterTypes = constructor.getParameterTypes();
+                Object[] parameters = new Object[parameterTypes.length];
+                for (int i = 0; i < parameterTypes.length; i++) {
+                    parameters[i] = get(parameterTypes[i]);
+                }
+                return constructor.newInstance(parameters);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

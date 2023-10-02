@@ -62,8 +62,8 @@ public class ContextUnitTest extends BaseUnitTest {
     class InjectConstruction {
 
         @Test
-        @DisplayName("通过默认函数注入")
-        void should_inject_with_default_contructor() {
+        @DisplayName("通过默认函数绑定方式")
+        void should_bind_with_default_contructor() {
 
             // 获取ComponentB需要的实例
             //Class[] klass = ComponentB.class.getConstructors()[0].getParameterTypes();
@@ -75,6 +75,21 @@ public class ContextUnitTest extends BaseUnitTest {
             // 如果都有的话，那就直接返回ComponentB实例，如果没有会出现递归构造，先不考虑（步子迈太大）
             assertThat(instance).isNotNull();
             assertThat(instance).isInstanceOf(ComponentInstanceWithDefaultContructor.class);
+        }
+
+        @Test
+        @DisplayName("通过构造函数注入的绑定方式")
+        void should_bind_with_inject_constructor() {
+            Dependency dependency = new Dependency() { };
+            context.bind(Dependency.class, dependency);
+            context.bind(Component.class, ComponentInstaceWithInject.class);
+
+            Component component = context.get(Component.class);
+
+            assertThat(component).isNotNull();
+            assertThat(component).isInstanceOf(ComponentInstaceWithInject.class);
+            assertThat(((ComponentInstaceWithInject) component).getDependency()).isSameAs(dependency);
+
         }
 
     }
