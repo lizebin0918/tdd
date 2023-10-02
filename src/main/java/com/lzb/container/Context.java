@@ -31,9 +31,6 @@ public class Context {
         newComponents.put(componentClass, () -> {
             try {
                 Constructor<?> constructor = implementationClass.getConstructors()[0];
-                if (constructor.getParameterCount() == 0) {
-                    return constructor.newInstance();
-                }
                 Class<?>[] parameterTypes = constructor.getParameterTypes();
                 Object[] parameters = new Object[parameterTypes.length];
                 for (int i = 0; i < parameterTypes.length; i++) {
