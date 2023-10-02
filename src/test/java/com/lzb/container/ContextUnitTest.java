@@ -2,6 +2,7 @@ package com.lzb.container;
 
 import com.lzb.BaseUnitTest;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,6 +25,13 @@ import org.junit.jupiter.api.Test;
  */
 public class ContextUnitTest extends BaseUnitTest {
 
+    Context context;
+
+    @BeforeEach
+    public void beforeEach() {
+        context = new Context();
+    }
+
     @Nested
     @DisplayName("没有依赖的实例，直接注入容器")
     class InstanceWithoutInject {
@@ -31,7 +39,6 @@ public class ContextUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("直接实例化到容器")
         void should_instance_to_context_directly() {
-            Context context = new Context();
             ComponentDirectlyInstance instance = new ComponentDirectlyInstance();
             context.bind(ComponentDirectlyInstance.class, instance);
             Component component = context.get(ComponentDirectlyInstance.class);
@@ -57,8 +64,6 @@ public class ContextUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("通过默认函数注入")
         void should_inject_with_default_contructor() {
-            // ComponentB
-            Context context = new Context();
 
             // 获取ComponentB需要的实例
             //Class[] klass = ComponentB.class.getConstructors()[0].getParameterTypes();
