@@ -26,20 +26,28 @@ public class Context {
                 .get();
     }
 
-    <Component, ComponentImpl extends Component> void bind(Class<Component> componentClass,
-            Class<ComponentImpl> implementationClass) {
+    <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
         newComponents.put(componentClass, () -> {
             try {
-                Constructor<?> constructor = implementationClass.getConstructors()[0];
-                Class<?>[] parameterTypes = constructor.getParameterTypes();
-                Object[] parameters = new Object[parameterTypes.length];
-                for (int i = 0; i < parameterTypes.length; i++) {
-                    parameters[i] = get(parameterTypes[i]);
-                }
+                Constructor<?> constructor = getConstructor(implementationClass);
+                Object[] parameters = getInjectDependencies(constructor);
                 return constructor.newInstance(parameters);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    private static <T, I extends T> Constructor<?> getConstructor(Class<I> implementationClass) {
+        return implementationClass.getConstructors()[0];
+    }
+
+    private Object[] getInjectDependencies(Constructor<?> constructor) {
+        Class<?>[] parameterTypes = constructor.getParameterTypes();
+        Object[] parameters = new Object[parameterTypes.length];
+        for (int i = 0; i < parameterTypes.length; i++) {
+            parameters[i] = get(parameterTypes[i]);
+        }
+        return parameters;
     }
 }
