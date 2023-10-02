@@ -41,13 +41,19 @@ public class Context {
         });
     }
 
-    @SneakyThrows
     private static <T, I extends T> Constructor<?> getConstructor(Class<I> implementationClass) {
         Constructor<?>[] constructors = implementationClass.getConstructors();
         return Arrays.stream(constructors)
                 .filter(constructor -> constructor.isAnnotationPresent(Inject.class))
                 .findFirst()
-                .orElse(constructors[0]);
+                // 返回默认构造函数
+                .orElseGet(() -> {
+                    try {
+                        return implementationClass.getConstructor();
+                    } catch (NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 
     private Object[] getInjectDependencies(Constructor<?> constructor) {
