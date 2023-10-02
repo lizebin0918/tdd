@@ -65,7 +65,7 @@ public class ContextUnitTest extends BaseUnitTest {
             context.bind(Component.class, ComponentInstanceWithDefaultContructor.class);
 
             // 从context里面获取实例
-            var instance = context.get(ComponentInstanceWithDefaultContructor.class);
+            var instance = context.get(Component.class);
 
             // 如果都有的话，那就直接返回ComponentB实例，如果没有会出现递归构造，先不考虑（步子迈太大）
             assertThat(instance).isNotNull();

@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -16,21 +17,22 @@ import lombok.extern.slf4j.Slf4j;
 public class Context {
 
     private static final Map<Class<?>, Object> components = new HashMap<>();
+    private static final Map<Class<?>, Class<?>> componentImpls = new HashMap<>();
 
     <T> void bind(Class<T> componentClass, T instance) {
         components.put(componentClass, instance);
     }
 
+    @SneakyThrows
     <T> T get(Class<T> componentClass) {
-        return (T) components.get(componentClass);
+        T t = (T) components.get(componentClass);
+        if (null != t) {
+            return t;
+        }
+        return (T) componentImpls.get(componentClass).getConstructors()[0].newInstance();
     }
 
     <Component, ComponentImpl extends Component> void bind(Class<Component> componentClass, Class<ComponentImpl> implementationClass) {
-        Constructor<?> constructor = implementationClass.getConstructors()[0];
-        try {
-            components.put(implementationClass, constructor.newInstance(null));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        componentImpls.put(componentClass, implementationClass);
     }
 }
