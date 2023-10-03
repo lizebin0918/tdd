@@ -99,6 +99,8 @@ public class ContextUnitTest extends BaseUnitTest {
             context.bind(DependencyA.class, DependencyA.class);
             context.bind(DependencyB.class, DependencyB.class);
             context.bind(DependencyC.class, DependencyC.class);
+            String hello = "hello";
+            context.bind(String.class, hello);
 
             DependencyA dependencyA = context.get(DependencyA.class);
             assertThat(dependencyA).isNotNull();
@@ -111,6 +113,8 @@ public class ContextUnitTest extends BaseUnitTest {
 
             assertThat(dependencyC.dependencyB).isSameAs(dependencyB);
             assertThat(dependencyB.dependencyA).isSameAs(dependencyA);
+
+            assertThat(hello).isEqualTo(dependencyC.s);
         }
 
     }

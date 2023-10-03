@@ -23,8 +23,7 @@ public class Context {
     }
 
     <T> T get(Class<T> componentClass) {
-        return (T) newComponents.get(componentClass)
-                .get();
+        return (T) newComponents.get(componentClass).get();
     }
 
     <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
