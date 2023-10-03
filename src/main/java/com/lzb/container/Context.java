@@ -30,8 +30,8 @@ public class Context {
         newComponents.put(componentClass, new CacheProvider<>(() -> {
             try {
                 Constructor<?> constructor = getConstructor(implementationClass);
-                Object[] parameters = getInjectDependencies(constructor);
-                return constructor.newInstance(parameters);
+                Object[] dependencies = getInjectDependencies(constructor);
+                return constructor.newInstance(dependencies);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

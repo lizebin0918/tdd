@@ -117,6 +117,18 @@ public class ContextUnitTest extends BaseUnitTest {
             assertThat(hello).isEqualTo(dependencyC.s);
         }
 
+        @Test
+        @DisplayName("忽略bind顺序：A->B，先bind B，再bind A")
+        void should_bind_orderly() {
+            context.bind(DependencyD.class, DependencyD.class);
+            String hello = "hello";
+            context.bind(String.class, hello);
+
+            DependencyD dependencyD = context.get(DependencyD.class);
+            assertThat(dependencyD.getName()).isEqualTo(hello);
+
+        }
+
     }
 
 }
