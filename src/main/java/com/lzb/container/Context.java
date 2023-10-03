@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -18,10 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Context {
 
-    private static final Map<Class<?>, Provider<?>> newComponents = new HashMap<>();
+    private static final Map<Class<?>, CacheProvider<?>> newComponents = new HashMap<>();
 
     <T> void bind(Class<T> componentClass, T instance) {
-        newComponents.put(componentClass, () -> instance);
+        newComponents.put(componentClass, new CacheProvider<>(() -> instance));
     }
 
     <T> T get(Class<T> componentClass) {
@@ -30,7 +28,7 @@ public class Context {
     }
 
     <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
-        newComponents.put(componentClass, () -> {
+        newComponents.put(componentClass, new CacheProvider<>(() -> {
             try {
                 Constructor<?> constructor = getConstructor(implementationClass);
                 Object[] parameters = getInjectDependencies(constructor);
@@ -38,7 +36,7 @@ public class Context {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        });
+        }));
     }
 
     private static <T, I extends T> Constructor<?> getConstructor(Class<I> implementationClass) {

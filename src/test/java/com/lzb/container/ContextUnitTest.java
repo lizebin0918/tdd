@@ -92,6 +92,27 @@ public class ContextUnitTest extends BaseUnitTest {
 
         }
 
+        @Test
+        @DisplayName("多重传递依赖：A->B->C，没有循环依赖")
+        void should_ABC_dependency() {
+
+            context.bind(DependencyA.class, DependencyA.class);
+            context.bind(DependencyB.class, DependencyB.class);
+            context.bind(DependencyC.class, DependencyC.class);
+
+            DependencyA dependencyA = context.get(DependencyA.class);
+            assertThat(dependencyA).isNotNull();
+
+            DependencyB dependencyB = context.get(DependencyB.class);
+            assertThat(dependencyB).isNotNull();
+
+            DependencyC dependencyC = context.get(DependencyC.class);
+            assertThat(dependencyC).isNotNull();
+
+            assertThat(dependencyC.dependencyB).isSameAs(dependencyB);
+            assertThat(dependencyB.dependencyA).isSameAs(dependencyA);
+        }
+
     }
 
 }
