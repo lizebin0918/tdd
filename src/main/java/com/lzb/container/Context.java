@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -16,10 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Context {
 
-    private static final Map<Class<?>, CacheProvider<?>> newComponents = new HashMap<>();
+    private static final Map<Class<?>, Provider<?>> newComponents = new HashMap<>();
 
     <T> void bind(Class<T> componentClass, T instance) {
-        newComponents.put(componentClass, new CacheProvider<>(() -> instance));
+        newComponents.put(componentClass, () -> instance);
     }
 
     <T> T get(Class<T> componentClass) {
