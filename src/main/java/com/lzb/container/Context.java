@@ -24,7 +24,7 @@ public class Context {
 
     private final Map<Class<?>, Provider<?>> newComponents = new HashMap<>();
 
-    <T> void bind(Class<T> componentClass, T instance) {
+    public <T> void bind(Class<T> componentClass, T instance) {
         newComponents.put(componentClass, () -> instance);
     }
 
@@ -32,7 +32,7 @@ public class Context {
         return (Optional<T>) Optional.ofNullable(newComponents.get(componentClass)).map(Provider::get);
     }
 
-    <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
+    public <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
         Constructor<?> constructor = getConstructor(implementationClass);
         newComponents.put(componentClass, new CacheProvider<>(new ConstructorInjectProvider<>(constructor)));
     }
