@@ -14,9 +14,9 @@ import org.junit.jupiter.api.Test;
  * <br/>
  *
  * 无需注入的component
- * @Inject标记构造方法，通过构造函数注入
- * @Inject标记字段，通过字段注入
- * @Inject标记方法，通过方法注入
+ * `@Inject`标记构造方法，通过构造函数注入
+ * `@Inject`标记字段，通过字段注入
+ * `@Inject`标记方法，通过方法注入
  * 通过tag选择对应的依赖
  *
  * 父类注入
@@ -179,6 +179,28 @@ public class ContextUnitTest extends BaseUnitTest {
             assertThrows(CyclicDependencyException.class, () -> {
                 context.getOrThrow(DependencyE.class);
             });
+        }
+
+        @Test
+        @DisplayName("循环依赖检测的第二种情况(G->H->I->G)，抛出异常")
+        void should_throw_exception_multiple_cyclic() {
+
+            context.bind(DependencyG.class, DependencyG.class);
+            context.bind(DependencyH.class, DependencyH.class);
+            context.bind(DependencyI.class, DependencyI.class);
+
+            assertThrows(CyclicDependencyException.class, () -> {
+                context.getOrThrow(DependencyG.class);
+            });
+
+            assertThrows(CyclicDependencyException.class, () -> {
+                context.getOrThrow(DependencyH.class);
+            });
+
+            assertThrows(CyclicDependencyException.class, () -> {
+                context.getOrThrow(DependencyI.class);
+            });
+
         }
 
     }
