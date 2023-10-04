@@ -3,8 +3,10 @@ package com.lzb.container;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import jakarta.inject.Inject;
@@ -32,17 +34,10 @@ public class Context {
 
     <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
 
-        long injectConstructorsCount = getInjectConstructors(implementationClass).count();
-        if (injectConstructorsCount > 1) {
-            throw new IllegalArgumentException("不支持多个构造函数");
-        }
-        if (getDefaultConstructor(implementationClass).isEmpty() && injectConstructorsCount == 0) {
-            throw new IllegalArgumentException("构造函数非法");
-        }
+        Constructor<?> constructor = getConstructor(implementationClass);
 
         newComponents.put(componentClass, new CacheProvider<>(() -> {
             try {
-                Constructor<?> constructor = getConstructor(implementationClass);
                 Object[] dependencies = getInjectDependencies(constructor);
                 return constructor.newInstance(dependencies);
             } catch (Exception e) {
@@ -56,16 +51,18 @@ public class Context {
     }
 
     private <T, I extends T> Constructor<?> getConstructor(Class<I> implementationClass) {
-        return getInjectConstructors(implementationClass)
-                .findFirst()
-                // 返回默认构造函数
-                .orElseGet(() -> {
-                    try {
-                        return implementationClass.getConstructor();
-                    } catch (NoSuchMethodException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+
+        List<Constructor<?>> injectConstructors = getInjectConstructors(implementationClass).toList();
+        long injectConstructorsCount = injectConstructors.size();
+        if (injectConstructorsCount > 1) {
+            throw new IllegalArgumentException("不支持多个构造函数");
+        }
+        Optional<Constructor<?>> defaultConstructor = getDefaultConstructor(implementationClass);
+        if (injectConstructorsCount == 0 && defaultConstructor.isEmpty()) {
+            throw new IllegalArgumentException("构造函数非法");
+        }
+
+        return injectConstructors.stream().findFirst().orElseGet(defaultConstructor::orElseThrow);
     }
 
     private <T, I extends T> Stream<Constructor<?>> getInjectConstructors(Class<I> implementationClass) {
