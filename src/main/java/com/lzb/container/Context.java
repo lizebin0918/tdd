@@ -29,8 +29,9 @@ public class Context {
     }
 
     public <T> T getOrThrow(Class<T> componentClass) {
-        return get(componentClass).orElseThrow(DependencyNotFoundException::new);
+        return get(componentClass).orElseThrow();
     }
+
     public <T> Optional<T> get(Class<T> componentClass) {
         return (Optional<T>) Optional.ofNullable(newComponents.get(componentClass)).map(Provider::get);
     }
@@ -67,6 +68,13 @@ public class Context {
             }
         }
 
+        private Object[] getInjectDependencies(Constructor<?> constructor) {
+            Class<?>[] parameterTypes = constructor.getParameterTypes();
+            return Arrays.stream(parameterTypes)
+                    .map(p -> Context.this.get(p).orElseThrow(() -> new DependencyNotFoundException(p, constructor.getDeclaringClass())))
+                    .toArray();
+        }
+
     }
 
 
@@ -97,11 +105,4 @@ public class Context {
         return constructor.isAnnotationPresent(Inject.class);
     }
 
-    private Object[] getInjectDependencies(Constructor<?> constructor) {
-        Class<?>[] parameterTypes = constructor.getParameterTypes();
-        return Arrays.stream(parameterTypes)
-                .map(this::get)
-                .map(d -> d.orElseThrow(DependencyNotFoundException::new))
-                .toArray();
-    }
 }

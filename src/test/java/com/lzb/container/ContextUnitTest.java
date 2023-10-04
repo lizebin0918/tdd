@@ -73,7 +73,7 @@ public class ContextUnitTest extends BaseUnitTest {
 
         @Test
         @DisplayName("通过默认函数绑定方式")
-        void should_bind_with_default_contructor() {
+        void should_bind_with_default_constructor() {
 
             // 获取ComponentB需要的实例
             //Class[] klass = ComponentB.class.getConstructors()[0].getParameterTypes();
@@ -136,7 +136,18 @@ public class ContextUnitTest extends BaseUnitTest {
 
             DependencyD dependencyD = context.getOrThrow(DependencyD.class);
             assertThat(dependencyD.getName()).isEqualTo(hello);
+        }
 
+        @Test
+        @DisplayName("依赖不存在，抛出异常，判断异常的成员属性是否正确")
+        void should_throw_dependency_not_found_exception() {
+            context.bind(DependencyA.class, DependencyA.class);
+            context.bind(DependencyB.class, DependencyB.class);
+            context.bind(DependencyC.class, DependencyC.class);
+
+            var e = assertThrows(DependencyNotFoundException.class, () -> context.get(DependencyC.class));
+            assertThat(e.getDependencyType()).isEqualTo(String.class);
+            assertThat(e.getComponentType()).isEqualTo(DependencyC.class);
         }
 
         ///////////////////////////////////////////////////////////////////////////
@@ -164,9 +175,12 @@ public class ContextUnitTest extends BaseUnitTest {
         void should_throw_exception_when_dependency_not_exist() {
             context.bind(Component.class, ComponentDependencyNotExist.class);
 
-            assertThrows(DependencyNotFoundException.class, () -> {
+            DependencyNotFoundException e = assertThrows(DependencyNotFoundException.class, () -> {
                 context.getOrThrow(Component.class);
             });
+
+            assertThat(e.getDependencyType()).isEqualTo(String.class);
+            assertThat(e.getComponentType()).isEqualTo(ComponentDependencyNotExist.class);
         }
 
         @Test
