@@ -129,6 +129,18 @@ public class ContextUnitTest extends BaseUnitTest {
 
         }
 
+        ///////////////////////////////////////////////////////////////////////////
+        // 以下是异常的情况
+        ///////////////////////////////////////////////////////////////////////////
+
+        @Test
+        @DisplayName("多个inject构造函数，抛出异常，尽量把异常前置，在bind的时候检测")
+        void should_throw_exception_if_multi_inject_constructors() {
+            assertThrows(IllegalArgumentException.class, () -> {
+                context.bind(Component.class, ComponentInstanceWithMultiInject.class);
+            });
+        }
+
     }
 
 }

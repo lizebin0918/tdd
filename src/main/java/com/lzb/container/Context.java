@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
@@ -28,6 +29,11 @@ public class Context {
     }
 
     <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
+
+        if(getInjectConstructors(implementationClass).count() > 1) {
+            throw new IllegalArgumentException("不支持多个构造函数");
+        }
+
         newComponents.put(componentClass, new CacheProvider<>(() -> {
             try {
                 Constructor<?> constructor = getConstructor(implementationClass);
@@ -39,10 +45,8 @@ public class Context {
         }));
     }
 
-    private static <T, I extends T> Constructor<?> getConstructor(Class<I> implementationClass) {
-        Constructor<?>[] constructors = implementationClass.getConstructors();
-        return Arrays.stream(constructors)
-                .filter(constructor -> constructor.isAnnotationPresent(Inject.class))
+    private <T, I extends T> Constructor<?> getConstructor(Class<I> implementationClass) {
+        return getInjectConstructors(implementationClass)
                 .findFirst()
                 // 返回默认构造函数
                 .orElseGet(() -> {
@@ -52,6 +56,14 @@ public class Context {
                         throw new RuntimeException(e);
                     }
                 });
+    }
+
+    private <T, I extends T> Stream<Constructor<?>> getInjectConstructors(Class<I> implementationClass) {
+        return Arrays.stream(implementationClass.getConstructors()).filter(this::byIsInjectConstructor);
+    }
+
+    private boolean byIsInjectConstructor(Constructor<?> constructor) {
+        return constructor.isAnnotationPresent(Inject.class);
     }
 
     private Object[] getInjectDependencies(Constructor<?> constructor) {
