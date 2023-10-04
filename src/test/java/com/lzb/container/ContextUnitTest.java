@@ -1,5 +1,7 @@
 package com.lzb.container;
 
+import java.util.Set;
+
 import com.lzb.BaseUnitTest;
 import com.lzb.container.exception.CyclicDependencyException;
 import com.lzb.container.exception.DependencyNotFoundException;
@@ -190,9 +192,11 @@ public class ContextUnitTest extends BaseUnitTest {
             context.bind(DependencyE.class, DependencyE.class);
             context.bind(DependencyF.class, DependencyF.class);
 
-            assertThrows(CyclicDependencyException.class, () -> {
+            var e = assertThrows(CyclicDependencyException.class, () -> {
                 context.getOrThrow(DependencyE.class);
             });
+
+            assertThat(e.getComponents()).isEqualTo(Set.of(DependencyE.class, DependencyF.class));
         }
 
         @Test

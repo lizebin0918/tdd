@@ -53,12 +53,14 @@ public class Context {
         @Override
         public T get() {
             if (constructing) {
-                throw new CyclicDependencyException();
+                throw new CyclicDependencyException(constructor.getDeclaringClass());
             }
             try {
                 constructing = true;
                 Object[] dependencies = getInjectDependencies(constructor);
                 return constructor.newInstance(dependencies);
+            } catch (CyclicDependencyException e) {
+                throw new CyclicDependencyException(constructor.getDeclaringClass(), e);
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
@@ -71,7 +73,8 @@ public class Context {
         private Object[] getInjectDependencies(Constructor<?> constructor) {
             Class<?>[] parameterTypes = constructor.getParameterTypes();
             return Arrays.stream(parameterTypes)
-                    .map(p -> Context.this.get(p).orElseThrow(() -> new DependencyNotFoundException(p, constructor.getDeclaringClass())))
+                    .map(p -> Context.this.get(p)
+                            .orElseThrow(() -> new DependencyNotFoundException(p, constructor.getDeclaringClass())))
                     .toArray();
         }
 
