@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.lzb.container.exception.DependencyNotFoundException;
@@ -28,12 +27,11 @@ public class Context {
         newComponents.put(componentClass, () -> instance);
     }
 
-    <T> T get(Class<T> componentClass) {
-        Provider<?> provider = newComponents.get(componentClass);
-        if (provider == null) {
-            throw new DependencyNotFoundException();
-        }
-        return (T) provider.get();
+    public <T> T getOrThrow(Class<T> componentClass) {
+        return get(componentClass).orElseThrow(DependencyNotFoundException::new);
+    }
+    public <T> Optional<T> get(Class<T> componentClass) {
+        return (Optional<T>) Optional.ofNullable(newComponents.get(componentClass)).map(Provider::get);
     }
 
     <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
@@ -82,6 +80,7 @@ public class Context {
     private Object[] getInjectDependencies(Constructor<?> constructor) {
         return Arrays.stream(constructor.getParameterTypes())
                 .map(this::get)
+                .map(d -> d.orElseThrow(DependencyNotFoundException::new))
                 .toArray();
     }
 }

@@ -42,8 +42,15 @@ public class ContextUnitTest extends BaseUnitTest {
         void should_instance_to_context_directly() {
             ComponentDirectlyInstance instance = new ComponentDirectlyInstance();
             context.bind(ComponentDirectlyInstance.class, instance);
-            Component component = context.get(ComponentDirectlyInstance.class);
+            Component component = context.getOrThrow(ComponentDirectlyInstance.class);
             Assertions.assertSame(instance, component);
+        }
+
+        @Test
+        @DisplayName("获取不存在的实例，抛出异常")
+        void should_throw_exception_when_instance_not_exist() {
+            // assertThrows(DependencyNotFoundException.class, () -> context.getOrThrow(Component.class));
+            assertThat(context.get(Component.class).isEmpty());
         }
 
         @Test
@@ -71,7 +78,7 @@ public class ContextUnitTest extends BaseUnitTest {
             context.bind(Component.class, ComponentInstanceWithDefaultContructor.class);
 
             // 从context里面获取实例
-            var instance = context.get(Component.class);
+            var instance = context.getOrThrow(Component.class);
 
             // 如果都有的话，那就直接返回ComponentB实例，如果没有会出现递归构造，先不考虑（步子迈太大）
             assertThat(instance).isNotNull();
@@ -85,7 +92,7 @@ public class ContextUnitTest extends BaseUnitTest {
             context.bind(Dependency.class, dependency);
             context.bind(Component.class, ComponentInstaceWithInject.class);
 
-            Component component = context.get(Component.class);
+            Component component = context.getOrThrow(Component.class);
 
             assertThat(component).isNotNull();
             assertThat(component).isInstanceOf(ComponentInstaceWithInject.class);
@@ -103,13 +110,13 @@ public class ContextUnitTest extends BaseUnitTest {
             String hello = "hello";
             context.bind(String.class, hello);
 
-            DependencyA dependencyA = context.get(DependencyA.class);
+            DependencyA dependencyA = context.getOrThrow(DependencyA.class);
             assertThat(dependencyA).isNotNull();
 
-            DependencyB dependencyB = context.get(DependencyB.class);
+            DependencyB dependencyB = context.getOrThrow(DependencyB.class);
             assertThat(dependencyB).isNotNull();
 
-            DependencyC dependencyC = context.get(DependencyC.class);
+            DependencyC dependencyC = context.getOrThrow(DependencyC.class);
             assertThat(dependencyC).isNotNull();
 
             assertThat(dependencyC.dependencyB).isSameAs(dependencyB);
@@ -125,7 +132,7 @@ public class ContextUnitTest extends BaseUnitTest {
             String hello = "hello";
             context.bind(String.class, hello);
 
-            DependencyD dependencyD = context.get(DependencyD.class);
+            DependencyD dependencyD = context.getOrThrow(DependencyD.class);
             assertThat(dependencyD.getName()).isEqualTo(hello);
 
         }
@@ -153,9 +160,10 @@ public class ContextUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("依赖不存在，抛出异常")
         void should_throw_exception_when_dependency_not_exist() {
+            context.bind(Component.class, ComponentDependencyNotExist.class);
+
             assertThrows(DependencyNotFoundException.class, () -> {
-                context.bind(Component.class, ComponentDependencyNotExist.class);
-                context.get(Component.class);
+                context.getOrThrow(Component.class);
             });
         }
 
