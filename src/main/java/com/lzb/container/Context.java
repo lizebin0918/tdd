@@ -28,10 +28,6 @@ public class Context {
         newComponents.put(componentClass, () -> instance);
     }
 
-    public <T> T getOrThrow(Class<T> componentClass) {
-        return get(componentClass).orElseThrow();
-    }
-
     public <T> Optional<T> get(Class<T> componentClass) {
         return (Optional<T>) Optional.ofNullable(newComponents.get(componentClass)).map(Provider::get);
     }

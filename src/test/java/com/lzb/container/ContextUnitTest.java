@@ -45,7 +45,7 @@ public class ContextUnitTest extends BaseUnitTest {
         void should_instance_to_context_directly() {
             ComponentDirectlyInstance instance = new ComponentDirectlyInstance();
             context.bind(ComponentDirectlyInstance.class, instance);
-            Component component = context.getOrThrow(ComponentDirectlyInstance.class);
+            Component component = context.get(ComponentDirectlyInstance.class).orElseThrow();
             Assertions.assertSame(instance, component);
         }
 
@@ -82,7 +82,7 @@ public class ContextUnitTest extends BaseUnitTest {
             context.bind(Component.class, ComponentInstanceWithDefaultContructor.class);
 
             // 从context里面获取实例
-            var instance = context.getOrThrow(Component.class);
+            var instance = context.get(Component.class).orElseThrow();
 
             // 如果都有的话，那就直接返回ComponentB实例，如果没有会出现递归构造，先不考虑（步子迈太大）
             assertThat(instance).isNotNull();
@@ -96,7 +96,7 @@ public class ContextUnitTest extends BaseUnitTest {
             context.bind(Dependency.class, dependency);
             context.bind(Component.class, ComponentInstaceWithInject.class);
 
-            Component component = context.getOrThrow(Component.class);
+            Component component = context.get(Component.class).orElseThrow();
 
             assertThat(component).isNotNull();
             assertThat(component).isInstanceOf(ComponentInstaceWithInject.class);
@@ -114,13 +114,13 @@ public class ContextUnitTest extends BaseUnitTest {
             String hello = "hello";
             context.bind(String.class, hello);
 
-            DependencyA dependencyA = context.getOrThrow(DependencyA.class);
+            DependencyA dependencyA = context.get(DependencyA.class).orElseThrow();
             assertThat(dependencyA).isNotNull();
 
-            DependencyB dependencyB = context.getOrThrow(DependencyB.class);
+            DependencyB dependencyB = context.get(DependencyB.class).orElseThrow();
             assertThat(dependencyB).isNotNull();
 
-            DependencyC dependencyC = context.getOrThrow(DependencyC.class);
+            DependencyC dependencyC = context.get(DependencyC.class).orElseThrow();
             assertThat(dependencyC).isNotNull();
 
             assertThat(dependencyC.dependencyB).isSameAs(dependencyB);
@@ -136,7 +136,7 @@ public class ContextUnitTest extends BaseUnitTest {
             String hello = "hello";
             context.bind(String.class, hello);
 
-            DependencyD dependencyD = context.getOrThrow(DependencyD.class);
+            DependencyD dependencyD = context.get(DependencyD.class).orElseThrow();
             assertThat(dependencyD.getName()).isEqualTo(hello);
         }
 
@@ -178,7 +178,7 @@ public class ContextUnitTest extends BaseUnitTest {
             context.bind(Component.class, ComponentDependencyNotExist.class);
 
             DependencyNotFoundException e = assertThrows(DependencyNotFoundException.class, () -> {
-                context.getOrThrow(Component.class);
+                context.get(Component.class);
             });
 
             assertThat(e.getDependencyType()).isEqualTo(String.class);
@@ -193,7 +193,7 @@ public class ContextUnitTest extends BaseUnitTest {
             context.bind(DependencyF.class, DependencyF.class);
 
             var e = assertThrows(CyclicDependencyException.class, () -> {
-                context.getOrThrow(DependencyE.class);
+                context.get(DependencyE.class);
             });
 
             assertThat(e.getComponents()).isEqualTo(Set.of(DependencyE.class, DependencyF.class));
@@ -208,15 +208,15 @@ public class ContextUnitTest extends BaseUnitTest {
             context.bind(DependencyI.class, DependencyI.class);
 
             assertThrows(CyclicDependencyException.class, () -> {
-                context.getOrThrow(DependencyG.class);
+                context.get(DependencyG.class);
             });
 
             assertThrows(CyclicDependencyException.class, () -> {
-                context.getOrThrow(DependencyH.class);
+                context.get(DependencyH.class);
             });
 
             assertThrows(CyclicDependencyException.class, () -> {
-                context.getOrThrow(DependencyI.class);
+                context.get(DependencyI.class);
             });
 
         }
