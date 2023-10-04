@@ -1,6 +1,7 @@
 package com.lzb.container;
 
 import com.lzb.BaseUnitTest;
+import com.lzb.container.exception.DependencyNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -146,6 +147,15 @@ public class ContextUnitTest extends BaseUnitTest {
         void should_throw_exception_if_non_inject_constructor_nor_default_constructor() {
             assertThrows(IllegalArgumentException.class, () -> {
                 context.bind(Component.class, ComponentInstanceWithoutInjectAndDefaultConstructor.class);
+            });
+        }
+
+        @Test
+        @DisplayName("依赖不存在，抛出异常")
+        void should_throw_exception_when_dependency_not_exist() {
+            assertThrows(DependencyNotFoundException.class, () -> {
+                context.bind(Component.class, ComponentDependencyNotExist.class);
+                context.get(Component.class);
             });
         }
 

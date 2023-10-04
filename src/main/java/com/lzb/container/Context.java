@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.lzb.container.exception.DependencyNotFoundException;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
@@ -21,15 +22,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Context {
 
-    private static final Map<Class<?>, Provider<?>> newComponents = new HashMap<>();
+    private final Map<Class<?>, Provider<?>> newComponents = new HashMap<>();
 
     <T> void bind(Class<T> componentClass, T instance) {
         newComponents.put(componentClass, () -> instance);
     }
 
     <T> T get(Class<T> componentClass) {
-        return (T) newComponents.get(componentClass)
-                .get();
+        Provider<?> provider = newComponents.get(componentClass);
+        if (provider == null) {
+            throw new DependencyNotFoundException();
+        }
+        return (T) provider.get();
     }
 
     <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
@@ -40,6 +44,8 @@ public class Context {
             try {
                 Object[] dependencies = getInjectDependencies(constructor);
                 return constructor.newInstance(dependencies);
+            } catch(DependencyNotFoundException e) {
+                throw e;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -66,8 +72,7 @@ public class Context {
     }
 
     private <T, I extends T> Stream<Constructor<?>> getInjectConstructors(Class<I> implementationClass) {
-        return Arrays.stream(implementationClass.getConstructors())
-                .filter(this::byIsInjectConstructor);
+        return Arrays.stream(implementationClass.getConstructors()).filter(this::byIsInjectConstructor);
     }
 
     private boolean byIsInjectConstructor(Constructor<?> constructor) {
