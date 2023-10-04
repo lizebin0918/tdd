@@ -47,9 +47,10 @@ public class ContextUnitTest extends BaseUnitTest {
         }
 
         @Test
-        @DisplayName("获取不存在的实例，抛出异常")
-        void should_throw_exception_when_instance_not_exist() {
+        @DisplayName("获取不存在的实例")
+        void should_throw_exception_when_instance_not_defined() {
             // assertThrows(DependencyNotFoundException.class, () -> context.getOrThrow(Component.class));
+            // 这样更加友好，毕竟这是一个接口，可能还没有实现
             assertThat(context.get(Component.class).isEmpty());
         }
 
