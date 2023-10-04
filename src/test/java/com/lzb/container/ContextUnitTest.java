@@ -1,6 +1,7 @@
 package com.lzb.container;
 
 import com.lzb.BaseUnitTest;
+import com.lzb.container.exception.CyclicDependencyException;
 import com.lzb.container.exception.DependencyNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -165,6 +166,18 @@ public class ContextUnitTest extends BaseUnitTest {
 
             assertThrows(DependencyNotFoundException.class, () -> {
                 context.getOrThrow(Component.class);
+            });
+        }
+
+        @Test
+        @DisplayName("循环依赖，抛出异常")
+        void should_throw_exception_cyclic() {
+
+            context.bind(DependencyE.class, DependencyE.class);
+            context.bind(DependencyF.class, DependencyF.class);
+
+            assertThrows(CyclicDependencyException.class, () -> {
+                context.getOrThrow(DependencyE.class);
             });
         }
 

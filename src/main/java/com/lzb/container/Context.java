@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.lzb.container.exception.CyclicDependencyException;
 import com.lzb.container.exception.DependencyNotFoundException;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
@@ -35,20 +36,39 @@ public class Context {
     }
 
     <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
-
         Constructor<?> constructor = getConstructor(implementationClass);
+        newComponents.put(componentClass, new CacheProvider<>(new ConstructorInjectProvider<>(constructor)));
+    }
 
-        newComponents.put(componentClass, new CacheProvider<>(() -> {
+    class ConstructorInjectProvider<T> implements Provider<T> {
+
+        private final Constructor<T> constructor;
+        private boolean constructing = false;
+
+        public ConstructorInjectProvider(Constructor<T> constructor) {
+            this.constructor = constructor;
+        }
+
+        @Override
+        public T get() {
+            if (constructing) {
+                throw new CyclicDependencyException();
+            }
             try {
+                constructing = true;
                 Object[] dependencies = getInjectDependencies(constructor);
                 return constructor.newInstance(dependencies);
-            } catch(DependencyNotFoundException e) {
+            } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
                 throw new RuntimeException(e);
+            } finally {
+                constructing = false;
             }
-        }));
+        }
+
     }
+
 
     private <T, I extends T> Optional<Constructor<?>> getDefaultConstructor(Class<I> implementationClass) {
         return Arrays.stream(implementationClass.getConstructors()).filter(c -> c.getParameterCount() == 0).findFirst();
@@ -78,7 +98,8 @@ public class Context {
     }
 
     private Object[] getInjectDependencies(Constructor<?> constructor) {
-        return Arrays.stream(constructor.getParameterTypes())
+        Class<?>[] parameterTypes = constructor.getParameterTypes();
+        return Arrays.stream(parameterTypes)
                 .map(this::get)
                 .map(d -> d.orElseThrow(DependencyNotFoundException::new))
                 .toArray();
