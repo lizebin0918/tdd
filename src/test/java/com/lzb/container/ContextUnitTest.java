@@ -141,6 +141,14 @@ public class ContextUnitTest extends BaseUnitTest {
             });
         }
 
+        @Test
+        @DisplayName("没有inject和默认的构造函数，抛出异常")
+        void should_throw_exception_if_non_inject_constructor_nor_default_constructor() {
+            assertThrows(IllegalArgumentException.class, () -> {
+                context.bind(Component.class, ComponentInstanceWithoutInjectAndDefaultConstructor.class);
+            });
+        }
+
     }
 
 }

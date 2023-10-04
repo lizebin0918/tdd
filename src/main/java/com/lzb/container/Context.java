@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import jakarta.inject.Inject;
@@ -25,13 +26,18 @@ public class Context {
     }
 
     <T> T get(Class<T> componentClass) {
-        return (T) newComponents.get(componentClass).get();
+        return (T) newComponents.get(componentClass)
+                .get();
     }
 
     <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
 
-        if(getInjectConstructors(implementationClass).count() > 1) {
+        long injectConstructorsCount = getInjectConstructors(implementationClass).count();
+        if (injectConstructorsCount > 1) {
             throw new IllegalArgumentException("不支持多个构造函数");
+        }
+        if (getDefaultConstructor(implementationClass).isEmpty() && injectConstructorsCount == 0) {
+            throw new IllegalArgumentException("构造函数非法");
         }
 
         newComponents.put(componentClass, new CacheProvider<>(() -> {
@@ -43,6 +49,10 @@ public class Context {
                 throw new RuntimeException(e);
             }
         }));
+    }
+
+    private <T, I extends T> Optional<Constructor<?>> getDefaultConstructor(Class<I> implementationClass) {
+        return Arrays.stream(implementationClass.getConstructors()).filter(c -> c.getParameterCount() == 0).findFirst();
     }
 
     private <T, I extends T> Constructor<?> getConstructor(Class<I> implementationClass) {
@@ -59,7 +69,8 @@ public class Context {
     }
 
     private <T, I extends T> Stream<Constructor<?>> getInjectConstructors(Class<I> implementationClass) {
-        return Arrays.stream(implementationClass.getConstructors()).filter(this::byIsInjectConstructor);
+        return Arrays.stream(implementationClass.getConstructors())
+                .filter(this::byIsInjectConstructor);
     }
 
     private boolean byIsInjectConstructor(Constructor<?> constructor) {
@@ -67,6 +78,8 @@ public class Context {
     }
 
     private Object[] getInjectDependencies(Constructor<?> constructor) {
-        return Arrays.stream(constructor.getParameterTypes()).map(this::get).toArray();
+        return Arrays.stream(constructor.getParameterTypes())
+                .map(this::get)
+                .toArray();
     }
 }
