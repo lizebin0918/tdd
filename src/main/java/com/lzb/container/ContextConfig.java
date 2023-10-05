@@ -2,7 +2,9 @@ package com.lzb.container;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,7 +13,6 @@ import java.util.stream.Stream;
 
 import com.lzb.container.exception.CyclicDependencyException;
 import com.lzb.container.exception.DependencyNotBindException;
-import com.lzb.container.exception.DependencyNotFoundException;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,12 +48,27 @@ public class ContextConfig {
                     }
                 }));
 
+        dependencies.forEach((componentType, dependencyTypes) -> {
+            checkCyclicDependency(componentType, new LinkedList<>() { });
+        });
+
         return new Context() {
             @Override
             public <T> Optional<T> get(Class<T> componentClass) {
                 return (Optional<T>) Optional.ofNullable(newComponents.get(componentClass)).map(provider -> provider.get(this));
             }
         };
+    }
+
+    private void checkCyclicDependency(Class<?> componentType, Deque<Class<?>> visiting) {
+        for (Class<?> dependency : dependencies.get(componentType)) {
+            if (visiting.contains(dependency)) {
+                throw new CyclicDependencyException(visiting);
+            }
+            visiting.push(dependency);
+            checkCyclicDependency(dependency, visiting);
+            visiting.pop();
+        }
     }
 
     private <T, I extends T> Optional<Constructor<?>> getDefaultConstructor(Class<I> implementationClass) {

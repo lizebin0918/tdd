@@ -1,5 +1,6 @@
 package com.lzb.container.exception;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,6 +23,10 @@ public class CyclicDependencyException extends RuntimeException {
 
     public CyclicDependencyException(Class<?> componentType) {
         this.components.add(componentType);
+    }
+
+    public CyclicDependencyException(Collection<Class<?>> componentTypes) {
+        this.components.addAll(componentTypes);
     }
 
 }

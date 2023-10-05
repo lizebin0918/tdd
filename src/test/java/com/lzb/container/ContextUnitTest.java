@@ -5,7 +5,6 @@ import java.util.Set;
 import com.lzb.BaseUnitTest;
 import com.lzb.container.exception.CyclicDependencyException;
 import com.lzb.container.exception.DependencyNotBindException;
-import com.lzb.container.exception.DependencyNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -199,10 +198,8 @@ public class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(DependencyE.class, DependencyE.class);
             contextConfig.bind(DependencyF.class, DependencyF.class);
 
-            Context context = contextConfig.getContext();
-
             var e = assertThrows(CyclicDependencyException.class, () -> {
-                context.get(DependencyE.class);
+                contextConfig.getContext();
             });
 
             assertThat(e.getComponents()).isEqualTo(Set.of(DependencyE.class, DependencyF.class));
@@ -216,18 +213,9 @@ public class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(DependencyH.class, DependencyH.class);
             contextConfig.bind(DependencyI.class, DependencyI.class);
 
-            Context context = contextConfig.getContext();
 
             assertThrows(CyclicDependencyException.class, () -> {
-                context.get(DependencyG.class);
-            });
-
-            assertThrows(CyclicDependencyException.class, () -> {
-                context.get(DependencyH.class);
-            });
-
-            assertThrows(CyclicDependencyException.class, () -> {
-                context.get(DependencyI.class);
+                contextConfig.getContext();
             });
 
         }
