@@ -40,15 +40,18 @@ public class ContextConfig {
 
     public Context getContext() {
 
-        // 检查依赖是否存在
-        dependencies.forEach((componentType, dependencyTypes) ->
-                dependencyTypes.forEach(dependencyType -> {
-                    if (!newComponents.containsKey(dependencyType)) {
-                        throw new DependencyNotBindException(dependencyType, componentType);
-                    }
-                }));
+        dependencies.forEach((componentType, dependencyTypes) -> {
 
-        dependencies.forEach((componentType, dependencyTypes) -> checkCyclicDependency(componentType, new LinkedList<>() { }));
+            // 检查依赖是否存在
+            dependencyTypes.forEach(dependencyType -> {
+                if (!newComponents.containsKey(dependencyType)) {
+                    throw new DependencyNotBindException(dependencyType, componentType);
+                }
+            });
+
+            // 检查循环依赖
+            checkCyclicDependency(componentType, new LinkedList<>());
+        });
 
         return new Context() {
             @Override
