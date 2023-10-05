@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author lizebin
  */
 @Slf4j
-public class ContextConfig {
+public class ContextConfig implements Context {
 
     private final Map<Class<?>, Provider<?>> newComponents = new HashMap<>();
 
@@ -28,6 +28,7 @@ public class ContextConfig {
         newComponents.put(componentClass, () -> instance);
     }
 
+    @Override
     public <T> Optional<T> get(Class<T> componentClass) {
         return (Optional<T>) Optional.ofNullable(newComponents.get(componentClass)).map(Provider::get);
     }
