@@ -30,7 +30,16 @@ public class ContextConfig implements Context {
 
     @Override
     public <T> Optional<T> get(Class<T> componentClass) {
-        return (Optional<T>) Optional.ofNullable(newComponents.get(componentClass)).map(Provider::get);
+        return getContext().get(componentClass);
+    }
+
+    public Context getContext() {
+        return new Context() {
+            @Override
+            public <T> Optional<T> get(Class<T> componentClass) {
+                return (Optional<T>) Optional.ofNullable(newComponents.get(componentClass)).map(Provider::get);
+            }
+        };
     }
 
     public <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
