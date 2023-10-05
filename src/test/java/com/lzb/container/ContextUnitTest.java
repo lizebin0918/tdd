@@ -29,11 +29,11 @@ import org.junit.jupiter.api.Test;
  */
 public class ContextUnitTest extends BaseUnitTest {
 
-    Context context;
+    ContextConfig contextConfig;
 
     @BeforeEach
     public void beforeEach() {
-        context = new Context();
+        contextConfig = new ContextConfig();
     }
 
     @Nested
@@ -44,8 +44,8 @@ public class ContextUnitTest extends BaseUnitTest {
         @DisplayName("直接实例化到容器")
         void should_instance_to_context_directly() {
             ComponentDirectlyInstance instance = new ComponentDirectlyInstance();
-            context.bind(ComponentDirectlyInstance.class, instance);
-            Component component = context.get(ComponentDirectlyInstance.class).orElseThrow();
+            contextConfig.bind(ComponentDirectlyInstance.class, instance);
+            Component component = contextConfig.get(ComponentDirectlyInstance.class).orElseThrow();
             Assertions.assertSame(instance, component);
         }
 
@@ -54,7 +54,7 @@ public class ContextUnitTest extends BaseUnitTest {
         void should_throw_exception_when_instance_not_defined() {
             // assertThrows(DependencyNotFoundException.class, () -> context.getOrThrow(Component.class));
             // 这样更加友好，毕竟这是一个接口，可能还没有实现
-            assertThat(context.get(Component.class).isEmpty());
+            assertThat(contextConfig.get(Component.class).isEmpty());
         }
 
         @Test
@@ -79,10 +79,10 @@ public class ContextUnitTest extends BaseUnitTest {
 
             // 获取ComponentB需要的实例
             //Class[] klass = ComponentB.class.getConstructors()[0].getParameterTypes();
-            context.bind(Component.class, ComponentInstanceWithDefaultContructor.class);
+            contextConfig.bind(Component.class, ComponentInstanceWithDefaultContructor.class);
 
             // 从context里面获取实例
-            var instance = context.get(Component.class).orElseThrow();
+            var instance = contextConfig.get(Component.class).orElseThrow();
 
             // 如果都有的话，那就直接返回ComponentB实例，如果没有会出现递归构造，先不考虑（步子迈太大）
             assertThat(instance).isNotNull();
@@ -93,10 +93,10 @@ public class ContextUnitTest extends BaseUnitTest {
         @DisplayName("通过构造函数注入的绑定方式")
         void should_bind_with_inject_constructor() {
             Dependency dependency = new Dependency() { };
-            context.bind(Dependency.class, dependency);
-            context.bind(Component.class, ComponentInstaceWithInject.class);
+            contextConfig.bind(Dependency.class, dependency);
+            contextConfig.bind(Component.class, ComponentInstaceWithInject.class);
 
-            Component component = context.get(Component.class).orElseThrow();
+            Component component = contextConfig.get(Component.class).orElseThrow();
 
             assertThat(component).isNotNull();
             assertThat(component).isInstanceOf(ComponentInstaceWithInject.class);
@@ -108,19 +108,19 @@ public class ContextUnitTest extends BaseUnitTest {
         @DisplayName("多重传递依赖：A->B->C，没有循环依赖")
         void should_ABC_dependency() {
 
-            context.bind(DependencyA.class, DependencyA.class);
-            context.bind(DependencyB.class, DependencyB.class);
-            context.bind(DependencyC.class, DependencyC.class);
+            contextConfig.bind(DependencyA.class, DependencyA.class);
+            contextConfig.bind(DependencyB.class, DependencyB.class);
+            contextConfig.bind(DependencyC.class, DependencyC.class);
             String hello = "hello";
-            context.bind(String.class, hello);
+            contextConfig.bind(String.class, hello);
 
-            DependencyA dependencyA = context.get(DependencyA.class).orElseThrow();
+            DependencyA dependencyA = contextConfig.get(DependencyA.class).orElseThrow();
             assertThat(dependencyA).isNotNull();
 
-            DependencyB dependencyB = context.get(DependencyB.class).orElseThrow();
+            DependencyB dependencyB = contextConfig.get(DependencyB.class).orElseThrow();
             assertThat(dependencyB).isNotNull();
 
-            DependencyC dependencyC = context.get(DependencyC.class).orElseThrow();
+            DependencyC dependencyC = contextConfig.get(DependencyC.class).orElseThrow();
             assertThat(dependencyC).isNotNull();
 
             assertThat(dependencyC.dependencyB).isSameAs(dependencyB);
@@ -132,22 +132,22 @@ public class ContextUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("忽略bind顺序：A->B，先bind B，再bind A")
         void should_bind_orderly() {
-            context.bind(DependencyD.class, DependencyD.class);
+            contextConfig.bind(DependencyD.class, DependencyD.class);
             String hello = "hello";
-            context.bind(String.class, hello);
+            contextConfig.bind(String.class, hello);
 
-            DependencyD dependencyD = context.get(DependencyD.class).orElseThrow();
+            DependencyD dependencyD = contextConfig.get(DependencyD.class).orElseThrow();
             assertThat(dependencyD.getName()).isEqualTo(hello);
         }
 
         @Test
         @DisplayName("依赖不存在，抛出异常，判断异常的成员属性是否正确")
         void should_throw_dependency_not_found_exception() {
-            context.bind(DependencyA.class, DependencyA.class);
-            context.bind(DependencyB.class, DependencyB.class);
-            context.bind(DependencyC.class, DependencyC.class);
+            contextConfig.bind(DependencyA.class, DependencyA.class);
+            contextConfig.bind(DependencyB.class, DependencyB.class);
+            contextConfig.bind(DependencyC.class, DependencyC.class);
 
-            var e = assertThrows(DependencyNotFoundException.class, () -> context.get(DependencyC.class));
+            var e = assertThrows(DependencyNotFoundException.class, () -> contextConfig.get(DependencyC.class));
             assertThat(e.getDependencyType()).isEqualTo(String.class);
             assertThat(e.getComponentType()).isEqualTo(DependencyC.class);
         }
@@ -160,7 +160,7 @@ public class ContextUnitTest extends BaseUnitTest {
         @DisplayName("多个inject构造函数，抛出异常，尽量把异常前置，在bind的时候检测")
         void should_throw_exception_if_multi_inject_constructors() {
             assertThrows(IllegalArgumentException.class, () -> {
-                context.bind(Component.class, ComponentInstanceWithMultiInject.class);
+                contextConfig.bind(Component.class, ComponentInstanceWithMultiInject.class);
             });
         }
 
@@ -168,17 +168,17 @@ public class ContextUnitTest extends BaseUnitTest {
         @DisplayName("没有inject和默认的构造函数，抛出异常")
         void should_throw_exception_if_non_inject_constructor_nor_default_constructor() {
             assertThrows(IllegalArgumentException.class, () -> {
-                context.bind(Component.class, ComponentInstanceWithoutInjectAndDefaultConstructor.class);
+                contextConfig.bind(Component.class, ComponentInstanceWithoutInjectAndDefaultConstructor.class);
             });
         }
 
         @Test
         @DisplayName("依赖不存在，抛出异常")
         void should_throw_exception_when_dependency_not_exist() {
-            context.bind(Component.class, ComponentDependencyNotExist.class);
+            contextConfig.bind(Component.class, ComponentDependencyNotExist.class);
 
             DependencyNotFoundException e = assertThrows(DependencyNotFoundException.class, () -> {
-                context.get(Component.class);
+                contextConfig.get(Component.class);
             });
 
             assertThat(e.getDependencyType()).isEqualTo(String.class);
@@ -189,11 +189,11 @@ public class ContextUnitTest extends BaseUnitTest {
         @DisplayName("循环依赖，抛出异常")
         void should_throw_exception_cyclic() {
 
-            context.bind(DependencyE.class, DependencyE.class);
-            context.bind(DependencyF.class, DependencyF.class);
+            contextConfig.bind(DependencyE.class, DependencyE.class);
+            contextConfig.bind(DependencyF.class, DependencyF.class);
 
             var e = assertThrows(CyclicDependencyException.class, () -> {
-                context.get(DependencyE.class);
+                contextConfig.get(DependencyE.class);
             });
 
             assertThat(e.getComponents()).isEqualTo(Set.of(DependencyE.class, DependencyF.class));
@@ -203,20 +203,20 @@ public class ContextUnitTest extends BaseUnitTest {
         @DisplayName("循环依赖检测的第二种情况(G->H->I->G)，抛出异常")
         void should_throw_exception_multiple_cyclic() {
 
-            context.bind(DependencyG.class, DependencyG.class);
-            context.bind(DependencyH.class, DependencyH.class);
-            context.bind(DependencyI.class, DependencyI.class);
+            contextConfig.bind(DependencyG.class, DependencyG.class);
+            contextConfig.bind(DependencyH.class, DependencyH.class);
+            contextConfig.bind(DependencyI.class, DependencyI.class);
 
             assertThrows(CyclicDependencyException.class, () -> {
-                context.get(DependencyG.class);
+                contextConfig.get(DependencyG.class);
             });
 
             assertThrows(CyclicDependencyException.class, () -> {
-                context.get(DependencyH.class);
+                contextConfig.get(DependencyH.class);
             });
 
             assertThrows(CyclicDependencyException.class, () -> {
-                context.get(DependencyI.class);
+                contextConfig.get(DependencyI.class);
             });
 
         }

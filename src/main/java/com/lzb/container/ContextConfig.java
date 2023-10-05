@@ -15,12 +15,12 @@ import jakarta.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <br/>
+ * Context->ContextConfig 改造成 builder 模式，实现构造和初始化context分离<br/>
  * Created on : 2023-10-01 17:25
  * @author lizebin
  */
 @Slf4j
-public class Context {
+public class ContextConfig {
 
     private final Map<Class<?>, Provider<?>> newComponents = new HashMap<>();
 
@@ -69,7 +69,7 @@ public class Context {
         private Object[] getInjectDependencies(Constructor<?> constructor) {
             Class<?>[] parameterTypes = constructor.getParameterTypes();
             return Arrays.stream(parameterTypes)
-                    .map(p -> Context.this.get(p)
+                    .map(p -> ContextConfig.this.get(p)
                             .orElseThrow(() -> new DependencyNotFoundException(p, constructor.getDeclaringClass())))
                     .toArray();
         }
