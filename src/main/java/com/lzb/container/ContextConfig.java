@@ -22,27 +22,27 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ContextConfig {
 
-    private final Map<Class<?>, Provider<?>> newComponents = new HashMap<>();
+    private final Map<Class<?>, ContextProvider<?>> newComponents = new HashMap<>();
 
     public <T> void bind(Class<T> componentClass, T instance) {
-        newComponents.put(componentClass, () -> instance);
+        newComponents.put(componentClass, context -> instance);
+    }
+
+    public <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
+        Constructor<?> constructor = getConstructor(implementationClass);
+        newComponents.put(componentClass, new ConstructorInjectProvider<>(constructor));
     }
 
     public Context getContext() {
         return new Context() {
             @Override
             public <T> Optional<T> get(Class<T> componentClass) {
-                return (Optional<T>) Optional.ofNullable(newComponents.get(componentClass)).map(Provider::get);
+                return (Optional<T>) Optional.ofNullable(newComponents.get(componentClass)).map(provider -> provider.get(this));
             }
         };
     }
 
-    public <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
-        Constructor<?> constructor = getConstructor(implementationClass);
-        newComponents.put(componentClass, new CacheProvider<>(new ConstructorInjectProvider<>(constructor)));
-    }
-
-    class ConstructorInjectProvider<T> implements Provider<T> {
+    class ConstructorInjectProvider<T> implements ContextProvider<T> {
 
         private final Constructor<T> constructor;
         private boolean constructing = false;
@@ -51,14 +51,22 @@ public class ContextConfig {
             this.constructor = constructor;
         }
 
+        private Object[] getInjectDependencies(Constructor<?> constructor, Context context) {
+            Class<?>[] parameterTypes = constructor.getParameterTypes();
+            return Arrays.stream(parameterTypes)
+                    .map(p -> context.get(p)
+                            .orElseThrow(() -> new DependencyNotFoundException(p, constructor.getDeclaringClass())))
+                    .toArray();
+        }
+
         @Override
-        public T get() {
+        public T get(Context context) {
             if (constructing) {
                 throw new CyclicDependencyException(constructor.getDeclaringClass());
             }
             try {
                 constructing = true;
-                Object[] dependencies = getInjectDependencies(constructor);
+                Object[] dependencies = getInjectDependencies(constructor, context);
                 return constructor.newInstance(dependencies);
             } catch (CyclicDependencyException e) {
                 throw new CyclicDependencyException(constructor.getDeclaringClass(), e);
@@ -70,15 +78,6 @@ public class ContextConfig {
                 constructing = false;
             }
         }
-
-        private Object[] getInjectDependencies(Constructor<?> constructor) {
-            Class<?>[] parameterTypes = constructor.getParameterTypes();
-            return Arrays.stream(parameterTypes)
-                    .map(p -> getContext().get(p)
-                            .orElseThrow(() -> new DependencyNotFoundException(p, constructor.getDeclaringClass())))
-                    .toArray();
-        }
-
     }
 
 
