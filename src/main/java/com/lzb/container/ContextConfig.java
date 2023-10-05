@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import com.lzb.container.exception.CyclicDependencyException;
@@ -25,11 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ContextConfig {
 
-    private final Map<Class<?>, ContextProvider<?>> newComponents = new HashMap<>();
-    private final Map<Class<?>, Set<Class<?>>> dependencies = new HashMap<>();
+    private final Map<Class<?>, ContextProvider<?>> components = new HashMap<>();
 
     public <T> void bind(Class<T> componentClass, T instance) {
-        newComponents.put(componentClass, new ContextProvider<>() {
+        components.put(componentClass, new ContextProvider<>() {
             @Override
             public Object get(Context context) {
                 return instance;
@@ -40,22 +38,20 @@ public class ContextConfig {
                 return Collections.emptyList();
             }
         });
-        dependencies.put(componentClass, Collections.emptySet());
     }
 
     public <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
         Constructor<?> constructor = getConstructor(implementationClass);
-        newComponents.put(componentClass, new ConstructorInjectProvider<>(constructor));
-        dependencies.put(componentClass, Set.of(constructor.getParameterTypes()));
+        components.put(componentClass, new ConstructorInjectProvider<>(constructor));
     }
 
     public Context getContext() {
 
-        dependencies.forEach((componentType, dependencyTypes) -> {
+        components.forEach((componentType, provider) -> {
 
             // 检查依赖是否存在
-            dependencyTypes.forEach(dependencyType -> {
-                if (!newComponents.containsKey(dependencyType)) {
+            provider.getDependencies().forEach(dependencyType -> {
+                if (!components.containsKey(dependencyType)) {
                     throw new DependencyNotBindException(dependencyType, componentType);
                 }
             });
@@ -67,13 +63,13 @@ public class ContextConfig {
         return new Context() {
             @Override
             public <T> Optional<T> get(Class<T> componentClass) {
-                return (Optional<T>) Optional.ofNullable(newComponents.get(componentClass)).map(provider -> provider.get(this));
+                return (Optional<T>) Optional.ofNullable(components.get(componentClass)).map(provider -> provider.get(this));
             }
         };
     }
 
     private void checkCyclicDependency(Class<?> componentType, Deque<Class<?>> visiting) {
-        for (Class<?> dependency : dependencies.get(componentType)) {
+        for (Class<?> dependency : components.get(componentType).getDependencies()) {
             if (visiting.contains(dependency)) {
                 throw new CyclicDependencyException(visiting);
             }
