@@ -1,4 +1,4 @@
-package com.lzb.container;
+package com.lzb.container.constructor;
 
 import jakarta.inject.Inject;
 

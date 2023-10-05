@@ -1,4 +1,4 @@
-package com.lzb.container;
+package com.lzb.container.constructor;
 
 
 import jakarta.inject.Inject;
@@ -17,7 +17,7 @@ public class ComponentInstaceWithInject implements Component {
         this.dependency = dependency;
     }
 
-    Dependency getDependency() {
+    public Dependency getDependency() {
         return dependency;
     }
 }
