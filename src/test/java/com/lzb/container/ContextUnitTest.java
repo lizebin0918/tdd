@@ -45,7 +45,8 @@ public class ContextUnitTest extends BaseUnitTest {
         void should_instance_to_context_directly() {
             ComponentDirectlyInstance instance = new ComponentDirectlyInstance();
             contextConfig.bind(ComponentDirectlyInstance.class, instance);
-            Component component = contextConfig.get(ComponentDirectlyInstance.class).orElseThrow();
+            Context context = contextConfig.getContext();
+            Component component = context.get(ComponentDirectlyInstance.class).orElseThrow();
             Assertions.assertSame(instance, component);
         }
 
@@ -54,7 +55,8 @@ public class ContextUnitTest extends BaseUnitTest {
         void should_throw_exception_when_instance_not_defined() {
             // assertThrows(DependencyNotFoundException.class, () -> context.getOrThrow(Component.class));
             // 这样更加友好，毕竟这是一个接口，可能还没有实现
-            assertThat(contextConfig.get(Component.class).isEmpty());
+            Context context = contextConfig.getContext();
+            assertThat(context.get(Component.class).isEmpty());
         }
 
         @Test
@@ -82,7 +84,8 @@ public class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(Component.class, ComponentInstanceWithDefaultContructor.class);
 
             // 从context里面获取实例
-            var instance = contextConfig.get(Component.class).orElseThrow();
+            Context context = contextConfig.getContext();
+            var instance = context.get(Component.class).orElseThrow();
 
             // 如果都有的话，那就直接返回ComponentB实例，如果没有会出现递归构造，先不考虑（步子迈太大）
             assertThat(instance).isNotNull();
@@ -96,7 +99,8 @@ public class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(Dependency.class, dependency);
             contextConfig.bind(Component.class, ComponentInstaceWithInject.class);
 
-            Component component = contextConfig.get(Component.class).orElseThrow();
+            Context context = contextConfig.getContext();
+            Component component = context.get(Component.class).orElseThrow();
 
             assertThat(component).isNotNull();
             assertThat(component).isInstanceOf(ComponentInstaceWithInject.class);
@@ -114,13 +118,14 @@ public class ContextUnitTest extends BaseUnitTest {
             String hello = "hello";
             contextConfig.bind(String.class, hello);
 
-            DependencyA dependencyA = contextConfig.get(DependencyA.class).orElseThrow();
+            Context context = contextConfig.getContext();
+            DependencyA dependencyA = context.get(DependencyA.class).orElseThrow();
             assertThat(dependencyA).isNotNull();
 
-            DependencyB dependencyB = contextConfig.get(DependencyB.class).orElseThrow();
+            DependencyB dependencyB = context.get(DependencyB.class).orElseThrow();
             assertThat(dependencyB).isNotNull();
 
-            DependencyC dependencyC = contextConfig.get(DependencyC.class).orElseThrow();
+            DependencyC dependencyC = context.get(DependencyC.class).orElseThrow();
             assertThat(dependencyC).isNotNull();
 
             assertThat(dependencyC.dependencyB).isSameAs(dependencyB);
@@ -136,7 +141,8 @@ public class ContextUnitTest extends BaseUnitTest {
             String hello = "hello";
             contextConfig.bind(String.class, hello);
 
-            DependencyD dependencyD = contextConfig.get(DependencyD.class).orElseThrow();
+            Context context = contextConfig.getContext();
+            DependencyD dependencyD = context.get(DependencyD.class).orElseThrow();
             assertThat(dependencyD.getName()).isEqualTo(hello);
         }
 
@@ -147,7 +153,8 @@ public class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(DependencyB.class, DependencyB.class);
             contextConfig.bind(DependencyC.class, DependencyC.class);
 
-            var e = assertThrows(DependencyNotFoundException.class, () -> contextConfig.get(DependencyC.class));
+            var e = assertThrows(DependencyNotFoundException.class, () -> contextConfig.getContext()
+                    .get(DependencyC.class));
             assertThat(e.getDependencyType()).isEqualTo(String.class);
             assertThat(e.getComponentType()).isEqualTo(DependencyC.class);
         }
@@ -177,8 +184,10 @@ public class ContextUnitTest extends BaseUnitTest {
         void should_throw_exception_when_dependency_not_exist() {
             contextConfig.bind(Component.class, ComponentDependencyNotExist.class);
 
+            Context context = contextConfig.getContext();
+
             DependencyNotFoundException e = assertThrows(DependencyNotFoundException.class, () -> {
-                contextConfig.get(Component.class);
+                context.get(Component.class);
             });
 
             assertThat(e.getDependencyType()).isEqualTo(String.class);
@@ -192,8 +201,10 @@ public class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(DependencyE.class, DependencyE.class);
             contextConfig.bind(DependencyF.class, DependencyF.class);
 
+            Context context = contextConfig.getContext();
+
             var e = assertThrows(CyclicDependencyException.class, () -> {
-                contextConfig.get(DependencyE.class);
+                context.get(DependencyE.class);
             });
 
             assertThat(e.getComponents()).isEqualTo(Set.of(DependencyE.class, DependencyF.class));
@@ -207,16 +218,18 @@ public class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(DependencyH.class, DependencyH.class);
             contextConfig.bind(DependencyI.class, DependencyI.class);
 
+            Context context = contextConfig.getContext();
+
             assertThrows(CyclicDependencyException.class, () -> {
-                contextConfig.get(DependencyG.class);
+                context.get(DependencyG.class);
             });
 
             assertThrows(CyclicDependencyException.class, () -> {
-                contextConfig.get(DependencyH.class);
+                context.get(DependencyH.class);
             });
 
             assertThrows(CyclicDependencyException.class, () -> {
-                contextConfig.get(DependencyI.class);
+                context.get(DependencyI.class);
             });
 
         }

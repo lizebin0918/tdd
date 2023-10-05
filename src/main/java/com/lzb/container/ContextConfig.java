@@ -20,17 +20,12 @@ import lombok.extern.slf4j.Slf4j;
  * @author lizebin
  */
 @Slf4j
-public class ContextConfig implements Context {
+public class ContextConfig {
 
     private final Map<Class<?>, Provider<?>> newComponents = new HashMap<>();
 
     public <T> void bind(Class<T> componentClass, T instance) {
         newComponents.put(componentClass, () -> instance);
-    }
-
-    @Override
-    public <T> Optional<T> get(Class<T> componentClass) {
-        return getContext().get(componentClass);
     }
 
     public Context getContext() {
@@ -79,7 +74,7 @@ public class ContextConfig implements Context {
         private Object[] getInjectDependencies(Constructor<?> constructor) {
             Class<?>[] parameterTypes = constructor.getParameterTypes();
             return Arrays.stream(parameterTypes)
-                    .map(p -> ContextConfig.this.get(p)
+                    .map(p -> getContext().get(p)
                             .orElseThrow(() -> new DependencyNotFoundException(p, constructor.getDeclaringClass())))
                     .toArray();
         }
