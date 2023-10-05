@@ -4,6 +4,7 @@ import java.util.Set;
 
 import com.lzb.BaseUnitTest;
 import com.lzb.container.exception.CyclicDependencyException;
+import com.lzb.container.exception.DependencyNotBindException;
 import com.lzb.container.exception.DependencyNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -153,8 +154,7 @@ public class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(DependencyB.class, DependencyB.class);
             contextConfig.bind(DependencyC.class, DependencyC.class);
 
-            var e = assertThrows(DependencyNotFoundException.class, () -> contextConfig.getContext()
-                    .get(DependencyC.class));
+            var e = assertThrows(DependencyNotBindException.class, () -> contextConfig.getContext());
             assertThat(e.getDependencyType()).isEqualTo(String.class);
             assertThat(e.getComponentType()).isEqualTo(DependencyC.class);
         }
@@ -184,14 +184,12 @@ public class ContextUnitTest extends BaseUnitTest {
         void should_throw_exception_when_dependency_not_exist() {
             contextConfig.bind(Component.class, ComponentDependencyNotExist.class);
 
-            Context context = contextConfig.getContext();
-
-            DependencyNotFoundException e = assertThrows(DependencyNotFoundException.class, () -> {
-                context.get(Component.class);
+            DependencyNotBindException e = assertThrows(DependencyNotBindException.class, () -> {
+                contextConfig.getContext();
             });
 
             assertThat(e.getDependencyType()).isEqualTo(String.class);
-            assertThat(e.getComponentType()).isEqualTo(ComponentDependencyNotExist.class);
+            assertThat(e.getComponentType()).isEqualTo(Component.class);
         }
 
         @Test
