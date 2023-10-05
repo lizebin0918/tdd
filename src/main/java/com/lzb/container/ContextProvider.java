@@ -1,5 +1,7 @@
 package com.lzb.container;
 
+import java.util.List;
+
 /**
  * <br/>
  * Created on : 2023-10-05 09:09
@@ -8,5 +10,7 @@ package com.lzb.container;
 public interface ContextProvider<T> {
 
     T get(Context context);
+
+    List<Class<?>> getDependencies();
 
 }

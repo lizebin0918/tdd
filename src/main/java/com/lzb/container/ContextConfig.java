@@ -2,6 +2,7 @@ package com.lzb.container;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,8 +29,18 @@ public class ContextConfig {
     private final Map<Class<?>, Set<Class<?>>> dependencies = new HashMap<>();
 
     public <T> void bind(Class<T> componentClass, T instance) {
-        newComponents.put(componentClass, context -> instance);
-        dependencies.put(componentClass, Set.of());
+        newComponents.put(componentClass, new ContextProvider<>() {
+            @Override
+            public Object get(Context context) {
+                return instance;
+            }
+
+            @Override
+            public List<Class<?>> getDependencies() {
+                return Collections.emptyList();
+            }
+        });
+        dependencies.put(componentClass, Collections.emptySet());
     }
 
     public <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
