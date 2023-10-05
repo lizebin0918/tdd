@@ -48,16 +48,7 @@ public class ContextConfig {
     public Context getContext() {
 
         components.forEach((componentType, provider) -> {
-
-            // 检查依赖是否存在
-            provider.getDependencies().forEach(dependencyType -> {
-                if (!components.containsKey(dependencyType)) {
-                    throw new DependencyNotBindException(dependencyType, componentType);
-                }
-            });
-
-            // 检查循环依赖
-            checkCyclicDependency(componentType, new LinkedList<>());
+            checkDependency(componentType, new LinkedList<>());
         });
 
         return new Context() {
@@ -68,13 +59,21 @@ public class ContextConfig {
         };
     }
 
-    private void checkCyclicDependency(Class<?> componentType, Deque<Class<?>> visiting) {
+    private void checkDependency(Class<?> componentType, Deque<Class<?>> visiting) {
         for (Class<?> dependency : components.get(componentType).getDependencies()) {
+
+            // 检查依赖是否存在
+            if (!components.containsKey(dependency)) {
+                throw new DependencyNotBindException(dependency, componentType);
+            }
+
+            // 检查循环依赖
             if (visiting.contains(dependency)) {
                 throw new CyclicDependencyException(visiting);
             }
+
             visiting.push(dependency);
-            checkCyclicDependency(dependency, visiting);
+            checkDependency(dependency, visiting);
             visiting.pop();
         }
     }
