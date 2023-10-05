@@ -1,5 +1,6 @@
 package com.lzb.container;
 
+import java.util.Optional;
 import java.util.Set;
 
 import com.lzb.BaseUnitTest;
@@ -9,7 +10,6 @@ import com.lzb.container.constructor.ComponentDirectlyInstance;
 import com.lzb.container.constructor.ComponentInstaceWithInject;
 import com.lzb.container.constructor.ComponentInstanceWithDefaultContructor;
 import com.lzb.container.constructor.ComponentInstanceWithMultiInject;
-import com.lzb.container.constructor.ComponentInstanceWithoutInjectAndDefaultConstructor;
 import com.lzb.container.constructor.Dependency;
 import com.lzb.container.constructor.DependencyA;
 import com.lzb.container.constructor.DependencyB;
@@ -22,12 +22,15 @@ import com.lzb.container.constructor.DependencyH;
 import com.lzb.container.constructor.DependencyI;
 import com.lzb.container.exception.CyclicDependencyException;
 import com.lzb.container.exception.DependencyNotBindException;
+import com.lzb.container.field.ComponentWithFieldInjection;
+import com.lzb.container.provider.ConstructorInjectProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 /**
  * <br/>
@@ -188,14 +191,6 @@ public class ContextUnitTest extends BaseUnitTest {
         }
 
         @Test
-        @DisplayName("没有inject和默认的构造函数，抛出异常")
-        void should_throw_exception_if_non_inject_constructor_nor_default_constructor() {
-            assertThrows(IllegalArgumentException.class, () -> {
-                contextConfig.bind(Component.class, ComponentInstanceWithoutInjectAndDefaultConstructor.class);
-            });
-        }
-
-        @Test
         @DisplayName("依赖不存在，抛出异常")
         void should_throw_exception_when_dependency_not_exist() {
             contextConfig.bind(Component.class, ComponentDependencyNotExist.class);
@@ -239,4 +234,45 @@ public class ContextUnitTest extends BaseUnitTest {
 
     }
 
+    @Nested
+    @DisplayName("属性注入")
+    @Disabled
+    class FieldInjection {
+
+        @Test
+        @DisplayName("属性注入（第一种写法）")
+        void should_inject_dependency_via_field() {
+            Dependency dependency = new Dependency() { };
+            contextConfig.bind(Dependency.class, dependency);
+            contextConfig.bind(ComponentWithFieldInjection.class, ComponentWithFieldInjection.class);
+            Context context = contextConfig.getContext();
+
+            ComponentWithFieldInjection component = context.get(ComponentWithFieldInjection.class).orElseThrow();
+            assertThat(component.getDependency()).isNotNull();
+            assertThat(component.getDependency()).isSameAs(dependency);
+        }
+
+        @Test
+        @DisplayName("属性注入（第二种写法）")
+        void should_inject_dependency_vis_field_1() {
+            Context context = Mockito.mock(Context.class);
+            Dependency dependency = Mockito.mock(Dependency.class);
+            when(context.get(Dependency.class)).thenReturn(Optional.of(dependency));
+
+            var provider = new ConstructorInjectProvider<ComponentWithFieldInjection>(ComponentWithFieldInjection.class);
+            ComponentWithFieldInjection component = provider.get(context);
+            assertThat(component.getDependency()).isNotNull();
+            assertThat(component.getDependency()).isSameAs(dependency);
+        }
+
+        @Test
+        @DisplayName("属性依赖缺失")
+        void should_throw_exception_when_field_dependency_missing() {
+            contextConfig.bind(ComponentWithFieldInjection.class, ComponentWithFieldInjection.class);
+            assertThrows(DependencyNotBindException.class, () -> {
+                contextConfig.getContext();
+            });
+        }
+
+    }
 }

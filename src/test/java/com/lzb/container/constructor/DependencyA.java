@@ -5,6 +5,6 @@ package com.lzb.container.constructor;
  * Created on : 2023-10-03 09:13
  * @author lizebin
  */
-public class DependencyA {
+public class DependencyA implements Dependency {
 
 }

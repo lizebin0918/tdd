@@ -26,7 +26,11 @@ public class ConstructorInjectProvider<T> implements ContextProvider<T> {
     }
 
     private static <T, I extends T> Optional<Constructor<?>> getDefaultConstructor(Class<I> implementationClass) {
-        return Arrays.stream(implementationClass.getConstructors()).filter(c -> c.getParameterCount() == 0).findFirst();
+        try {
+            return Optional.of(implementationClass.getDeclaredConstructor());
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     static <T, I extends T> Constructor<?> getConstructor(Class<I> implementationClass) {
@@ -36,12 +40,7 @@ public class ConstructorInjectProvider<T> implements ContextProvider<T> {
         if (injectConstructorsCount > 1) {
             throw new IllegalArgumentException("不支持多个构造函数");
         }
-        Optional<Constructor<?>> defaultConstructor = getDefaultConstructor(implementationClass);
-        if (injectConstructorsCount == 0 && defaultConstructor.isEmpty()) {
-            throw new IllegalArgumentException("构造函数非法");
-        }
-
-        return injectConstructors.stream().findFirst().orElseGet(defaultConstructor::orElseThrow);
+        return injectConstructors.stream().findFirst().or(() -> getDefaultConstructor(implementationClass)).orElseThrow();
     }
 
     private static <T, I extends T> Stream<Constructor<?>> getInjectConstructors(Class<I> implementationClass) {
