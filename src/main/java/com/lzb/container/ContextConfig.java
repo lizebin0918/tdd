@@ -55,45 +55,6 @@ public class ContextConfig {
         };
     }
 
-    class ConstructorInjectProvider<T> implements ContextProvider<T> {
-
-        private final Constructor<T> constructor;
-        private boolean constructing = false;
-        private final Class<T> componentType;
-
-        public ConstructorInjectProvider(Constructor<T> constructor) {
-            this.constructor = constructor;
-            this.componentType = constructor.getDeclaringClass();
-        }
-
-        private Object[] getInjectDependencies(Context context) {
-            return Stream.of(constructor.getParameterTypes())
-                    .map(p -> context.get(p)
-                            .orElseThrow(() -> new DependencyNotFoundException(p, componentType)))
-                    .toArray();
-        }
-
-        @Override
-        public T get(Context context) {
-            if (constructing) {
-                throw new CyclicDependencyException(componentType);
-            }
-            try {
-                constructing = true;
-                return constructor.newInstance(getInjectDependencies(context));
-            } catch (CyclicDependencyException e) {
-                throw new CyclicDependencyException(componentType, e);
-            } catch (RuntimeException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            } finally {
-                constructing = false;
-            }
-        }
-    }
-
-
     private <T, I extends T> Optional<Constructor<?>> getDefaultConstructor(Class<I> implementationClass) {
         return Arrays.stream(implementationClass.getConstructors()).filter(c -> c.getParameterCount() == 0).findFirst();
     }
