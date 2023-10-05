@@ -48,9 +48,7 @@ public class ContextConfig {
                     }
                 }));
 
-        dependencies.forEach((componentType, dependencyTypes) -> {
-            checkCyclicDependency(componentType, new LinkedList<>() { });
-        });
+        dependencies.forEach((componentType, dependencyTypes) -> checkCyclicDependency(componentType, new LinkedList<>() { }));
 
         return new Context() {
             @Override
