@@ -22,7 +22,11 @@ import com.lzb.container.constructor.DependencyH;
 import com.lzb.container.constructor.DependencyI;
 import com.lzb.container.exception.CyclicDependencyException;
 import com.lzb.container.exception.DependencyNotBindException;
+import com.lzb.container.field.ClassA;
+import com.lzb.container.field.ClassB;
+import com.lzb.container.field.ClassC;
 import com.lzb.container.field.ComponentWithFieldInjection;
+import com.lzb.container.field.SubComponentWithFieldInjection;
 import com.lzb.container.provider.ConstructorInjectProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -236,7 +240,6 @@ public class ContextUnitTest extends BaseUnitTest {
 
     @Nested
     @DisplayName("属性注入")
-    @Disabled
     class FieldInjection {
 
         @Test
@@ -253,7 +256,7 @@ public class ContextUnitTest extends BaseUnitTest {
         }
 
         @Test
-        @DisplayName("属性注入（第二种写法）")
+        @DisplayName("属性注入（第二种写法，更接近于我们平时说的单元测试），但是这个写法会有一个问题就是你需要知道里面的实现细节，因为在contextConfig.getContext()的时候，通过各种检查，但是这个测试无法模拟")
         void should_inject_dependency_vis_field_1() {
             Context context = Mockito.mock(Context.class);
             Dependency dependency = Mockito.mock(Dependency.class);
@@ -266,10 +269,54 @@ public class ContextUnitTest extends BaseUnitTest {
         }
 
         @Test
-        @DisplayName("属性依赖缺失")
+        @DisplayName("父类继承属性")
+        void should_inject_dependency_via_superclass_inject_field() {
+            Dependency dependency = new Dependency() { };
+            contextConfig.bind(Dependency.class, dependency);
+            contextConfig.bind(SubComponentWithFieldInjection.class, SubComponentWithFieldInjection.class);
+            Context context = contextConfig.getContext();
+
+            SubComponentWithFieldInjection component = context.get(SubComponentWithFieldInjection.class).orElseThrow();
+            assertThat(component.getDependency()).isNotNull();
+            assertThat(component.getDependency()).isSameAs(dependency);
+        }
+
+        @Test
+        @DisplayName("属性之间出现循环依赖")
+        void should_throw_exception_when_field_cyclic_dependency() {
+            contextConfig.bind(ClassA.class, new ClassA());
+            contextConfig.bind(ClassB.class, new ClassB());
+            contextConfig.bind(ClassC.class, new ClassC());
+            Context context = contextConfig.getContext();
+            ClassA classA = context.get(ClassA.class).orElseThrow();
+            assertThat(classA).isNotNull();
+            assertThat(classA.getC()).isNotNull();
+        }
+
+        @Test
+        @Disabled
+        @DisplayName("延伸第一种：属性依赖缺失")
         void should_throw_exception_when_field_dependency_missing() {
             contextConfig.bind(ComponentWithFieldInjection.class, ComponentWithFieldInjection.class);
             assertThrows(DependencyNotBindException.class, () -> {
+                contextConfig.getContext();
+            });
+        }
+
+        @Test
+        @Disabled
+        @DisplayName("延伸第二种：属性依赖缺失，针对于provider来处理。最后发现Provider只是提供数据，不提供功能，功能都在ContextConfig")
+        void should_include_field_dependency_in_dependencies() {
+            var provider = new ConstructorInjectProvider<ComponentWithFieldInjection>(ComponentWithFieldInjection.class);
+            assertThat(provider.getDependencies()).contains(Dependency.class);
+        }
+
+        @Test
+        @Disabled
+        @DisplayName("延伸第一种：判断循环依赖")
+        void should_throw_exception_when_field_has_cyclic_dependency() {
+            contextConfig.bind(ComponentWithFieldInjection.class, ComponentWithFieldInjection.class);
+            assertThrows(CyclicDependencyException.class, () -> {
                 contextConfig.getContext();
             });
         }
