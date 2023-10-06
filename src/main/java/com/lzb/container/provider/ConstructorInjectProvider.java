@@ -33,7 +33,16 @@ public class ConstructorInjectProvider<T> implements ContextProvider<T> {
         List<Method> injectMethods = new ArrayList<>();
         Class<?> current = component;
         while (current != Object.class) {
-            injectMethods.addAll(Arrays.stream(current.getDeclaredMethods()).filter(f -> f.isAnnotationPresent(Inject.class)).toList());
+            injectMethods.addAll(Arrays.stream(current.getDeclaredMethods())
+                    .filter(f -> f.isAnnotationPresent(Inject.class))
+                    // 父类声明@Inject，子类没有声明，不会注入
+                    .filter(m -> injectMethods.stream().noneMatch(o -> o.getName()
+                            .equals(m.getName()) && Arrays.equals(o.getParameterTypes(), m.getParameterTypes())))
+                    .filter(m -> Stream.of(component.getDeclaredMethods())
+                            .filter(m1 -> !m1.isAnnotationPresent(Inject.class))
+                            .noneMatch(o -> o.getName()
+                                    .equals(m.getName()) && Arrays.equals(o.getParameterTypes(), m.getParameterTypes())))
+                    .toList());
             current = current.getSuperclass();
         }
         // 先实例化父类
@@ -45,7 +54,8 @@ public class ConstructorInjectProvider<T> implements ContextProvider<T> {
         List<Field> injectFields = new ArrayList<>();
         Class<?> current = component;
         while (current != Object.class) {
-            injectFields.addAll(Arrays.stream(current.getDeclaredFields()).filter(f -> f.isAnnotationPresent(Inject.class)).toList());
+            injectFields.addAll(Arrays.stream(current.getDeclaredFields())
+                    .filter(f -> f.isAnnotationPresent(Inject.class)).toList());
             current = current.getSuperclass();
         }
         return injectFields;
@@ -70,11 +80,13 @@ public class ConstructorInjectProvider<T> implements ContextProvider<T> {
         if (injectConstructorsCount > 1) {
             throw new IllegalArgumentException("不支持多个构造函数");
         }
-        return injectConstructors.stream().findFirst().or(() -> getDefaultConstructor(implementationClass)).orElseThrow();
+        return injectConstructors.stream().findFirst().or(() -> getDefaultConstructor(implementationClass))
+                .orElseThrow();
     }
 
     private static <T, I extends T> Stream<Constructor<?>> getInjectConstructors(Class<I> implementationClass) {
-        return Arrays.stream(implementationClass.getConstructors()).filter(ConstructorInjectProvider::byIsInjectConstructor);
+        return Arrays.stream(implementationClass.getConstructors())
+                .filter(ConstructorInjectProvider::byIsInjectConstructor);
     }
 
     private Object[] getInjectDependencies(Context context) {

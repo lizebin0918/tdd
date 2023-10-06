@@ -28,6 +28,7 @@ import com.lzb.container.field.ClassC;
 import com.lzb.container.field.ComponentWithFieldInjection;
 import com.lzb.container.field.SubComponentWithFieldInjection;
 import com.lzb.container.method.MethodInjectComponent;
+import com.lzb.container.method.NonParameterAndInjectMethodComponent;
 import com.lzb.container.method.NonParameterMethodComponent;
 import com.lzb.container.method.SubNonParameterMethodComponent;
 import com.lzb.container.provider.ConstructorInjectProvider;
@@ -358,6 +359,16 @@ public class ContextUnitTest extends BaseUnitTest {
             SubNonParameterMethodComponent component = context.get(SubNonParameterMethodComponent.class).orElseThrow();
             assertThat(component.called).isTrue();
             assertThat(component.subCalled).isTrue();
+        }
+
+        @Test
+        @DisplayName("子类重写父类inject方法，但是子类没有inject注解，不会注入")
+        void should_sub_class_without_inject() {
+            contextConfig.bind(NonParameterAndInjectMethodComponent.class, NonParameterAndInjectMethodComponent.class);
+            Context context = contextConfig.getContext();
+            NonParameterAndInjectMethodComponent nonParameterAndInjectMethodComponent = context.get(NonParameterAndInjectMethodComponent.class)
+                    .orElseThrow();
+            assertThat(nonParameterAndInjectMethodComponent.called).isFalse();
         }
 
     }
