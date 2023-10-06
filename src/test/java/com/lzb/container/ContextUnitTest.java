@@ -28,6 +28,8 @@ import com.lzb.container.field.ClassC;
 import com.lzb.container.field.ComponentWithFieldInjection;
 import com.lzb.container.field.SubComponentWithFieldInjection;
 import com.lzb.container.method.MethodInjectComponent;
+import com.lzb.container.method.NonParameterMethodComponent;
+import com.lzb.container.method.SubNonParameterMethodComponent;
 import com.lzb.container.provider.ConstructorInjectProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -338,5 +340,25 @@ public class ContextUnitTest extends BaseUnitTest {
             assertThat(methodInjection.getDependency()).isNotNull();
 
         }
+
+        @Test
+        @DisplayName("inject方法没有任何参数")
+        void should_inject_non_parameter_method() {
+            contextConfig.bind(NonParameterMethodComponent.class, NonParameterMethodComponent.class);
+            Context context = contextConfig.getContext();
+            NonParameterMethodComponent component = context.get(NonParameterMethodComponent.class).orElseThrow();
+            assertThat(component.called).isTrue();
+        }
+
+        @Test
+        @DisplayName("@Inject存在于继承关系")
+        void should_inject_in_extends() {
+            contextConfig.bind(SubNonParameterMethodComponent.class, SubNonParameterMethodComponent.class);
+            Context context = contextConfig.getContext();
+            SubNonParameterMethodComponent component = context.get(SubNonParameterMethodComponent.class).orElseThrow();
+            assertThat(component.called).isTrue();
+            assertThat(component.subCalled).isTrue();
+        }
+
     }
 }

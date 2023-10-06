@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -35,6 +36,8 @@ public class ConstructorInjectProvider<T> implements ContextProvider<T> {
             injectMethods.addAll(Arrays.stream(current.getDeclaredMethods()).filter(f -> f.isAnnotationPresent(Inject.class)).toList());
             current = current.getSuperclass();
         }
+        // 先实例化父类
+        Collections.reverse(injectMethods);
         return injectMethods;
     }
 
