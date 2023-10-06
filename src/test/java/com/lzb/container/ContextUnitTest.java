@@ -284,13 +284,10 @@ public class ContextUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("属性之间出现循环依赖")
         void should_throw_exception_when_field_cyclic_dependency() {
-            contextConfig.bind(ClassA.class, new ClassA());
-            contextConfig.bind(ClassB.class, new ClassB());
-            contextConfig.bind(ClassC.class, new ClassC());
-            Context context = contextConfig.getContext();
-            ClassA classA = context.get(ClassA.class).orElseThrow();
-            assertThat(classA).isNotNull();
-            assertThat(classA.getC()).isNotNull();
+            contextConfig.bind(ClassA.class, ClassA.class);
+            contextConfig.bind(ClassB.class, ClassB.class);
+            contextConfig.bind(ClassC.class, ClassC.class);
+            assertThrows(CyclicDependencyException.class, () -> contextConfig.getContext());
         }
 
         @Test
