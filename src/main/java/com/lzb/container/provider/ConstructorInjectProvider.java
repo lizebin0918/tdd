@@ -2,6 +2,7 @@ package com.lzb.container.provider;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,14 +18,24 @@ public class ConstructorInjectProvider<T> implements ContextProvider<T> {
 
     private final Constructor<?> constructor;
 
-    private final List<Class<?>> dependencies;
-
     private final List<Field> injectFields;
+
+    private final List<Method> injectMethods;
 
     public ConstructorInjectProvider(Class<?> component) {
         this.constructor = getConstructor(component);
-        this.dependencies = List.of(constructor.getParameterTypes());
         this.injectFields = getInjectFields(component);
+        this.injectMethods = getInjectMethods(component);
+    }
+
+    private static List<Method> getInjectMethods(Class<?> component) {
+        List<Method> injectMethods = new ArrayList<>();
+        Class<?> current = component;
+        while (current != Object.class) {
+            injectMethods.addAll(Arrays.stream(current.getDeclaredMethods()).filter(f -> f.isAnnotationPresent(Inject.class)).toList());
+            current = current.getSuperclass();
+        }
+        return injectMethods;
     }
 
     private static List<Field> getInjectFields(Class<?> component) {
@@ -64,7 +75,7 @@ public class ConstructorInjectProvider<T> implements ContextProvider<T> {
     }
 
     private Object[] getInjectDependencies(Context context) {
-        return dependencies.stream()
+        return Stream.of(constructor.getParameterTypes())
                 .map(context::get)
                 .filter(Optional::isPresent)
                 .map(Optional::get).toArray();
@@ -75,10 +86,24 @@ public class ConstructorInjectProvider<T> implements ContextProvider<T> {
         try {
             T instance = (T) constructor.newInstance(getInjectDependencies(context));
             injectFields.forEach(setField(context, instance));
+            injectMethods.forEach(invokeMethod(context, instance));
             return instance;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static <T> Consumer<Method> invokeMethod(Context context, T instance) {
+        return m -> {
+            try {
+                m.setAccessible(true);
+                Object[] parameters = Arrays.stream(m.getParameterTypes()).map(context::get).filter(Optional::isPresent)
+                        .map(Optional::get).toArray();
+                m.invoke(instance, parameters);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
     }
 
     private static <T> Consumer<Field> setField(Context context, T instance) {
@@ -94,8 +119,9 @@ public class ConstructorInjectProvider<T> implements ContextProvider<T> {
 
     @Override
     public List<Class<?>> getDependencies() {
-        List<Class<?>> allDependencies = new ArrayList<>(dependencies);
+        List<Class<?>> allDependencies = new ArrayList<>(List.of(constructor.getParameterTypes()));
         injectFields.forEach(f -> allDependencies.add(f.getType()));
+        injectMethods.forEach(m -> allDependencies.addAll(Arrays.asList(m.getParameterTypes())));
         return allDependencies;
     }
 }

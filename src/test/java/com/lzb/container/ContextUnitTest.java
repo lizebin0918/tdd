@@ -27,6 +27,7 @@ import com.lzb.container.field.ClassB;
 import com.lzb.container.field.ClassC;
 import com.lzb.container.field.ComponentWithFieldInjection;
 import com.lzb.container.field.SubComponentWithFieldInjection;
+import com.lzb.container.method.MethodInjectComponent;
 import com.lzb.container.provider.ConstructorInjectProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -318,5 +319,24 @@ public class ContextUnitTest extends BaseUnitTest {
             });
         }
 
+    }
+
+    @Nested
+    @DisplayName("方法注入")
+    class MethodInjection {
+
+        @Test
+        @DisplayName("方法注入")
+        void should_method_injection() {
+
+            contextConfig.bind(Dependency.class, DependencyA.class);
+            contextConfig.bind(MethodInjectComponent.class, MethodInjectComponent.class);
+
+            Context context = contextConfig.getContext();
+            MethodInjectComponent methodInjection = context.get(MethodInjectComponent.class).orElseThrow();
+
+            assertThat(methodInjection.getDependency()).isNotNull();
+
+        }
     }
 }
