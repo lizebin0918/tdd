@@ -34,6 +34,7 @@ import com.lzb.container.method.MethodInjectComponent;
 import com.lzb.container.method.NonParameterAndInjectMethodComponent;
 import com.lzb.container.method.NonParameterMethodComponent;
 import com.lzb.container.method.SubNonParameterMethodComponent;
+import com.lzb.container.method.TypeParameterMethodInjectComponent;
 import com.lzb.container.provider.ConstructorInjectProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -382,6 +383,14 @@ public class ContextUnitTest extends BaseUnitTest {
             NonParameterAndInjectMethodComponent nonParameterAndInjectMethodComponent = context.get(NonParameterAndInjectMethodComponent.class)
                     .orElseThrow();
             assertThat(nonParameterAndInjectMethodComponent.called).isFalse();
+        }
+
+        @Test
+        @DisplayName("注入方法不能有泛型")
+        void should_throw_exception_when_inject_method_has_type_parameter() {
+            assertThrows(IllegalComponentException.class, () -> {
+                new ConstructorInjectProvider<>(TypeParameterMethodInjectComponent.class);
+            });
         }
 
     }
