@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.lzb.BaseUnitTest;
+import com.lzb.container.constructor.AbstractComponent;
 import com.lzb.container.constructor.Component;
 import com.lzb.container.constructor.ComponentDependencyNotExist;
 import com.lzb.container.constructor.ComponentDirectlyInstance;
@@ -22,10 +23,12 @@ import com.lzb.container.constructor.DependencyH;
 import com.lzb.container.constructor.DependencyI;
 import com.lzb.container.exception.CyclicDependencyException;
 import com.lzb.container.exception.DependencyNotBindException;
+import com.lzb.container.exception.IllegalComponentException;
 import com.lzb.container.field.ClassA;
 import com.lzb.container.field.ClassB;
 import com.lzb.container.field.ClassC;
 import com.lzb.container.field.ComponentWithFieldInjection;
+import com.lzb.container.field.FinalFieldInjection;
 import com.lzb.container.field.SubComponentWithFieldInjection;
 import com.lzb.container.method.MethodInjectComponent;
 import com.lzb.container.method.NonParameterAndInjectMethodComponent;
@@ -89,12 +92,14 @@ public class ContextUnitTest extends BaseUnitTest {
 
         @Test
         @DisplayName("抽象类不能实例化到容器")
-        @Disabled("没想明白测的是啥")
         void should_exception_when_class_is_abstract() {
-            /*Context context = new Context();
-            Assertions.assertThrows(IllegalArgumentException.class, () -> {
-                context.bind(Component.class, new Object());
-            });*/
+            assertThrows(IllegalComponentException.class, () -> new ConstructorInjectProvider<>(AbstractComponent.class));
+        }
+
+        @Test
+        @DisplayName("接口不能实例化到容器")
+        void should_exception_when_class_is_interface() {
+            assertThrows(IllegalComponentException.class, () -> new ConstructorInjectProvider<>(Component.class));
         }
 
     }
@@ -238,6 +243,14 @@ public class ContextUnitTest extends BaseUnitTest {
                 contextConfig.getContext();
             });
 
+        }
+
+        @Test
+        @DisplayName("绑定final字段抛异常")
+        void should_throw_exception_if_field_is_final() {
+            assertThrows(IllegalComponentException.class, () -> {
+                new ConstructorInjectProvider<>(FinalFieldInjection.class);
+            });
         }
 
     }

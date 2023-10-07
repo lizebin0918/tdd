@@ -3,6 +3,7 @@ package com.lzb.container.provider;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.stream.Stream;
 
 import com.lzb.container.Context;
 import com.lzb.container.ContextProvider;
+import com.lzb.container.exception.IllegalComponentException;
 import jakarta.inject.Inject;
 
 public class ConstructorInjectProvider<T> implements ContextProvider<T> {
@@ -24,9 +26,16 @@ public class ConstructorInjectProvider<T> implements ContextProvider<T> {
     private final List<Method> injectMethods;
 
     public ConstructorInjectProvider(Class<?> component) {
+
+        if (Modifier.isAbstract(component.getModifiers())) throw new IllegalComponentException();
+
         this.constructor = getConstructor(component);
         this.injectFields = getInjectFields(component);
         this.injectMethods = getInjectMethods(component);
+
+        if (injectFields.stream().anyMatch(f -> Modifier.isFinal(f.getModifiers()))) {
+            throw new IllegalComponentException();
+        }
     }
 
     private static List<Method> getInjectMethods(Class<?> component) {
