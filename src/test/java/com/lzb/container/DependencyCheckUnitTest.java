@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  */
 @Nested
 @DisplayName("依赖检测")
-public class DependencyCheck extends BaseUnitTest {
+public class DependencyCheckUnitTest extends BaseUnitTest {
 
     ContextConfig contextConfig;
 
