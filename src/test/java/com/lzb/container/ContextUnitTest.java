@@ -205,48 +205,6 @@ public class ContextUnitTest extends BaseUnitTest {
         }
 
         @Test
-        @DisplayName("依赖不存在，抛出异常")
-        void should_throw_exception_when_dependency_not_exist() {
-            contextConfig.bind(Component.class, ComponentDependencyNotExist.class);
-
-            DependencyNotBindException e = assertThrows(DependencyNotBindException.class, () -> {
-                contextConfig.getContext();
-            });
-
-            assertThat(e.getDependencyType()).isEqualTo(String.class);
-            assertThat(e.getComponentType()).isEqualTo(Component.class);
-        }
-
-        @Test
-        @DisplayName("循环依赖，抛出异常")
-        void should_throw_exception_cyclic() {
-
-            contextConfig.bind(DependencyE.class, DependencyE.class);
-            contextConfig.bind(DependencyF.class, DependencyF.class);
-
-            var e = assertThrows(CyclicDependencyException.class, () -> {
-                contextConfig.getContext();
-            });
-
-            assertThat(e.getComponents()).isEqualTo(Set.of(DependencyE.class, DependencyF.class));
-        }
-
-        @Test
-        @DisplayName("循环依赖检测的第二种情况(G->H->I->G)，抛出异常")
-        void should_throw_exception_multiple_cyclic() {
-
-            contextConfig.bind(DependencyG.class, DependencyG.class);
-            contextConfig.bind(DependencyH.class, DependencyH.class);
-            contextConfig.bind(DependencyI.class, DependencyI.class);
-
-
-            assertThrows(CyclicDependencyException.class, () -> {
-                contextConfig.getContext();
-            });
-
-        }
-
-        @Test
         @DisplayName("绑定final字段抛异常")
         void should_throw_exception_if_field_is_final() {
             assertThrows(IllegalComponentException.class, () -> {
@@ -299,16 +257,8 @@ public class ContextUnitTest extends BaseUnitTest {
             assertThat(component.getDependency()).isSameAs(dependency);
         }
 
-        @Test
-        @DisplayName("属性之间出现循环依赖")
-        void should_throw_exception_when_field_cyclic_dependency() {
-            contextConfig.bind(ClassA.class, ClassA.class);
-            contextConfig.bind(ClassB.class, ClassB.class);
-            contextConfig.bind(ClassC.class, ClassC.class);
-            assertThrows(CyclicDependencyException.class, () -> contextConfig.getContext());
-        }
 
-        @Test
+        /*@Test
         @Disabled
         @DisplayName("延伸第一种：属性依赖缺失")
         void should_throw_exception_when_field_dependency_missing() {
@@ -327,14 +277,13 @@ public class ContextUnitTest extends BaseUnitTest {
         }
 
         @Test
-        @Disabled
         @DisplayName("延伸第一种：判断循环依赖")
         void should_throw_exception_when_field_has_cyclic_dependency() {
             contextConfig.bind(ComponentWithFieldInjection.class, ComponentWithFieldInjection.class);
             assertThrows(CyclicDependencyException.class, () -> {
                 contextConfig.getContext();
             });
-        }
+        }*/
 
     }
 
@@ -394,4 +343,66 @@ public class ContextUnitTest extends BaseUnitTest {
         }
 
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // 测试重构
+    ///////////////////////////////////////////////////////////////////////////
+
+    @Nested
+    @DisplayName("依赖检测")
+    class DependencyCheck {
+
+        @Test
+        @DisplayName("依赖不存在，抛出异常")
+        void should_throw_exception_when_dependency_not_exist() {
+            contextConfig.bind(Component.class, ComponentDependencyNotExist.class);
+
+            DependencyNotBindException e = assertThrows(DependencyNotBindException.class, () -> {
+                contextConfig.getContext();
+            });
+
+            assertThat(e.getDependencyType()).isEqualTo(String.class);
+            assertThat(e.getComponentType()).isEqualTo(Component.class);
+        }
+
+        @Test
+        @DisplayName("循环依赖，抛出异常")
+        void should_throw_exception_cyclic() {
+
+            contextConfig.bind(DependencyE.class, DependencyE.class);
+            contextConfig.bind(DependencyF.class, DependencyF.class);
+
+            var e = assertThrows(CyclicDependencyException.class, () -> {
+                contextConfig.getContext();
+            });
+
+            assertThat(e.getComponents()).isEqualTo(Set.of(DependencyE.class, DependencyF.class));
+        }
+
+        @Test
+        @DisplayName("循环依赖检测的第二种情况(G->H->I->G)，抛出异常")
+        void should_throw_exception_multiple_cyclic() {
+
+            contextConfig.bind(DependencyG.class, DependencyG.class);
+            contextConfig.bind(DependencyH.class, DependencyH.class);
+            contextConfig.bind(DependencyI.class, DependencyI.class);
+
+
+            assertThrows(CyclicDependencyException.class, () -> {
+                contextConfig.getContext();
+            });
+
+        }
+
+        @Test
+        @DisplayName("属性之间出现循环依赖")
+        void should_throw_exception_when_field_cyclic_dependency() {
+            contextConfig.bind(ClassA.class, ClassA.class);
+            contextConfig.bind(ClassB.class, ClassB.class);
+            contextConfig.bind(ClassC.class, ClassC.class);
+            assertThrows(CyclicDependencyException.class, () -> contextConfig.getContext());
+        }
+
+    }
+
 }
