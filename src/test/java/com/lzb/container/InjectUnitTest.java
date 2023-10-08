@@ -56,16 +56,12 @@ public class InjectUnitTest extends BaseUnitTest {
 
             // 获取ComponentB需要的实例
             //Class[] klass = ComponentB.class.getConstructors()[0].getParameterTypes();
-            contextConfig.bind(Component.class, ComponentInstanceWithDefaultContructor.class);
-
-            // 从context里面获取实例
-            Context context = contextConfig.getContext();
-            var instance = context.get(Component.class)
-                    .orElseThrow();
+            Class<ComponentInstanceWithDefaultContructor> implementation = ComponentInstanceWithDefaultContructor.class;
+            var instance = getComponent(Component.class, implementation);
 
             // 如果都有的话，那就直接返回ComponentB实例，如果没有会出现递归构造，先不考虑（步子迈太大）
             assertThat(instance).isNotNull();
-            assertThat(instance).isInstanceOf(ComponentInstanceWithDefaultContructor.class);
+            assertThat(instance).isInstanceOf(implementation);
         }
 
         @Test
@@ -73,14 +69,13 @@ public class InjectUnitTest extends BaseUnitTest {
         void should_bind_with_inject_constructor() {
             Dependency dependency = new Dependency() { };
             contextConfig.bind(Dependency.class, dependency);
-            contextConfig.bind(Component.class, ComponentInstaceWithInject.class);
+            Class<ComponentInstaceWithInject> implementation = ComponentInstaceWithInject.class;
+            contextConfig.bind(Component.class, implementation);
 
-            Context context = contextConfig.getContext();
-            Component component = context.get(Component.class)
-                    .orElseThrow();
+            Component component = getComponent(Component.class, implementation);
 
             assertThat(component).isNotNull();
-            assertThat(component).isInstanceOf(ComponentInstaceWithInject.class);
+            assertThat(component).isInstanceOf(implementation);
             assertThat(((ComponentInstaceWithInject) component).getDependency()).isSameAs(dependency);
 
         }
@@ -161,6 +156,12 @@ public class InjectUnitTest extends BaseUnitTest {
 
     }
 
+    private <T, I extends T> T getComponent(Class<T> component, Class<I> implementation) {
+        contextConfig.bind(component, implementation);
+        Context context = contextConfig.getContext();
+        return context.get(component).orElseThrow();
+    }
+
     @Nested
     @DisplayName("属性注入")
     class FieldInjection {
@@ -170,11 +171,10 @@ public class InjectUnitTest extends BaseUnitTest {
         void should_inject_dependency_via_field() {
             Dependency dependency = new Dependency() { };
             contextConfig.bind(Dependency.class, dependency);
-            contextConfig.bind(ComponentWithFieldInjection.class, ComponentWithFieldInjection.class);
-            Context context = contextConfig.getContext();
+            Class<ComponentWithFieldInjection> implementationClass = ComponentWithFieldInjection.class;
+            contextConfig.bind(Component.class, implementationClass);
 
-            ComponentWithFieldInjection component = context.get(ComponentWithFieldInjection.class)
-                    .orElseThrow();
+            ComponentWithFieldInjection component = (ComponentWithFieldInjection) getComponent(Component.class, implementationClass);
             assertThat(component.getDependency()).isNotNull();
             assertThat(component.getDependency()).isSameAs(dependency);
         }

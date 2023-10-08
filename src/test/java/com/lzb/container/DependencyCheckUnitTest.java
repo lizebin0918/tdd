@@ -17,7 +17,6 @@ import com.lzb.container.field.ClassB;
 import com.lzb.container.field.ClassC;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -25,9 +24,8 @@ import org.junit.jupiter.api.Test;
  * Created on : 2023-10-07 21:44
  * @author lizebin
  */
-@Nested
 @DisplayName("依赖检测")
-public class DependencyCheckUnitTest extends BaseUnitTest {
+class DependencyCheckUnitTest extends BaseUnitTest {
 
     ContextConfig contextConfig;
 

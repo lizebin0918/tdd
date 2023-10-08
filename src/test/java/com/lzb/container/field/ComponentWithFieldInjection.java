@@ -1,5 +1,6 @@
 package com.lzb.container.field;
 
+import com.lzb.container.constructor.Component;
 import com.lzb.container.constructor.Dependency;
 import jakarta.inject.Inject;
 
@@ -8,7 +9,7 @@ import jakarta.inject.Inject;
  * Created on : 2023-10-05 22:36
  * @author mac
  */
-public class ComponentWithFieldInjection {
+public class ComponentWithFieldInjection implements Component {
 
     @Inject
     private Dependency dependency;
