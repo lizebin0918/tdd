@@ -1,5 +1,6 @@
 package com.lzb.container;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -11,6 +12,8 @@ public interface ContextProvider<T> {
 
     T get(Context context);
 
-    List<Class<?>> getDependencies();
+    default List<Class<?>> getDependencies() {
+        return Collections.emptyList();
+    }
 
 }

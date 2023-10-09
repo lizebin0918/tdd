@@ -1,8 +1,5 @@
 package com.lzb.container.provider;
 
-import java.util.Collections;
-import java.util.List;
-
 import com.lzb.container.Context;
 import com.lzb.container.ContextProvider;
 
@@ -22,11 +19,6 @@ public class InstanceProvider<T> implements ContextProvider<T> {
     @Override
     public T get(Context context) {
         return instance;
-    }
-
-    @Override
-    public List<Class<?>> getDependencies() {
-        return Collections.emptyList();
     }
 
 }
