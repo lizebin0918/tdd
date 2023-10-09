@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -40,9 +41,15 @@ public class InjectUnitTest extends BaseUnitTest {
 
     ContextConfig contextConfig;
 
+    @Mock
+    private Context context;
+
+    Dependency dependency = new Dependency() { };
+
     @BeforeEach
     public void beforeEach() {
         contextConfig = new ContextConfig();
+        lenient().when(context.get(eq(Dependency.class))).thenReturn(Optional.of(dependency));
     }
 
 
@@ -67,71 +74,13 @@ public class InjectUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("通过构造函数注入的绑定方式")
         void should_bind_with_inject_constructor() {
-            Dependency dependency = new Dependency() { };
-            contextConfig.bind(Dependency.class, dependency);
-            Class<ComponentInstaceWithInject> implementation = ComponentInstaceWithInject.class;
-            contextConfig.bind(Component.class, implementation);
 
-            Component component = getComponent(Component.class, implementation);
+            ComponentInstaceWithInject component = (ComponentInstaceWithInject) getComponent(Component.class, ComponentInstaceWithInject.class);
 
             assertThat(component).isNotNull();
-            assertThat(component).isInstanceOf(implementation);
+            assertThat(component).isInstanceOf(ComponentInstaceWithInject.class);
             assertThat(((ComponentInstaceWithInject) component).getDependency()).isSameAs(dependency);
 
-        }
-
-        @Test
-        @DisplayName("多重传递依赖：A->B->C，没有循环依赖")
-        void should_ABC_dependency() {
-
-            contextConfig.bind(DependencyA.class, DependencyA.class);
-            contextConfig.bind(DependencyB.class, DependencyB.class);
-            contextConfig.bind(DependencyC.class, DependencyC.class);
-            String hello = "hello";
-            contextConfig.bind(String.class, hello);
-
-            Context context = contextConfig.getContext();
-            DependencyA dependencyA = context.get(DependencyA.class)
-                    .orElseThrow();
-            assertThat(dependencyA).isNotNull();
-
-            DependencyB dependencyB = context.get(DependencyB.class)
-                    .orElseThrow();
-            assertThat(dependencyB).isNotNull();
-
-            DependencyC dependencyC = context.get(DependencyC.class)
-                    .orElseThrow();
-            assertThat(dependencyC).isNotNull();
-
-            // assertThat(dependencyC.dependencyB).isSameAs(dependencyB);
-            // assertThat(dependencyB.dependencyA).isSameAs(dependencyA);
-
-            assertThat(hello).isEqualTo(dependencyC.s);
-        }
-
-        @Test
-        @DisplayName("忽略bind顺序：A->B，先bind B，再bind A")
-        void should_bind_orderly() {
-            contextConfig.bind(DependencyD.class, DependencyD.class);
-            String hello = "hello";
-            contextConfig.bind(String.class, hello);
-
-            Context context = contextConfig.getContext();
-            DependencyD dependencyD = context.get(DependencyD.class)
-                    .orElseThrow();
-            assertThat(dependencyD.getName()).isEqualTo(hello);
-        }
-
-        @Test
-        @DisplayName("依赖不存在，抛出异常，判断异常的成员属性是否正确")
-        void should_throw_dependency_not_found_exception() {
-            contextConfig.bind(DependencyA.class, DependencyA.class);
-            contextConfig.bind(DependencyB.class, DependencyB.class);
-            contextConfig.bind(DependencyC.class, DependencyC.class);
-
-            var e = assertThrows(DependencyNotBindException.class, () -> contextConfig.getContext());
-            assertThat(e.getDependencyType()).isEqualTo(String.class);
-            assertThat(e.getComponentType()).isEqualTo(DependencyC.class);
         }
 
         ///////////////////////////////////////////////////////////////////////////
@@ -157,9 +106,7 @@ public class InjectUnitTest extends BaseUnitTest {
     }
 
     private <T, I extends T> T getComponent(Class<T> component, Class<I> implementation) {
-        contextConfig.bind(component, implementation);
-        Context context = contextConfig.getContext();
-        return context.get(component).orElseThrow();
+        return new ConstructorInjectProvider<T>(implementation).get(context);
     }
 
     @Nested
@@ -169,12 +116,7 @@ public class InjectUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("属性注入（第一种写法）")
         void should_inject_dependency_via_field() {
-            Dependency dependency = new Dependency() { };
-            contextConfig.bind(Dependency.class, dependency);
-            Class<ComponentWithFieldInjection> implementationClass = ComponentWithFieldInjection.class;
-            contextConfig.bind(Component.class, implementationClass);
-
-            ComponentWithFieldInjection component = (ComponentWithFieldInjection) getComponent(Component.class, implementationClass);
+            ComponentWithFieldInjection component = (ComponentWithFieldInjection) getComponent(Component.class, ComponentWithFieldInjection.class);
             assertThat(component.getDependency()).isNotNull();
             assertThat(component.getDependency()).isSameAs(dependency);
         }
@@ -182,10 +124,6 @@ public class InjectUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("属性注入（第二种写法，更接近于我们平时说的单元测试），但是这个写法会有一个问题就是你需要知道里面的实现细节，因为在contextConfig.getContext()的时候，通过各种检查，但是这个测试无法模拟")
         void should_inject_dependency_vis_field_1() {
-            Context context = Mockito.mock(Context.class);
-            Dependency dependency = Mockito.mock(Dependency.class);
-            when(context.get(Dependency.class)).thenReturn(Optional.of(dependency));
-
             var provider = new ConstructorInjectProvider<ComponentWithFieldInjection>(ComponentWithFieldInjection.class);
             ComponentWithFieldInjection component = provider.get(context);
             assertThat(component.getDependency()).isNotNull();
@@ -195,13 +133,8 @@ public class InjectUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("父类继承属性")
         void should_inject_dependency_via_superclass_inject_field() {
-            Dependency dependency = new Dependency() { };
-            contextConfig.bind(Dependency.class, dependency);
-            contextConfig.bind(SubComponentWithFieldInjection.class, SubComponentWithFieldInjection.class);
-            Context context = contextConfig.getContext();
 
-            SubComponentWithFieldInjection component = context.get(SubComponentWithFieldInjection.class)
-                    .orElseThrow();
+            SubComponentWithFieldInjection component = (SubComponentWithFieldInjection) getComponent(Component.class, SubComponentWithFieldInjection.class);
             assertThat(component.getDependency()).isNotNull();
             assertThat(component.getDependency()).isSameAs(dependency);
         }
