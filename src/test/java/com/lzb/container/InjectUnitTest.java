@@ -8,11 +8,6 @@ import com.lzb.container.constructor.ComponentInstaceWithInject;
 import com.lzb.container.constructor.ComponentInstanceWithDefaultContructor;
 import com.lzb.container.constructor.ComponentInstanceWithMultiInject;
 import com.lzb.container.constructor.Dependency;
-import com.lzb.container.constructor.DependencyA;
-import com.lzb.container.constructor.DependencyB;
-import com.lzb.container.constructor.DependencyC;
-import com.lzb.container.constructor.DependencyD;
-import com.lzb.container.exception.DependencyNotBindException;
 import com.lzb.container.exception.IllegalComponentException;
 import com.lzb.container.field.ComponentWithFieldInjection;
 import com.lzb.container.field.FinalFieldInjection;
@@ -28,7 +23,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 
 /**
  * <br/>
@@ -124,8 +118,7 @@ public class InjectUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("属性注入（第二种写法，更接近于我们平时说的单元测试），但是这个写法会有一个问题就是你需要知道里面的实现细节，因为在contextConfig.getContext()的时候，通过各种检查，但是这个测试无法模拟")
         void should_inject_dependency_vis_field_1() {
-            var provider = new ConstructorInjectProvider<ComponentWithFieldInjection>(ComponentWithFieldInjection.class);
-            ComponentWithFieldInjection component = provider.get(context);
+            ComponentWithFieldInjection component = (ComponentWithFieldInjection) getComponent(Component.class, ComponentWithFieldInjection.class);
             assertThat(component.getDependency()).isNotNull();
             assertThat(component.getDependency()).isSameAs(dependency);
         }
@@ -176,35 +169,21 @@ public class InjectUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("方法注入")
         void should_method_injection() {
-
-            contextConfig.bind(Dependency.class, DependencyA.class);
-            contextConfig.bind(MethodInjectComponent.class, MethodInjectComponent.class);
-
-            Context context = contextConfig.getContext();
-            MethodInjectComponent methodInjection = context.get(MethodInjectComponent.class)
-                    .orElseThrow();
-
+            MethodInjectComponent methodInjection = (MethodInjectComponent) getComponent(Component.class, MethodInjectComponent.class);
             assertThat(methodInjection.getDependency()).isNotNull();
-
         }
 
         @Test
         @DisplayName("inject方法没有任何参数")
         void should_inject_non_parameter_method() {
-            contextConfig.bind(NonParameterMethodComponent.class, NonParameterMethodComponent.class);
-            Context context = contextConfig.getContext();
-            NonParameterMethodComponent component = context.get(NonParameterMethodComponent.class)
-                    .orElseThrow();
+            NonParameterMethodComponent component = (NonParameterMethodComponent) getComponent(Component.class, NonParameterMethodComponent.class);
             assertThat(component.called).isTrue();
         }
 
         @Test
         @DisplayName("@Inject存在于继承关系")
         void should_inject_in_extends() {
-            contextConfig.bind(SubNonParameterMethodComponent.class, SubNonParameterMethodComponent.class);
-            Context context = contextConfig.getContext();
-            SubNonParameterMethodComponent component = context.get(SubNonParameterMethodComponent.class)
-                    .orElseThrow();
+            SubNonParameterMethodComponent component = (SubNonParameterMethodComponent) getComponent(Component.class, SubNonParameterMethodComponent.class);
             assertThat(component.called).isTrue();
             assertThat(component.subCalled).isTrue();
         }
@@ -212,11 +191,8 @@ public class InjectUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("子类重写父类inject方法，但是子类没有inject注解，不会注入")
         void should_sub_class_without_inject() {
-            contextConfig.bind(NonParameterAndInjectMethodComponent.class, NonParameterAndInjectMethodComponent.class);
-            Context context = contextConfig.getContext();
-            NonParameterAndInjectMethodComponent nonParameterAndInjectMethodComponent = context.get(NonParameterAndInjectMethodComponent.class)
-                    .orElseThrow();
-            assertThat(nonParameterAndInjectMethodComponent.called).isFalse();
+            NonParameterAndInjectMethodComponent component = (NonParameterAndInjectMethodComponent) getComponent(Component.class, NonParameterAndInjectMethodComponent.class);
+            assertThat(component.called).isFalse();
         }
 
         @Test

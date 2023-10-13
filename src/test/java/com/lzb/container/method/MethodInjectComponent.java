@@ -1,5 +1,6 @@
 package com.lzb.container.method;
 
+import com.lzb.container.constructor.Component;
 import com.lzb.container.constructor.Dependency;
 import jakarta.inject.Inject;
 
@@ -8,7 +9,7 @@ import jakarta.inject.Inject;
  * Created on : 2023-10-06 15:37
  * @author mac
  */
-public class MethodInjectComponent {
+public class MethodInjectComponent implements Component {
 
     private Dependency dependency;
 
