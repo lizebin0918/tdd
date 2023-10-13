@@ -1,11 +1,15 @@
 package com.lzb.container;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 import com.lzb.BaseUnitTest;
 import com.lzb.container.constructor.AbstractComponent;
 import com.lzb.container.constructor.Component;
 import com.lzb.container.constructor.ComponentDirectlyInstance;
 import com.lzb.container.exception.IllegalComponentException;
 import com.lzb.container.provider.ConstructorInjectProvider;
+import jakarta.inject.Provider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -72,6 +76,23 @@ public class ContextUnitTest extends BaseUnitTest {
             assertThrows(IllegalComponentException.class, () -> new ConstructorInjectProvider<>(Component.class));
         }
 
+    }
+
+    @Test
+    @DisplayName("could get Provider<T> from context")
+    void should_retrieve_bind_type_as_provider() {
+        Component instance = new Component() { };
+        contextConfig.bind(Component.class, instance);
+        Context context = contextConfig.getContext();
+        ParameterizedType type = (ParameterizedType) new TypeLiteral<Provider<Component>>() { }.getType();
+        assertThat(Provider.class).isEqualTo(type.getRawType());
+        assertThat(Component.class).isEqualTo(type.getActualTypeArguments()[0]);
+    }
+
+    static abstract class TypeLiteral<T> {
+        public Type getType() {
+            return ((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        }
     }
 
 }
