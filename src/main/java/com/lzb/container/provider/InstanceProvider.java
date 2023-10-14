@@ -1,14 +1,14 @@
 package com.lzb.container.provider;
 
 import com.lzb.container.Context;
-import com.lzb.container.ContextProvider;
+import com.lzb.container.ComponentProvider;
 
 /**
  * <br/>
  * Created on : 2023-10-05 22:29
  * @author mac
  */
-public class InstanceProvider<T> implements ContextProvider<T> {
+public class InstanceProvider<T> implements ComponentProvider<T> {
 
     private final T instance;
 

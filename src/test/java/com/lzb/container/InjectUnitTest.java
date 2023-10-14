@@ -17,7 +17,7 @@ import com.lzb.container.method.NonParameterAndInjectMethodComponent;
 import com.lzb.container.method.NonParameterMethodComponent;
 import com.lzb.container.method.SubNonParameterMethodComponent;
 import com.lzb.container.method.TypeParameterMethodInjectComponent;
-import com.lzb.container.provider.ConstructorInjectProvider;
+import com.lzb.container.provider.InjectProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -93,14 +93,14 @@ public class InjectUnitTest extends BaseUnitTest {
         @DisplayName("绑定final字段抛异常")
         void should_throw_exception_if_field_is_final() {
             assertThrows(IllegalComponentException.class, () -> {
-                new ConstructorInjectProvider<>(FinalFieldInjection.class);
+                new InjectProvider<>(FinalFieldInjection.class);
             });
         }
 
     }
 
     private <T, I extends T> T getComponent(Class<T> component, Class<I> implementation) {
-        return new ConstructorInjectProvider<T>(implementation).get(context);
+        return new InjectProvider<T>(implementation).get(context);
     }
 
     @Nested
@@ -131,6 +131,7 @@ public class InjectUnitTest extends BaseUnitTest {
             assertThat(component.getDependency()).isNotNull();
             assertThat(component.getDependency()).isSameAs(dependency);
         }
+
 
 
     /*@Test
@@ -199,7 +200,7 @@ public class InjectUnitTest extends BaseUnitTest {
         @DisplayName("注入方法不能有泛型")
         void should_throw_exception_when_inject_method_has_type_parameter() {
             assertThrows(IllegalComponentException.class, () -> {
-                new ConstructorInjectProvider<>(TypeParameterMethodInjectComponent.class);
+                new InjectProvider<>(TypeParameterMethodInjectComponent.class);
             });
         }
 

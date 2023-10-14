@@ -8,7 +8,7 @@ import java.util.List;
  * Created on : 2023-10-05 09:09
  * @author lizebin
  */
-public interface ContextProvider<T> {
+public interface ComponentProvider<T> {
 
     T get(Context context);
 

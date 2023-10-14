@@ -1,20 +1,22 @@
 package com.lzb.container;
 
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.util.List;
 
 import com.lzb.BaseUnitTest;
 import com.lzb.container.constructor.AbstractComponent;
 import com.lzb.container.constructor.Component;
 import com.lzb.container.constructor.ComponentDirectlyInstance;
 import com.lzb.container.exception.IllegalComponentException;
-import com.lzb.container.provider.ConstructorInjectProvider;
+import com.lzb.container.provider.InjectProvider;
 import jakarta.inject.Provider;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * <br/>
@@ -31,7 +33,7 @@ import org.junit.jupiter.api.Test;
  * Created on : 2023-09-30 22:50
  * @author lizebin
  */
-public class ContextUnitTest extends BaseUnitTest {
+class ContextUnitTest extends BaseUnitTest {
 
     ContextConfig contextConfig;
 
@@ -52,7 +54,7 @@ public class ContextUnitTest extends BaseUnitTest {
             Context context = contextConfig.getContext();
             Component component = context.get(Component.class)
                     .orElseThrow();
-            Assertions.assertSame(instance, component);
+            assertSame(instance, component);
         }
 
         @Test
@@ -67,13 +69,13 @@ public class ContextUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("抽象类不能实例化到容器")
         void should_exception_when_class_is_abstract() {
-            assertThrows(IllegalComponentException.class, () -> new ConstructorInjectProvider<>(AbstractComponent.class));
+            assertThrows(IllegalComponentException.class, () -> new InjectProvider<>(AbstractComponent.class));
         }
 
         @Test
         @DisplayName("接口不能实例化到容器")
         void should_exception_when_class_is_interface() {
-            assertThrows(IllegalComponentException.class, () -> new ConstructorInjectProvider<>(Component.class));
+            assertThrows(IllegalComponentException.class, () -> new InjectProvider<>(Component.class));
         }
 
     }
@@ -84,14 +86,27 @@ public class ContextUnitTest extends BaseUnitTest {
         Component instance = new Component() { };
         contextConfig.bind(Component.class, instance);
         Context context = contextConfig.getContext();
-        ParameterizedType type = (ParameterizedType) new TypeLiteral<Provider<Component>>() { }.getType();
+        ParameterizedType type = new TypeLiteral<Provider<Component>>() { }.getType();
         assertThat(Provider.class).isEqualTo(type.getRawType());
         assertThat(Component.class).isEqualTo(type.getActualTypeArguments()[0]);
+
+        Provider provider = context.get(type).get();
+        assertSame(instance, provider.get());
+    }
+
+    @Test
+    @DisplayName("获取不到Provider")
+    void should_not_found_provider() {
+        Component instance = new Component() { };
+        contextConfig.bind(Component.class, instance);
+        Context context = contextConfig.getContext();
+        ParameterizedType type = new TypeLiteral<List<Component>>() { }.getType();
+        assertFalse(context.get(type).isPresent());
     }
 
     static abstract class TypeLiteral<T> {
-        public Type getType() {
-            return ((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        public ParameterizedType getType() {
+            return (ParameterizedType)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         }
     }
 

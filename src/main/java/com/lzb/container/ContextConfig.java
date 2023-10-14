@@ -1,5 +1,6 @@
 package com.lzb.container;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -8,8 +9,9 @@ import java.util.Optional;
 
 import com.lzb.container.exception.CyclicDependencyException;
 import com.lzb.container.exception.DependencyNotBindException;
-import com.lzb.container.provider.ConstructorInjectProvider;
+import com.lzb.container.provider.InjectProvider;
 import com.lzb.container.provider.InstanceProvider;
+import jakarta.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -20,14 +22,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ContextConfig {
 
-    private final Map<Class<?>, ContextProvider<?>> providers = new HashMap<>();
+    private final Map<Class<?>, ComponentProvider<?>> providers = new HashMap<>();
 
     public <T> void bind(Class<T> componentClass, T instance) {
         providers.put(componentClass, new InstanceProvider<>(instance));
     }
 
     public <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
-        providers.put(componentClass, new ConstructorInjectProvider<>(implementationClass));
+        providers.put(componentClass, new InjectProvider<>(implementationClass));
     }
 
     public Context getContext() {
@@ -38,6 +40,14 @@ public class ContextConfig {
             @Override
             public <T> Optional<T> get(Class<T> type) {
                 return Optional.ofNullable(providers.get(type)).map(provider -> (T) provider.get(this));
+            }
+
+            @Override
+            public Optional<Provider> get(ParameterizedType type) {
+                if (type.getRawType() != Provider.class) return Optional.empty();
+                Class<?> componentType = (Class<?>) type.getActualTypeArguments()[0];
+                return Optional.ofNullable(providers.get(componentType))
+                        .map(provider -> (Provider<Object>) () -> provider.get(this));
             }
         };
     }
