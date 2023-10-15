@@ -52,33 +52,19 @@ public class InjectProvider<T> implements ComponentProvider<T> {
      * @return
      */
     private static List<Method> getInjectMethods(Class<?> component) {
-        BiFunction<Class<?>, List<Method>, List<Method>> function = (current, methods) -> getList(component, current, methods);
+        BiFunction<Class<?>, List<Method>, List<Method>> function = (current, methods) -> injectable(current.getDeclaredMethods())
+                // 父类声明@Inject，子类没有声明，不会注入
+                .filter(m -> isOverrideByInjectMethod(m, methods))
+                .filter(m -> isOverrideByNoInjectMethod(component, m))
+                .toList();
         List<Method> injectMethods = traverse(component, function);
         // 先实例化父类
         Collections.reverse(injectMethods);
         return injectMethods;
     }
 
-    private static List<Method> traverse1(Class<?> component, BiFunction<Class<?>, List<Method>, List<Method>> function) {
-        List<Method> injectMethods = new ArrayList<>();
-        Class<?> current = component;
-        while (current != Object.class) {
-            injectMethods.addAll(function.apply(current, injectMethods));
-            current = current.getSuperclass();
-        }
-        return injectMethods;
-    }
-
-    private static List<Method> getList(Class<?> component, Class<?> current, List<Method> injectMethods) {
-        return injectable(current.getDeclaredMethods())
-                // 父类声明@Inject，子类没有声明，不会注入
-                .filter(m -> isOverrideByInjectMethod(m, injectMethods))
-                .filter(m -> isOverrideByNoInjectMethod(component, m))
-                .toList();
-    }
-
     private static List<Field> getInjectFields(Class<?> component) {
-        BiFunction<Class<?>, List<Field>, List<Field>> function = InjectProvider::getList;
+        BiFunction<Class<?>, List<Field>, List<Field>> function = (current, fields) -> injectable(current.getDeclaredFields()).toList();
         // 给定的component，通过给定的function向上找到所有的injectFields
         return traverse(component, function);
     }
@@ -91,10 +77,6 @@ public class InjectProvider<T> implements ComponentProvider<T> {
             current = current.getSuperclass();
         }
         return injectFields;
-    }
-
-    private static List<Field> getList(Class<?> current, List<Field> fields) {
-        return injectable(current.getDeclaredFields()).toList();
     }
 
     private static <T extends AnnotatedElement> Stream<T> injectable(T[] declareds) {
