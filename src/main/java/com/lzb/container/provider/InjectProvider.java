@@ -53,7 +53,7 @@ public class InjectProvider<T> implements ComponentProvider<T> {
      */
     private static List<Method> getInjectMethods(Class<?> component) {
         BiFunction<Class<?>, List<Method>, List<Method>> function = (current, methods) -> getList(component, current, methods);
-        List<Method> injectMethods = traverse1(component, function);
+        List<Method> injectMethods = traverse(component, function);
         // 先实例化父类
         Collections.reverse(injectMethods);
         return injectMethods;
@@ -83,8 +83,8 @@ public class InjectProvider<T> implements ComponentProvider<T> {
         return traverse(component, function);
     }
 
-    private static List<Field> traverse(Class<?> component, BiFunction<Class<?>, List<Field>, List<Field>> function) {
-        List<Field> injectFields = new ArrayList<>();
+    private static <T> List<T> traverse(Class<?> component, BiFunction<Class<?>, List<T>, List<T>> function) {
+        List<T> injectFields = new ArrayList<>();
         Class<?> current = component;
         while (current != Object.class) {
             injectFields.addAll(function.apply(current, injectFields));
