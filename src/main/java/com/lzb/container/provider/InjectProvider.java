@@ -11,11 +11,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import com.lzb.container.Context;
 import com.lzb.container.ComponentProvider;
+import com.lzb.container.Context;
 import com.lzb.container.exception.IllegalComponentException;
 import jakarta.inject.Inject;
 
@@ -71,16 +72,17 @@ public class InjectProvider<T> implements ComponentProvider<T> {
     }
 
     private static List<Field> getInjectFields(Class<?> component) {
+        BiFunction<Class<?>, List<Field>, List<Field>> function = InjectProvider::getList;
         List<Field> injectFields = new ArrayList<>();
         Class<?> current = component;
         while (current != Object.class) {
-            injectFields.addAll(getList(current));
+            injectFields.addAll(function.apply(current, injectFields));
             current = current.getSuperclass();
         }
         return injectFields;
     }
 
-    private static List<Field> getList(Class<?> current) {
+    private static List<Field> getList(Class<?> current, List<Field> fields) {
         return injectable(current.getDeclaredFields()).toList();
     }
 
