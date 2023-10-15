@@ -54,11 +54,7 @@ public class InjectProvider<T> implements ComponentProvider<T> {
         List<Method> injectMethods = new ArrayList<>();
         Class<?> current = component;
         while (current != Object.class) {
-            injectMethods.addAll(injectable(current.getDeclaredMethods())
-                    // 父类声明@Inject，子类没有声明，不会注入
-                    .filter(m -> isOverrideByInjectMethod(m, injectMethods))
-                    .filter(m -> isOverrideByNoInjectMethod(component, m))
-                    .toList());
+            injectMethods.addAll(getList(component, current, injectMethods));
             current = current.getSuperclass();
         }
         // 先实例化父类
@@ -66,14 +62,26 @@ public class InjectProvider<T> implements ComponentProvider<T> {
         return injectMethods;
     }
 
+    private static List<Method> getList(Class<?> component, Class<?> current, List<Method> injectMethods) {
+        return injectable(current.getDeclaredMethods())
+                // 父类声明@Inject，子类没有声明，不会注入
+                .filter(m -> isOverrideByInjectMethod(m, injectMethods))
+                .filter(m -> isOverrideByNoInjectMethod(component, m))
+                .toList();
+    }
+
     private static List<Field> getInjectFields(Class<?> component) {
         List<Field> injectFields = new ArrayList<>();
         Class<?> current = component;
         while (current != Object.class) {
-            injectFields.addAll(injectable(current.getDeclaredFields()).toList());
+            injectFields.addAll(getList(current));
             current = current.getSuperclass();
         }
         return injectFields;
+    }
+
+    private static List<Field> getList(Class<?> current) {
+        return injectable(current.getDeclaredFields()).toList();
     }
 
     private static <T extends AnnotatedElement> Stream<T> injectable(T[] declareds) {
