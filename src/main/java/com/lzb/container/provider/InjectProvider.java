@@ -44,6 +44,12 @@ public class InjectProvider<T> implements ComponentProvider<T> {
         }
     }
 
+    /**
+     * 下面两个方法存在结构重复
+     *
+     * @param component
+     * @return
+     */
     private static List<Method> getInjectMethods(Class<?> component) {
         List<Method> injectMethods = new ArrayList<>();
         Class<?> current = component;
