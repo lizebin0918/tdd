@@ -52,31 +52,29 @@ public class InjectProvider<T> implements ComponentProvider<T> {
      * @return
      */
     private static List<Method> getInjectMethods(Class<?> component) {
-        BiFunction<Class<?>, List<Method>, List<Method>> function = (current, methods) -> injectable(current.getDeclaredMethods())
+        List<Method> injectMethods = traverse(component, (current, methods) -> injectable(current.getDeclaredMethods())
                 // 父类声明@Inject，子类没有声明，不会注入
                 .filter(m -> isOverrideByInjectMethod(m, methods))
                 .filter(m -> isOverrideByNoInjectMethod(component, m))
-                .toList();
-        List<Method> injectMethods = traverse(component, function);
+                .toList());
         // 先实例化父类
         Collections.reverse(injectMethods);
         return injectMethods;
     }
 
     private static List<Field> getInjectFields(Class<?> component) {
-        BiFunction<Class<?>, List<Field>, List<Field>> function = (current, fields) -> injectable(current.getDeclaredFields()).toList();
         // 给定的component，通过给定的function向上找到所有的injectFields
-        return traverse(component, function);
+        return traverse(component, (current, fields) -> injectable(current.getDeclaredFields()).toList());
     }
 
-    private static <T> List<T> traverse(Class<?> component, BiFunction<Class<?>, List<T>, List<T>> function) {
-        List<T> injectFields = new ArrayList<>();
+    private static <T> List<T> traverse(Class<?> component, BiFunction<Class<?>, List<T>, List<T>> finder) {
+        List<T> members = new ArrayList<>();
         Class<?> current = component;
         while (current != Object.class) {
-            injectFields.addAll(function.apply(current, injectFields));
+            members.addAll(finder.apply(current, members));
             current = current.getSuperclass();
         }
-        return injectFields;
+        return members;
     }
 
     private static <T extends AnnotatedElement> Stream<T> injectable(T[] declareds) {
