@@ -96,7 +96,7 @@ class ContextUnitTest extends BaseUnitTest {
 
     @Test
     @DisplayName("获取不到Provider")
-    void should_not_found_provider() {
+    void should_not_retrieve_bind_type_as_unsupported_container() {
         Component instance = new Component() { };
         contextConfig.bind(Component.class, instance);
         Context context = contextConfig.getContext();
