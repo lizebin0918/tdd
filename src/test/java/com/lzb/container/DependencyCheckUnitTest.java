@@ -5,6 +5,7 @@ import java.util.Set;
 import com.lzb.BaseUnitTest;
 import com.lzb.container.constructor.Component;
 import com.lzb.container.constructor.ComponentDependencyNotExist;
+import com.lzb.container.constructor.Dependency;
 import com.lzb.container.constructor.DependencyA;
 import com.lzb.container.constructor.DependencyB;
 import com.lzb.container.constructor.DependencyC;
@@ -14,6 +15,7 @@ import com.lzb.container.constructor.DependencyF;
 import com.lzb.container.constructor.DependencyG;
 import com.lzb.container.constructor.DependencyH;
 import com.lzb.container.constructor.DependencyI;
+import com.lzb.container.constructor.MissingDependencyProviderConstructor;
 import com.lzb.container.exception.CyclicDependencyException;
 import com.lzb.container.exception.DependencyNotBindException;
 import com.lzb.container.field.ClassA;
@@ -141,6 +143,18 @@ class DependencyCheckUnitTest extends BaseUnitTest {
         var e = assertThrows(DependencyNotBindException.class, () -> contextConfig.getContext());
         assertThat(e.getDependencyType()).isEqualTo(String.class);
         assertThat(e.getComponentType()).isEqualTo(DependencyC.class);
+    }
+
+    @Test
+    @DisplayName("不存在的Provider，抛出异常")
+    void should_missing_dependency_provider() {
+        contextConfig.bind(Component.class, MissingDependencyProviderConstructor.class);
+
+        DependencyNotBindException e = assertThrows(DependencyNotBindException.class, () -> {
+            contextConfig.getContext();
+        });
+
+        assertThat(e.getDependencyType()).isEqualTo(Dependency.class);
     }
 
 }
