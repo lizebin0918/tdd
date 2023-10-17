@@ -6,6 +6,8 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -101,10 +103,13 @@ public class InjectProvider<T> implements ComponentProvider<T> {
     }
 
     private static Object[] toDependencies(Context context, Executable executable) {
-        return Stream.of(executable.getParameterTypes())
-                .map(context::get)
-                .filter(Optional::isPresent)
-                .map(Optional::get).toArray();
+        return Arrays.stream(executable.getParameters()).map(p -> {
+            Type type = p.getParameterizedType();
+            if (type instanceof ParameterizedType pt) {
+                return context.get(pt).get();
+            }
+            return context.get((Class<?>)type).get();
+        }).toArray(Object[]::new);
     }
 
     @Override
@@ -135,7 +140,12 @@ public class InjectProvider<T> implements ComponentProvider<T> {
         return f -> {
             try {
                 f.setAccessible(true);
-                f.set(instance, context.get(f.getType()).orElseThrow());
+                Type type = f.getGenericType();
+                if (type instanceof ParameterizedType pt) {
+                    f.set(instance, context.get(pt).orElseThrow());
+                    return;
+                }
+                f.set(instance, context.get((Class<?>) type).orElseThrow());
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }

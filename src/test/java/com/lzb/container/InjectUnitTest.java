@@ -1,5 +1,6 @@
 package com.lzb.container;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Optional;
 
 import com.lzb.BaseUnitTest;
@@ -8,21 +9,27 @@ import com.lzb.container.constructor.ComponentInstaceWithInject;
 import com.lzb.container.constructor.ComponentInstanceWithDefaultContructor;
 import com.lzb.container.constructor.ComponentInstanceWithMultiInject;
 import com.lzb.container.constructor.Dependency;
+import com.lzb.container.constructor.ProviderInjectConstructor;
 import com.lzb.container.exception.IllegalComponentException;
 import com.lzb.container.field.ComponentWithFieldInjection;
 import com.lzb.container.field.FinalFieldInjection;
+import com.lzb.container.field.ProviderInjectField;
 import com.lzb.container.field.SubComponentWithFieldInjection;
 import com.lzb.container.method.MethodInjectComponent;
 import com.lzb.container.method.NonParameterAndInjectMethodComponent;
 import com.lzb.container.method.NonParameterMethodComponent;
+import com.lzb.container.method.ProviderInjectMethod;
 import com.lzb.container.method.SubNonParameterMethodComponent;
 import com.lzb.container.method.TypeParameterMethodInjectComponent;
 import com.lzb.container.provider.InjectProvider;
+import jakarta.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * <br/>
@@ -40,10 +47,15 @@ public class InjectUnitTest extends BaseUnitTest {
 
     Dependency dependency = new Dependency() { };
 
+    @Mock
+    Provider<Dependency> dependencyProvider;
+
     @BeforeEach
-    public void beforeEach() {
+    public void beforeEach() throws NoSuchFieldException {
+        ParameterizedType providerType = (ParameterizedType) InjectUnitTest.class.getDeclaredField("dependencyProvider").getGenericType();
         contextConfig = new ContextConfig();
         lenient().when(context.get(eq(Dependency.class))).thenReturn(Optional.of(dependency));
+        lenient().when(context.get(eq(providerType))).thenReturn(Optional.of(dependencyProvider));
     }
 
 
@@ -97,6 +109,13 @@ public class InjectUnitTest extends BaseUnitTest {
             });
         }
 
+        @Test
+        @DisplayName("通过构造函数注入Provider")
+        void should_inject_provider_via_inject_constructor() {
+            ProviderInjectConstructor instance = new InjectProvider<ProviderInjectConstructor>(ProviderInjectConstructor.class).get(context);
+            assertSame(dependencyProvider, instance.dependency);
+        }
+
     }
 
     private <T, I extends T> T getComponent(Class<T> component, Class<I> implementation) {
@@ -130,6 +149,13 @@ public class InjectUnitTest extends BaseUnitTest {
             SubComponentWithFieldInjection component = (SubComponentWithFieldInjection) getComponent(Component.class, SubComponentWithFieldInjection.class);
             assertThat(component.getDependency()).isNotNull();
             assertThat(component.getDependency()).isSameAs(dependency);
+        }
+
+        @Test
+        @DisplayName("通过方法注入Provider")
+        void should_inject_provider_via_inject_field() {
+            var instance = new InjectProvider<ProviderInjectField>(ProviderInjectField.class).get(context);
+            assertSame(dependencyProvider, instance.dependency);
         }
 
 
@@ -202,6 +228,13 @@ public class InjectUnitTest extends BaseUnitTest {
             assertThrows(IllegalComponentException.class, () -> {
                 new InjectProvider<>(TypeParameterMethodInjectComponent.class);
             });
+        }
+
+        @Test
+        @DisplayName("通过方法注入Provider")
+        void should_inject_provider_via_inject_method() {
+            ProviderInjectMethod instance = new InjectProvider<ProviderInjectMethod>(ProviderInjectMethod.class).get(context);
+            assertSame(dependencyProvider, instance.dependency);
         }
 
     }
