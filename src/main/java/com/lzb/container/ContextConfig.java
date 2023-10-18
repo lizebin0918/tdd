@@ -1,6 +1,7 @@
 package com.lzb.container;
 
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -53,22 +54,35 @@ public class ContextConfig {
     }
 
     private void checkDependency(Class<?> componentType, Deque<Class<?>> visiting) {
-        for (Class<?> dependency : providers.get(componentType).getDependencies()) {
-
-            // 检查依赖是否存在
-            if (!providers.containsKey(dependency)) {
-                throw new DependencyNotBindException(dependency, componentType);
+        // for (Class<?> dependency : providers.get(componentType).getDependencies()) {
+        for (Type dependency : providers.get(componentType).getDependencyTypes()) {
+            if (dependency instanceof Class<?> c) {
+                checkDependency(componentType, visiting, c);
             }
-
-            // 检查循环依赖
-            if (visiting.contains(dependency)) {
-                throw new CyclicDependencyException(visiting);
+            if (dependency instanceof ParameterizedType pt) {
+                Class<?> type = (Class<?>) pt.getActualTypeArguments()[0];
+                if (!providers.containsKey(type)) {
+                    throw new DependencyNotBindException(componentType, type);
+                }
+                // 是否存在循环依赖？provider注入不存在
             }
-
-            visiting.push(dependency);
-            checkDependency(dependency, visiting);
-            visiting.pop();
         }
+    }
+
+    private void checkDependency(Class<?> componentType, Deque<Class<?>> visiting, Class<?> dependency) {
+        // 检查依赖是否存在
+        if (!providers.containsKey(dependency)) {
+            throw new DependencyNotBindException(componentType, dependency);
+        }
+
+        // 检查循环依赖
+        if (visiting.contains(dependency)) {
+            throw new CyclicDependencyException(visiting);
+        }
+
+        visiting.push(dependency);
+        checkDependency(dependency, visiting);
+        visiting.pop();
     }
 
 }

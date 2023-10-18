@@ -1,6 +1,7 @@
 package com.lzb.container;
 
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Optional;
 
 import com.lzb.BaseUnitTest;
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
@@ -50,12 +52,15 @@ public class InjectUnitTest extends BaseUnitTest {
     @Mock
     Provider<Dependency> dependencyProvider;
 
+
+    private ParameterizedType dependencyProviderType;
+
     @BeforeEach
     public void beforeEach() throws NoSuchFieldException {
-        ParameterizedType providerType = (ParameterizedType) InjectUnitTest.class.getDeclaredField("dependencyProvider").getGenericType();
+        dependencyProviderType = (ParameterizedType) InjectUnitTest.class.getDeclaredField("dependencyProvider").getGenericType();
         contextConfig = new ContextConfig();
         lenient().when(context.get(eq(Dependency.class))).thenReturn(Optional.of(dependency));
-        lenient().when(context.get(eq(providerType))).thenReturn(Optional.of(dependencyProvider));
+        lenient().when(context.get(eq(dependencyProviderType))).thenReturn(Optional.of(dependencyProvider));
     }
 
 
@@ -116,6 +121,13 @@ public class InjectUnitTest extends BaseUnitTest {
             assertSame(dependencyProvider, instance.dependency);
         }
 
+        @Test
+        @DisplayName("通过构造函数注入Provider，通过dependencyType返回对应类型")
+        void should_include_provider_type_from_inject_constructor() {
+            var provider = new InjectProvider<ProviderInjectConstructor>(ProviderInjectConstructor.class);
+            assertArrayEquals(new Type[]{dependencyProviderType}, provider.getDependencyTypes().toArray(Type[]::new));
+        }
+
     }
 
     private <T, I extends T> T getComponent(Class<T> component, Class<I> implementation) {
@@ -156,6 +168,13 @@ public class InjectUnitTest extends BaseUnitTest {
         void should_inject_provider_via_inject_field() {
             var instance = new InjectProvider<ProviderInjectField>(ProviderInjectField.class).get(context);
             assertSame(dependencyProvider, instance.dependency);
+        }
+
+        @Test
+        @DisplayName("通过Field注入Provider，通过dependencyType返回对应类型")
+        void should_include_provider_type_from_inject_field() {
+            var provider = new InjectProvider<ProviderInjectField>(ProviderInjectField.class);
+            assertArrayEquals(new Type[]{dependencyProviderType}, provider.getDependencyTypes().toArray(Type[]::new));
         }
 
 
@@ -235,6 +254,13 @@ public class InjectUnitTest extends BaseUnitTest {
         void should_inject_provider_via_inject_method() {
             ProviderInjectMethod instance = new InjectProvider<ProviderInjectMethod>(ProviderInjectMethod.class).get(context);
             assertSame(dependencyProvider, instance.dependency);
+        }
+
+        @Test
+        @DisplayName("通过method注入Provider，通过dependencyType返回对应类型")
+        void should_include_provider_type_from_inject_method() {
+            var provider = new InjectProvider<ProviderInjectMethod>(ProviderInjectMethod.class);
+            assertArrayEquals(new Type[]{dependencyProviderType}, provider.getDependencyTypes().toArray(Type[]::new));
         }
 
     }

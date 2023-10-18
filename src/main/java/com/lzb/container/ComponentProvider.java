@@ -1,5 +1,6 @@
 package com.lzb.container;
 
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,6 +17,8 @@ public interface ComponentProvider<T> {
         return Collections.emptyList();
     }
 
-
+    default List<Type> getDependencyTypes() {
+        return Collections.emptyList();
+    }
 
 }

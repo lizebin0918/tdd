@@ -13,7 +13,7 @@ public class DependencyNotBindException extends RuntimeException {
     private final Class<?> dependencyType;
     private final Class<?> componentType;
 
-    public DependencyNotBindException(Class<?> dependencyType, Class<?> componentType) {
+    public DependencyNotBindException(Class<?> componentType, Class<?> dependencyType) {
         this.dependencyType = dependencyType;
         this.componentType = componentType;
     }

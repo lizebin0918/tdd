@@ -5,6 +5,8 @@ import java.util.Set;
 import com.lzb.BaseUnitTest;
 import com.lzb.container.constructor.Component;
 import com.lzb.container.constructor.ComponentDependencyNotExist;
+import com.lzb.container.constructor.ComponentInstaceWithInject;
+import com.lzb.container.constructor.CyclicDependencyProviderConstructor;
 import com.lzb.container.constructor.Dependency;
 import com.lzb.container.constructor.DependencyA;
 import com.lzb.container.constructor.DependencyB;
@@ -21,9 +23,13 @@ import com.lzb.container.exception.DependencyNotBindException;
 import com.lzb.container.field.ClassA;
 import com.lzb.container.field.ClassB;
 import com.lzb.container.field.ClassC;
+import com.lzb.container.field.MissingDependencyProviderField;
+import com.lzb.container.method.MissingDependencyProviderMethod;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * <br/>
@@ -147,14 +153,52 @@ class DependencyCheckUnitTest extends BaseUnitTest {
 
     @Test
     @DisplayName("不存在的Provider，抛出异常")
-    void should_missing_dependency_provider() {
+    void should_missing_dependency_provider_with_constructor() {
         contextConfig.bind(Component.class, MissingDependencyProviderConstructor.class);
 
         DependencyNotBindException e = assertThrows(DependencyNotBindException.class, () -> {
             contextConfig.getContext();
         });
 
+        // 希望测试告诉我哪个Provider没找到
+        // TODO:lizebin provider inject field/method
         assertThat(e.getDependencyType()).isEqualTo(Dependency.class);
+    }
+
+    @Test
+    @DisplayName("不存在的Provider，抛出异常")
+    void should_missing_dependency_provider_with_field() {
+        contextConfig.bind(Component.class, MissingDependencyProviderField.class);
+
+        DependencyNotBindException e = assertThrows(DependencyNotBindException.class, () -> {
+            contextConfig.getContext();
+        });
+
+        // 希望测试告诉我哪个Provider没找到
+        assertThat(e.getDependencyType()).isEqualTo(Dependency.class);
+    }
+
+    @Test
+    @DisplayName("不存在的Provider，抛出异常")
+    void should_missing_dependency_provider_with_method() {
+        contextConfig.bind(Component.class, MissingDependencyProviderMethod.class);
+
+        DependencyNotBindException e = assertThrows(DependencyNotBindException.class, () -> {
+            contextConfig.getContext();
+        });
+
+        // 希望测试告诉我哪个Provider没找到
+        assertThat(e.getDependencyType()).isEqualTo(Dependency.class);
+    }
+
+    @Test
+    @DisplayName("provider不存在循环依赖")
+    void should_not_throw_exception_if_cyclic_dependency_via_provider() {
+        contextConfig.bind(Component.class, ComponentInstaceWithInject.class);
+        contextConfig.bind(Dependency.class, CyclicDependencyProviderConstructor.class);
+
+        Context context = contextConfig.getContext();
+        assertTrue(context.get(Component.class).isPresent());
     }
 
 }

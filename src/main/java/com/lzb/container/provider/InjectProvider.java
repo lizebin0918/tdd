@@ -22,9 +22,11 @@ import com.lzb.container.Context;
 import com.lzb.container.exception.IllegalComponentException;
 import jakarta.inject.Inject;
 
+import static java.util.Arrays.stream;
+
 public class InjectProvider<T> implements ComponentProvider<T> {
 
-    private final Constructor<?> constructor;
+    private final Constructor<?> injectConstructor;
 
     private final List<Field> injectFields;
 
@@ -34,7 +36,7 @@ public class InjectProvider<T> implements ComponentProvider<T> {
 
         if (Modifier.isAbstract(component.getModifiers())) throw new IllegalComponentException();
 
-        this.constructor = getConstructor(component);
+        this.injectConstructor = getConstructor(component);
         this.injectFields = getInjectFields(component);
         this.injectMethods = getInjectMethods(component);
 
@@ -80,7 +82,7 @@ public class InjectProvider<T> implements ComponentProvider<T> {
     }
 
     private static <T extends AnnotatedElement> Stream<T> injectable(T[] declareds) {
-        return Arrays.stream(declareds).filter(f -> f.isAnnotationPresent(Inject.class));
+        return stream(declareds).filter(f -> f.isAnnotationPresent(Inject.class));
     }
 
     private static <T, I extends T> Optional<Constructor<?>> getDefaultConstructor(Class<I> implementationClass) {
@@ -103,7 +105,7 @@ public class InjectProvider<T> implements ComponentProvider<T> {
     }
 
     private static Object[] toDependencies(Context context, Executable executable) {
-        return Arrays.stream(executable.getParameters()).map(p -> {
+        return stream(executable.getParameters()).map(p -> {
             Type type = p.getParameterizedType();
             if (type instanceof ParameterizedType pt) {
                 return context.get(pt).get();
@@ -115,13 +117,24 @@ public class InjectProvider<T> implements ComponentProvider<T> {
     @Override
     public T get(Context context) {
         try {
-            T instance = (T) constructor.newInstance(toDependencies(context, constructor));
+            T instance = (T) injectConstructor.newInstance(toDependencies(context, injectConstructor));
             injectFields.forEach(setField(context, instance));
             injectMethods.forEach(invokeMethod(context, instance));
             return instance;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<Type> getDependencyTypes() {
+        // 作者写法
+        // return Arrays.stream(injectConstructor.getParameters()).map(p -> p.getParameterizedType()).toList();
+
+        List<Type> types = new ArrayList<>(stream(injectConstructor.getGenericParameterTypes()).toList());
+        injectFields.forEach(f -> types.add(f.getGenericType()));
+        injectMethods.forEach(m -> types.addAll(Arrays.asList(m.getGenericParameterTypes())));
+        return types;
     }
 
     private static <T> Consumer<Method> invokeMethod(Context context, T instance) {
@@ -154,7 +167,7 @@ public class InjectProvider<T> implements ComponentProvider<T> {
 
     @Override
     public List<Class<?>> getDependencies() {
-        List<Class<?>> allDependencies = new ArrayList<>(List.of(constructor.getParameterTypes()));
+        List<Class<?>> allDependencies = new ArrayList<>(List.of(injectConstructor.getParameterTypes()));
         injectFields.forEach(f -> allDependencies.add(f.getType()));
         injectMethods.forEach(m -> allDependencies.addAll(Arrays.asList(m.getParameterTypes())));
         return allDependencies;
