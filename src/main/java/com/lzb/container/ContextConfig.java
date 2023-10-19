@@ -38,23 +38,22 @@ public class ContextConfig {
         providers.keySet().forEach(componentType -> checkDependency(componentType, new LinkedList<>()));
 
         return new Context() {
-            @Override
-            public <T> Optional<T> get(Class<T> type) {
-                return Optional.ofNullable(providers.get(type)).map(provider -> (T) provider.get(this));
-            }
 
             @Override
-            public Optional<Provider> get(ParameterizedType type) {
-                if (type.getRawType() != Provider.class) return Optional.empty();
-                Class<?> componentType = (Class<?>) type.getActualTypeArguments()[0];
-                return Optional.ofNullable(providers.get(componentType))
-                        .map(provider -> (Provider<Object>) () -> provider.get(this));
+            public Optional getType(Type type) {
+                if (type instanceof ParameterizedType pt) {
+                    if (pt.getRawType() != Provider.class) return Optional.empty();
+                    Class<?> componentType = (Class<?>) pt.getActualTypeArguments()[0];
+                    return Optional.ofNullable(providers.get(componentType))
+                            .map(provider -> (Provider<Object>) () -> provider.get(this));
+                }
+                return Optional.ofNullable(providers.get((Class<?>) type)).map(provider -> (Object) provider.get(this));
             }
+
         };
     }
 
     private void checkDependency(Class<?> componentType, Deque<Class<?>> visiting) {
-        // for (Class<?> dependency : providers.get(componentType).getDependencies()) {
         for (Type dependency : providers.get(componentType).getDependencies()) {
             if (dependency instanceof Class<?> c) {
                 checkDependency(componentType, visiting, c);

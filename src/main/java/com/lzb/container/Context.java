@@ -1,9 +1,7 @@
 package com.lzb.container;
 
-import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Optional;
-
-import jakarta.inject.Provider;
 
 /**
  * 容器<br/>
@@ -12,7 +10,5 @@ import jakarta.inject.Provider;
  */
 public interface Context {
 
-    <T> Optional<T> get(Class<T> type);
-
-    Optional<Provider> get(ParameterizedType type);
+    Optional getType(Type type);
 }

@@ -6,7 +6,6 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,10 +110,7 @@ public class InjectProvider<T> implements ComponentProvider<T> {
     }
 
     private static Object toDependency(Context context, Type type) {
-        if (type instanceof ParameterizedType pt) {
-            return context.get(pt).orElseThrow();
-        }
-        return context.get((Class<?>) type).orElseThrow();
+        return context.getType(type).orElseThrow();
     }
 
     @Override
