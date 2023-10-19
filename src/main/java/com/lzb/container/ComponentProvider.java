@@ -13,11 +13,7 @@ public interface ComponentProvider<T> {
 
     T get(Context context);
 
-    default List<Class<?>> getDependencies() {
-        return Collections.emptyList();
-    }
-
-    default List<Type> getDependencyTypes() {
+    default List<Type> getDependencies() {
         return Collections.emptyList();
     }
 

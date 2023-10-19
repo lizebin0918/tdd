@@ -55,7 +55,7 @@ public class ContextConfig {
 
     private void checkDependency(Class<?> componentType, Deque<Class<?>> visiting) {
         // for (Class<?> dependency : providers.get(componentType).getDependencies()) {
-        for (Type dependency : providers.get(componentType).getDependencyTypes()) {
+        for (Type dependency : providers.get(componentType).getDependencies()) {
             if (dependency instanceof Class<?> c) {
                 checkDependency(componentType, visiting, c);
             }

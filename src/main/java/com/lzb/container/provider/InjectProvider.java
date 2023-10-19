@@ -105,13 +105,16 @@ public class InjectProvider<T> implements ComponentProvider<T> {
     }
 
     private static Object[] toDependencies(Context context, Executable executable) {
-        return stream(executable.getParameters()).map(p -> {
-            Type type = p.getParameterizedType();
-            if (type instanceof ParameterizedType pt) {
-                return context.get(pt).get();
-            }
-            return context.get((Class<?>)type).get();
-        }).toArray(Object[]::new);
+        return stream(executable.getParameters())
+                .map(p -> toDependency(context, p.getParameterizedType()))
+                .toArray(Object[]::new);
+    }
+
+    private static Object toDependency(Context context, Type type) {
+        if (type instanceof ParameterizedType pt) {
+            return context.get(pt).orElseThrow();
+        }
+        return context.get((Class<?>) type).orElseThrow();
     }
 
     @Override
@@ -127,7 +130,7 @@ public class InjectProvider<T> implements ComponentProvider<T> {
     }
 
     @Override
-    public List<Type> getDependencyTypes() {
+    public List<Type> getDependencies() {
         // 作者写法
         // return Arrays.stream(injectConstructor.getParameters()).map(p -> p.getParameterizedType()).toList();
 
@@ -153,24 +156,12 @@ public class InjectProvider<T> implements ComponentProvider<T> {
         return f -> {
             try {
                 f.setAccessible(true);
-                Type type = f.getGenericType();
-                if (type instanceof ParameterizedType pt) {
-                    f.set(instance, context.get(pt).orElseThrow());
-                    return;
-                }
-                f.set(instance, context.get((Class<?>) type).orElseThrow());
+                Object dependency = toDependency(context, f.getGenericType());
+                f.set(instance, dependency);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         };
-    }
-
-    @Override
-    public List<Class<?>> getDependencies() {
-        List<Class<?>> allDependencies = new ArrayList<>(List.of(injectConstructor.getParameterTypes()));
-        injectFields.forEach(f -> allDependencies.add(f.getType()));
-        injectMethods.forEach(m -> allDependencies.addAll(Arrays.asList(m.getParameterTypes())));
-        return allDependencies;
     }
 
     private static boolean isOverride(Method m, Method o) {
