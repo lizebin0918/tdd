@@ -38,37 +38,51 @@ public class ContextConfig {
         providers.keySet().forEach(componentType -> checkDependency(componentType, new LinkedList<>()));
 
         return new Context() {
+            private <T> Optional<T> getComponent(Class<T> type) {
+                return Optional.ofNullable(providers.get(type)).map(provider -> (T) provider.get(this));
+            }
 
             @Override
             public Optional getType(Type type) {
                 if (type instanceof ParameterizedType pt) {
-                    if (pt.getRawType() != Provider.class) return Optional.empty();
-                    Class<?> componentType = (Class<?>) pt.getActualTypeArguments()[0];
-                    return Optional.ofNullable(providers.get(componentType))
-                            .map(provider -> (Provider<Object>) () -> provider.get(this));
+                    return getContainer(pt);
                 }
-                return Optional.ofNullable(providers.get((Class<?>) type)).map(provider -> (Object) provider.get(this));
+                return getComponent((Class<?>) type);
             }
 
+            private Optional<Provider> getContainer(ParameterizedType type) {
+                if (type.getRawType() != Provider.class) return Optional.empty();
+                Class<?> componentType = getComponentType(type);
+                return Optional.ofNullable(providers.get(componentType))
+                        .map(provider -> (Provider<Object>) () -> provider.get(this));
+            }
         };
+    }
+
+    private static Class<?> getComponentType(Type type) {
+        return (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
     }
 
     private void checkDependency(Class<?> componentType, Deque<Class<?>> visiting) {
         for (Type dependency : providers.get(componentType).getDependencies()) {
             if (dependency instanceof Class<?> c) {
-                checkDependency(componentType, visiting, c);
+                checkComponentTypeDependency(componentType, visiting, c);
             }
             if (dependency instanceof ParameterizedType pt) {
-                Class<?> type = (Class<?>) pt.getActualTypeArguments()[0];
-                if (!providers.containsKey(type)) {
-                    throw new DependencyNotBindException(componentType, type);
-                }
+                checkContainerTypeDependency(componentType, pt);
                 // 是否存在循环依赖？provider注入不存在
             }
         }
     }
 
-    private void checkDependency(Class<?> componentType, Deque<Class<?>> visiting, Class<?> dependency) {
+    private void checkContainerTypeDependency(Class<?> componentType, ParameterizedType pt) {
+        Class<?> type = getComponentType(pt);
+        if (!providers.containsKey(type)) {
+            throw new DependencyNotBindException(componentType, type);
+        }
+    }
+
+    private void checkComponentTypeDependency(Class<?> componentType, Deque<Class<?>> visiting, Class<?> dependency) {
         // 检查依赖是否存在
         if (!providers.containsKey(dependency)) {
             throw new DependencyNotBindException(componentType, dependency);
