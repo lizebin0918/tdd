@@ -38,13 +38,8 @@ public class ContextConfig {
         providers.keySet().forEach(componentType -> checkDependency(componentType, new LinkedList<>()));
 
         return new Context() {
-
             @Override
-            public Optional getType(Type type) {
-                return getObject(Ref.of(type));
-            }
-
-            private Optional<?> getObject(Ref ref) {
+            public Optional<?> get(Ref ref) {
                 if (ref.isContainerType()) {
                     if (ref.getContainerType() != Provider.class) return Optional.empty();
                     return Optional.ofNullable(providers.get(ref.getComponentType()))
@@ -62,7 +57,7 @@ public class ContextConfig {
 
     private void checkDependency(Class<?> componentType, Deque<Class<?>> visiting) {
         for (Type dependency : providers.get(componentType).getDependencies()) {
-            Ref ref = Ref.of(dependency);
+            Context.Ref ref = Context.Ref.of(dependency);
 
             // 检查依赖是否存在
             if (!providers.containsKey(ref.getComponentType())) {
