@@ -13,6 +13,8 @@ import com.lzb.container.exception.DependencyNotBindException;
 import com.lzb.container.provider.InjectProvider;
 import com.lzb.container.provider.InstanceProvider;
 import jakarta.inject.Provider;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -38,25 +40,50 @@ public class ContextConfig {
         providers.keySet().forEach(componentType -> checkDependency(componentType, new LinkedList<>()));
 
         return new Context() {
-            private <T> Optional<T> getComponent(Class<T> type) {
-                return Optional.ofNullable(providers.get(type)).map(provider -> (T) provider.get(this));
-            }
 
             @Override
             public Optional getType(Type type) {
-                if (type instanceof ParameterizedType pt) {
-                    return getContainer(pt);
-                }
-                return getComponent((Class<?>) type);
+                return getObject(Ref.of(type));
             }
 
-            private Optional<Provider> getContainer(ParameterizedType type) {
-                if (type.getRawType() != Provider.class) return Optional.empty();
-                Class<?> componentType = getComponentType(type);
-                return Optional.ofNullable(providers.get(componentType))
-                        .map(provider -> (Provider<Object>) () -> provider.get(this));
+            private Optional<?> getObject(Ref ref) {
+                if (ref.isContainerType()) {
+                    if (ref.getContainerType() != Provider.class) return Optional.empty();
+                    return Optional.ofNullable(providers.get(ref.getComponentType()))
+                            .map(provider -> (Provider<Object>) () -> provider.get(this));
+                }
+                return Optional.ofNullable(providers.get(ref.getComponentType())).map(provider -> provider.get(this));
             }
+
         };
+    }
+
+    @Getter
+    @EqualsAndHashCode
+    static class Ref {
+        private Type containerType;
+        private Class<?> componentType;
+
+        public Ref(ParameterizedType containerType) {
+            this.containerType = containerType.getRawType();
+            this.componentType = (Class<?>) containerType.getActualTypeArguments()[0];
+        }
+
+        public Ref(Class<?> componentType) {
+            this.componentType = componentType;
+        }
+
+        static Ref of(Type type) {
+            if (type instanceof ParameterizedType container) {
+                return new Ref(container);
+            }
+            return new Ref((Class<?>) type);
+        }
+
+        public boolean isContainerType() {
+            return containerType != null;
+        }
+
     }
 
     private static Class<?> getComponentType(Type type) {
@@ -75,26 +102,29 @@ public class ContextConfig {
         }
     }
 
-    private void checkContainerTypeDependency(Class<?> componentType, ParameterizedType pt) {
-        Class<?> type = getComponentType(pt);
-        if (!providers.containsKey(type)) {
-            throw new DependencyNotBindException(componentType, type);
+    private void checkContainerTypeDependency(Class<?> component, ParameterizedType pt) {
+        Class<?> componentType = getComponentType(pt);
+        if (!providers.containsKey(componentType)) {
+            throw new DependencyNotBindException(component, componentType);
         }
     }
 
-    private void checkComponentTypeDependency(Class<?> componentType, Deque<Class<?>> visiting, Class<?> dependency) {
+    private void checkComponentTypeDependency(Class<?> component, Deque<Class<?>> visiting, Class<?> dependency) {
+
+        Class<?> componentType = dependency;
+
         // 检查依赖是否存在
-        if (!providers.containsKey(dependency)) {
-            throw new DependencyNotBindException(componentType, dependency);
+        if (!providers.containsKey(componentType)) {
+            throw new DependencyNotBindException(component, componentType);
         }
 
         // 检查循环依赖
-        if (visiting.contains(dependency)) {
+        if (visiting.contains(componentType)) {
             throw new CyclicDependencyException(visiting);
         }
 
-        visiting.push(dependency);
-        checkDependency(dependency, visiting);
+        visiting.push(componentType);
+        checkDependency(componentType, visiting);
         visiting.pop();
     }
 
