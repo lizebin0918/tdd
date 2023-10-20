@@ -81,7 +81,7 @@ class ContextUnitTest extends BaseUnitTest {
     }
 
     @Test
-    @DisplayName("could get Provider<T> from context")
+    @DisplayName("could getType Provider<T> from context")
     void should_retrieve_bind_type_as_provider() {
         Component instance = new Component() { };
         contextConfig.bind(Component.class, instance);

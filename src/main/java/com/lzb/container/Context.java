@@ -14,11 +14,11 @@ import lombok.Getter;
  */
 public interface Context {
 
-    default Optional get(Type type) {
-        return get(Ref.of(type));
+    default Optional getType(Type type) {
+        return getType(Ref.of(type));
     }
 
-    default Optional get(Ref ref) {
+    default Optional getType(Ref ref) {
         return Optional.empty();
     }
 
