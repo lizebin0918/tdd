@@ -14,7 +14,7 @@ import lombok.Getter;
  */
 public interface Context {
 
-    Optional get(Ref ref);
+    <T> Optional<T> get(Ref<T> ref);
 
     /**
      * <br/>
@@ -23,28 +23,42 @@ public interface Context {
      */
     @Getter
     @EqualsAndHashCode
-    class Ref {
+    class Ref<T> {
         private Type containerType;
-        private Class<?> componentType;
+        private Class<T> componentType;
 
-        public Ref(ParameterizedType containerType) {
-            this.containerType = containerType.getRawType();
-            this.componentType = (Class<?>) containerType.getActualTypeArguments()[0];
+        public Ref(Type type) {
+            init(type);
         }
 
-        public Ref(Class<?> componentType) {
-            this.componentType = componentType;
+        public Ref(Class<T> componentType) {
+            init(componentType);
         }
 
         public static Ref of(Type type) {
-            if (type instanceof ParameterizedType container) {
-                return new Ref(container);
-            }
-            return new Ref((Class<?>) type);
+            return new Ref<>(type);
+        }
+
+        public static <T> Ref<T> of(Class<T> componentClass) {
+            return new Ref<>(componentClass);
         }
 
         public boolean isContainerType() {
             return containerType != null;
+        }
+
+        protected Ref() {
+            Type type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+            init(type);
+        }
+
+        private void init(Type type) {
+            if (type instanceof ParameterizedType container) {
+                this.componentType = (Class<T>) container.getActualTypeArguments()[0];
+                this.containerType = container.getRawType();
+            } else {
+                this.componentType = (Class<T>) type;
+            }
         }
 
     }

@@ -86,12 +86,11 @@ class ContextUnitTest extends BaseUnitTest {
         Component instance = new Component() { };
         contextConfig.bind(Component.class, instance);
         Context context = contextConfig.getContext();
-        ParameterizedType type = new TypeLiteral<Provider<Component>>() { }.getType();
+        /*ParameterizedType type = new TypeLiteral<Provider<Component>>() { }.getType();
         assertThat(Provider.class).isEqualTo(type.getRawType());
-        assertThat(Component.class).isEqualTo(type.getActualTypeArguments()[0]);
+        assertThat(Component.class).isEqualTo(type.getActualTypeArguments()[0]);*/
 
-        Provider provider = (Provider) context.get(Context.Ref.of(type))
-                .get();
+        Provider<Component> provider = context.get(new Context.Ref<Provider<Component>>(){}).orElseThrow();
         assertSame(instance, provider.get());
     }
 
@@ -101,9 +100,7 @@ class ContextUnitTest extends BaseUnitTest {
         Component instance = new Component() { };
         contextConfig.bind(Component.class, instance);
         Context context = contextConfig.getContext();
-        ParameterizedType type = new TypeLiteral<List<Component>>() { }.getType();
-        assertFalse(context.get(Context.Ref.of(type))
-                .isPresent());
+        assertFalse(context.get(new Context.Ref<List<Component>>() {}).isPresent());
     }
 
     static abstract class TypeLiteral<T> {
