@@ -25,7 +25,7 @@ public class InstanceProvider<T> implements ComponentProvider<T> {
     }
 
     @Override
-    public List<Context.Ref> getDependencyRefs() {
+    public List<Context.Ref> getDependencies() {
         return Collections.emptyList();
     }
 

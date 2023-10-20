@@ -124,7 +124,7 @@ public class InjectUnitTest extends BaseUnitTest {
         @DisplayName("通过构造函数注入Provider，通过dependencyType返回对应类型")
         void should_include_provider_type_from_inject_constructor() {
             var provider = new InjectProvider<ProviderInjectConstructor>(ProviderInjectConstructor.class);
-            assertArrayEquals(new Context.Ref[]{Context.Ref.of(dependencyProviderType)}, provider.getDependencyRefs().toArray(Context.Ref[]::new));
+            assertArrayEquals(new Context.Ref[]{Context.Ref.of(dependencyProviderType)}, provider.getDependencies().toArray(Context.Ref[]::new));
         }
 
     }
@@ -173,7 +173,7 @@ public class InjectUnitTest extends BaseUnitTest {
         @DisplayName("通过Field注入Provider，通过dependencyType返回对应类型")
         void should_include_provider_type_from_inject_field() {
             var provider = new InjectProvider<ProviderInjectField>(ProviderInjectField.class);
-            assertArrayEquals(new Context.Ref[]{Context.Ref.of(dependencyProviderType)}, provider.getDependencyRefs().toArray(Context.Ref[]::new));
+            assertArrayEquals(new Context.Ref[]{Context.Ref.of(dependencyProviderType)}, provider.getDependencies().toArray(Context.Ref[]::new));
         }
 
 
@@ -259,7 +259,7 @@ public class InjectUnitTest extends BaseUnitTest {
         @DisplayName("通过method注入Provider，通过dependencyType返回对应类型")
         void should_include_provider_type_from_inject_method() {
             var provider = new InjectProvider<ProviderInjectMethod>(ProviderInjectMethod.class);
-            assertArrayEquals(new Context.Ref[]{new Context.Ref(dependencyProviderType)}, provider.getDependencyRefs().toArray(Context.Ref[]::new));
+            assertArrayEquals(new Context.Ref[]{new Context.Ref(dependencyProviderType)}, provider.getDependencies().toArray(Context.Ref[]::new));
         }
 
     }

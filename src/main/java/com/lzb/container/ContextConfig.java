@@ -50,7 +50,7 @@ public class ContextConfig {
     }
 
     private void checkDependency(Class<?> componentType, Deque<Class<?>> visiting) {
-        for (Context.Ref dependency : providers.get(componentType).getDependencyRefs()) {
+        for (Context.Ref dependency : providers.get(componentType).getDependencies()) {
 
             // 检查依赖是否存在
             if (!providers.containsKey(dependency.getComponentType())) {
