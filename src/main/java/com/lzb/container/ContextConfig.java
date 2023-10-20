@@ -1,6 +1,5 @@
 package com.lzb.container;
 
-import java.lang.reflect.Type;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -51,23 +50,22 @@ public class ContextConfig {
     }
 
     private void checkDependency(Class<?> componentType, Deque<Class<?>> visiting) {
-        for (Type dependency : providers.get(componentType).getDependencies()) {
-            Context.Ref ref = Context.Ref.of(dependency);
+        for (Context.Ref dependency : providers.get(componentType).getDependencyRefs()) {
 
             // 检查依赖是否存在
-            if (!providers.containsKey(ref.getComponentType())) {
-                throw new DependencyNotBindException(componentType, ref.getComponentType());
+            if (!providers.containsKey(dependency.getComponentType())) {
+                throw new DependencyNotBindException(componentType, dependency.getComponentType());
             }
 
-            if (!ref.isContainerType()) {
+            if (!dependency.isContainerType()) {
 
                 // 检查循环依赖
-                if (visiting.contains(ref.getComponentType())) {
+                if (visiting.contains(dependency.getComponentType())) {
                     throw new CyclicDependencyException(visiting);
                 }
 
-                visiting.push(ref.getComponentType());
-                checkDependency(ref.getComponentType(), visiting);
+                visiting.push(dependency.getComponentType());
+                checkDependency(dependency.getComponentType(), visiting);
                 visiting.pop();
             }
         }

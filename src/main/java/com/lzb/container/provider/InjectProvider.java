@@ -126,7 +126,6 @@ public class InjectProvider<T> implements ComponentProvider<T> {
         }
     }
 
-    @Override
     public List<Type> getDependencies() {
         // 作者写法
         // return Arrays.stream(injectConstructor.getParameters()).map(p -> p.getParameterizedType()).toList();
@@ -135,6 +134,11 @@ public class InjectProvider<T> implements ComponentProvider<T> {
         injectFields.forEach(f -> types.add(f.getGenericType()));
         injectMethods.forEach(m -> types.addAll(Arrays.asList(m.getGenericParameterTypes())));
         return types;
+    }
+
+    @Override
+    public List<Context.Ref> getDependencyRefs() {
+        return getDependencies().stream().map(Context.Ref::of).toList();
     }
 
     private static <T> Consumer<Method> invokeMethod(Context context, T instance) {
