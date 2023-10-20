@@ -13,8 +13,6 @@ import com.lzb.container.exception.DependencyNotBindException;
 import com.lzb.container.provider.InjectProvider;
 import com.lzb.container.provider.InstanceProvider;
 import jakarta.inject.Provider;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -58,74 +56,31 @@ public class ContextConfig {
         };
     }
 
-    @Getter
-    @EqualsAndHashCode
-    static class Ref {
-        private Type containerType;
-        private Class<?> componentType;
-
-        public Ref(ParameterizedType containerType) {
-            this.containerType = containerType.getRawType();
-            this.componentType = (Class<?>) containerType.getActualTypeArguments()[0];
-        }
-
-        public Ref(Class<?> componentType) {
-            this.componentType = componentType;
-        }
-
-        static Ref of(Type type) {
-            if (type instanceof ParameterizedType container) {
-                return new Ref(container);
-            }
-            return new Ref((Class<?>) type);
-        }
-
-        public boolean isContainerType() {
-            return containerType != null;
-        }
-
-    }
-
     private static Class<?> getComponentType(Type type) {
         return (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
     }
 
     private void checkDependency(Class<?> componentType, Deque<Class<?>> visiting) {
         for (Type dependency : providers.get(componentType).getDependencies()) {
-            if (dependency instanceof Class<?> c) {
-                checkComponentTypeDependency(componentType, visiting, c);
+            Ref ref = Ref.of(dependency);
+
+            // 检查依赖是否存在
+            if (!providers.containsKey(ref.getComponentType())) {
+                throw new DependencyNotBindException(componentType, ref.getComponentType());
             }
-            if (dependency instanceof ParameterizedType pt) {
-                checkContainerTypeDependency(componentType, pt);
-                // 是否存在循环依赖？provider注入不存在
+
+            if (!ref.isContainerType()) {
+
+                // 检查循环依赖
+                if (visiting.contains(ref.getComponentType())) {
+                    throw new CyclicDependencyException(visiting);
+                }
+
+                visiting.push(ref.getComponentType());
+                checkDependency(ref.getComponentType(), visiting);
+                visiting.pop();
             }
         }
-    }
-
-    private void checkContainerTypeDependency(Class<?> component, ParameterizedType pt) {
-        Class<?> componentType = getComponentType(pt);
-        if (!providers.containsKey(componentType)) {
-            throw new DependencyNotBindException(component, componentType);
-        }
-    }
-
-    private void checkComponentTypeDependency(Class<?> component, Deque<Class<?>> visiting, Class<?> dependency) {
-
-        Class<?> componentType = dependency;
-
-        // 检查依赖是否存在
-        if (!providers.containsKey(componentType)) {
-            throw new DependencyNotBindException(component, componentType);
-        }
-
-        // 检查循环依赖
-        if (visiting.contains(componentType)) {
-            throw new CyclicDependencyException(visiting);
-        }
-
-        visiting.push(componentType);
-        checkDependency(componentType, visiting);
-        visiting.pop();
     }
 
 }
