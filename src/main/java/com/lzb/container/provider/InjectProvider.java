@@ -110,7 +110,8 @@ public class InjectProvider<T> implements ComponentProvider<T> {
     }
 
     private static Object toDependency(Context context, Type type) {
-        return context.getType(type).orElseThrow();
+        return context.getType(Context.Ref.of(type))
+                .orElseThrow();
     }
 
     @Override

@@ -52,7 +52,7 @@ class ContextUnitTest extends BaseUnitTest {
             ComponentDirectlyInstance instance = new ComponentDirectlyInstance();
             contextConfig.bind(Component.class, instance);
             Context context = contextConfig.getContext();
-            Component component = (Component) context.getType(Component.class)
+            Component component = (Component) context.getType(Context.Ref.of(Component.class))
                     .orElseThrow();
             assertSame(instance, component);
         }
@@ -63,7 +63,7 @@ class ContextUnitTest extends BaseUnitTest {
             // assertThrows(DependencyNotFoundException.class, () -> context.getOrThrow(Component.class));
             // 这样更加友好，毕竟这是一个接口，可能还没有实现
             Context context = contextConfig.getContext();
-            assertThat(context.getType(Component.class).isEmpty()).isTrue();
+            assertThat(context.getType(Context.Ref.of(Component.class)).isEmpty()).isTrue();
         }
 
         @Test
@@ -90,7 +90,8 @@ class ContextUnitTest extends BaseUnitTest {
         assertThat(Provider.class).isEqualTo(type.getRawType());
         assertThat(Component.class).isEqualTo(type.getActualTypeArguments()[0]);
 
-        Provider provider = (Provider) context.getType(type).get();
+        Provider provider = (Provider) context.getType(Context.Ref.of(type))
+                .get();
         assertSame(instance, provider.get());
     }
 
@@ -101,7 +102,8 @@ class ContextUnitTest extends BaseUnitTest {
         contextConfig.bind(Component.class, instance);
         Context context = contextConfig.getContext();
         ParameterizedType type = new TypeLiteral<List<Component>>() { }.getType();
-        assertFalse(context.getType(type).isPresent());
+        assertFalse(context.getType(Context.Ref.of(type))
+                .isPresent());
     }
 
     static abstract class TypeLiteral<T> {

@@ -14,13 +14,7 @@ import lombok.Getter;
  */
 public interface Context {
 
-    default Optional getType(Type type) {
-        return getType(Ref.of(type));
-    }
-
-    default Optional getType(Ref ref) {
-        return Optional.empty();
-    }
+    Optional getType(Ref ref);
 
     /**
      * <br/>
@@ -42,7 +36,7 @@ public interface Context {
             this.componentType = componentType;
         }
 
-        static Ref of(Type type) {
+        public static Ref of(Type type) {
             if (type instanceof ParameterizedType container) {
                 return new Ref(container);
             }
