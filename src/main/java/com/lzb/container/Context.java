@@ -14,7 +14,7 @@ import lombok.Getter;
  */
 public interface Context {
 
-    Optional getType(Ref ref);
+    Optional get(Ref ref);
 
     /**
      * <br/>

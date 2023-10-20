@@ -1,6 +1,5 @@
 package com.lzb.container;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Deque;
 import java.util.HashMap;
@@ -39,7 +38,7 @@ public class ContextConfig {
 
         return new Context() {
             @Override
-            public Optional<?> getType(Ref ref) {
+            public Optional<?> get(Ref ref) {
                 if (ref.isContainerType()) {
                     if (ref.getContainerType() != Provider.class) return Optional.empty();
                     return Optional.ofNullable(providers.get(ref.getComponentType()))
@@ -49,10 +48,6 @@ public class ContextConfig {
             }
 
         };
-    }
-
-    private static Class<?> getComponentType(Type type) {
-        return (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
     }
 
     private void checkDependency(Class<?> componentType, Deque<Class<?>> visiting) {

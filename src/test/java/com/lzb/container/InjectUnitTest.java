@@ -59,8 +59,8 @@ public class InjectUnitTest extends BaseUnitTest {
     public void beforeEach() throws NoSuchFieldException {
         dependencyProviderType = (ParameterizedType) InjectUnitTest.class.getDeclaredField("dependencyProvider").getGenericType();
         contextConfig = new ContextConfig();
-        lenient().when(context.getType(eq(Context.Ref.of(Dependency.class)))).thenReturn(Optional.of(dependency));
-        lenient().when(context.getType(eq(Context.Ref.of(dependencyProviderType)))).thenReturn(Optional.of(dependencyProvider));
+        lenient().when(context.get(eq(Context.Ref.of(Dependency.class)))).thenReturn(Optional.of(dependency));
+        lenient().when(context.get(eq(Context.Ref.of(dependencyProviderType)))).thenReturn(Optional.of(dependencyProvider));
     }
 
 

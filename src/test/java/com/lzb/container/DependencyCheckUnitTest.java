@@ -108,15 +108,15 @@ class DependencyCheckUnitTest extends BaseUnitTest {
         contextConfig.bind(String.class, hello);
 
         Context context = contextConfig.getContext();
-        DependencyA dependencyA = (DependencyA) context.getType(Context.Ref.of(DependencyA.class))
+        DependencyA dependencyA = (DependencyA) context.get(Context.Ref.of(DependencyA.class))
                 .orElseThrow();
         assertThat(dependencyA).isNotNull();
 
-        DependencyB dependencyB = (DependencyB) context.getType(Context.Ref.of(DependencyB.class))
+        DependencyB dependencyB = (DependencyB) context.get(Context.Ref.of(DependencyB.class))
                 .orElseThrow();
         assertThat(dependencyB).isNotNull();
 
-        DependencyC dependencyC = (DependencyC) context.getType(Context.Ref.of(DependencyC.class))
+        DependencyC dependencyC = (DependencyC) context.get(Context.Ref.of(DependencyC.class))
                 .orElseThrow();
         assertThat(dependencyC).isNotNull();
 
@@ -134,7 +134,7 @@ class DependencyCheckUnitTest extends BaseUnitTest {
         contextConfig.bind(String.class, hello);
 
         Context context = contextConfig.getContext();
-        DependencyD dependencyD = (DependencyD) context.getType(Context.Ref.of(DependencyD.class))
+        DependencyD dependencyD = (DependencyD) context.get(Context.Ref.of(DependencyD.class))
                 .orElseThrow();
         assertThat(dependencyD.getName()).isEqualTo(hello);
     }
@@ -198,7 +198,7 @@ class DependencyCheckUnitTest extends BaseUnitTest {
         contextConfig.bind(Dependency.class, CyclicDependencyProviderConstructor.class);
 
         Context context = contextConfig.getContext();
-        assertTrue(context.getType(Context.Ref.of(Component.class))
+        assertTrue(context.get(Context.Ref.of(Component.class))
                 .isPresent());
     }
 
