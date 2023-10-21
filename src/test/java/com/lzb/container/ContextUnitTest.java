@@ -114,8 +114,10 @@ class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(Component.class, instance, new NamedLiteral("myComponent"));
             Context context = contextConfig.getContext();
 
-            assertThat(instance).isSameAs(context.get(new Context.Ref<>(Component.class, new NamedLiteral("myComponent")))
-                    .orElseThrow());
+            Context.Ref<Component> myComponentType = new Context.Ref<>(Component.class, new NamedLiteral("myComponent"));
+            Component myComponent = context.get(myComponentType)
+                    .orElseThrow();
+            assertThat(instance).isSameAs(myComponent);
         }
 
     }

@@ -5,6 +5,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.lzb.container.exception.CyclicDependencyException;
@@ -45,6 +46,9 @@ public class ContextConfig {
         return new Context() {
             @Override
             public Optional<?> get(Ref ref) {
+                if (Objects.nonNull(ref.getQualifierComponentType())) {
+                    return Optional.ofNullable(componentProviders.get(ref.getQualifierComponentType())).map(provider -> provider.get(this));
+                }
                 if (ref.isContainerType()) {
                     if (ref.getContainerType() != Provider.class) return Optional.empty();
                     return Optional.ofNullable(providers.get(ref.getComponentType()))
