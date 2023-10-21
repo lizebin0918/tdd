@@ -1,5 +1,6 @@
 package com.lzb.container;
 
+import java.lang.annotation.Annotation;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -22,13 +23,19 @@ import lombok.extern.slf4j.Slf4j;
 public class ContextConfig {
 
     private final Map<Class<?>, ComponentProvider<?>> providers = new HashMap<>();
+    private final Map<Component, ComponentProvider<?>> componentProviders = new HashMap<>();
 
-    public <T> void bind(Class<T> componentClass, T instance) {
-        providers.put(componentClass, new InstanceProvider<>(instance));
+    public <T> void bind(Class<T> componentType, T instance) {
+        providers.put(componentType, new InstanceProvider<>(instance));
     }
 
-    public <T, I extends T> void bind(Class<T> componentClass, Class<I> implementationClass) {
-        providers.put(componentClass, new InjectProvider<>(implementationClass));
+    public <T> void bind(Class<T> componentType, T instance, Annotation qualifier) {
+        Component component = new Component(componentType, qualifier);
+        componentProviders.put(component, new InstanceProvider<>(instance));
+    }
+
+    public <T, I extends T> void bind(Class<T> componentType, Class<I> implementationType) {
+        providers.put(componentType, new InjectProvider<>(implementationType));
     }
 
     public Context getContext() {

@@ -1,6 +1,5 @@
 package com.lzb.container;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 import com.lzb.BaseUnitTest;
@@ -103,10 +102,21 @@ class ContextUnitTest extends BaseUnitTest {
         assertFalse(context.get(new Context.Ref<List<Component>>() {}).isPresent());
     }
 
-    static abstract class TypeLiteral<T> {
-        public ParameterizedType getType() {
-            return (ParameterizedType)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-        }
-    }
+    @Nested
+    class WithQualifier {
 
+        @Test
+        @DisplayName("实例绑定qualifier")
+        void should_bind_instance_with_qualifier() {
+            ComponentDirectlyInstance instance = new ComponentDirectlyInstance();
+            // 这样无法支持
+            // contextConfig.bind(Component.class, instance, @Named("myComponent"));
+            contextConfig.bind(Component.class, instance, new NamedLiteral("myComponent"));
+            Context context = contextConfig.getContext();
+
+            assertThat(instance).isSameAs(context.get(new Context.Ref<>(Component.class, new NamedLiteral("myComponent")))
+                    .orElseThrow());
+        }
+
+    }
 }

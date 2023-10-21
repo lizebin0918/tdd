@@ -26,6 +26,7 @@ public interface Context {
     class Ref<T> {
         private Type containerType;
         private Class<T> componentType;
+        private Component qualifierComponentType;
 
         public Ref(Type type) {
             init(type);
@@ -33,6 +34,10 @@ public interface Context {
 
         public Ref(Class<T> componentType) {
             init(componentType);
+        }
+
+        public Ref(Class<T> componentType, NamedLiteral qualifier) {
+            this.qualifierComponentType = new Component(componentType, qualifier);
         }
 
         public static Ref of(Type type) {
