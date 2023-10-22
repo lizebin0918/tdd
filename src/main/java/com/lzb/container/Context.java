@@ -39,7 +39,7 @@ public interface Context {
             init(componentType);
         }
 
-        public Ref(@NonNull Class<T> componentType, NamedLiteral qualifier) {
+        public Ref(@NonNull Class<T> componentType, Annotation qualifier) {
             if (Objects.isNull(qualifier)) {
                 init(componentType);
                 return;
