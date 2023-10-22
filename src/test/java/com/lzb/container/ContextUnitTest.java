@@ -1,5 +1,6 @@
 package com.lzb.container;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 
 import com.lzb.BaseUnitTest;
@@ -158,6 +159,27 @@ class ContextUnitTest extends BaseUnitTest {
             assertThat(dependency2).isNotNull();
         }
 
+        @Test
+        @DisplayName("如果qualifier声明的实例不存在，应该抛出异常")
+        void should_throw_exception_if_illegal_qualifier_given_to_instance() {
+            ComponentDirectlyInstance instance = new ComponentDirectlyInstance();
+            assertThrows(IllegalComponentException.class, () -> contextConfig.bind(Component.class, instance, new TestLiteral()));
+        }
 
+        @Test
+        @DisplayName("如果qualifier声明的实例不存在，应该抛出异常")
+        void should_throw_exception_if_illegal_qualifier_given_to_component_instance() {
+            assertThrows(IllegalComponentException.class, () -> contextConfig.bind(Component.class, ComponentDirectlyInstance.class, new TestLiteral()));
+        }
+
+
+    }
+}
+
+record TestLiteral() implements Test {
+
+    @Override
+    public Class<? extends Annotation> annotationType() {
+        return Test.class;
     }
 }

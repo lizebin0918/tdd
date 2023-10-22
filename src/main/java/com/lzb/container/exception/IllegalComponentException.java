@@ -7,4 +7,11 @@ package com.lzb.container.exception;
  */
 public class IllegalComponentException extends RuntimeException {
 
+    public IllegalComponentException(String message) {
+        super(message);
+    }
+
+    public IllegalComponentException() {
+    }
+
 }

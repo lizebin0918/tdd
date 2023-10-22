@@ -1,6 +1,7 @@
 package com.lzb.container;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -9,9 +10,11 @@ import java.util.Optional;
 
 import com.lzb.container.exception.CyclicDependencyException;
 import com.lzb.container.exception.DependencyNotBindException;
+import com.lzb.container.exception.IllegalComponentException;
 import com.lzb.container.provider.InjectProvider;
 import com.lzb.container.provider.InstanceProvider;
 import jakarta.inject.Provider;
+import jakarta.inject.Qualifier;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
@@ -32,6 +35,9 @@ public class ContextConfig {
             componentProviders.put(new Component(componentType, null), new InstanceProvider<>(instance));
             return;
         }
+        if (Arrays.stream(qualifiers).anyMatch(q -> !q.annotationType().isAnnotationPresent(Qualifier.class))) {
+            throw new IllegalComponentException("qualifier must be annotated by @Qualifier");
+        }
         for (Annotation qualifier : qualifiers) {
             Component component = new Component(componentType, qualifier);
             componentProviders.put(component, new InstanceProvider<>(instance));
@@ -42,6 +48,9 @@ public class ContextConfig {
         if (ArrayUtils.isEmpty(qualifiers)) {
             componentProviders.put(new Component(componentType, null), new InjectProvider<>(implementationType));
             return;
+        }
+        if (Arrays.stream(qualifiers).anyMatch(q -> !q.annotationType().isAnnotationPresent(Qualifier.class))) {
+            throw new IllegalComponentException("qualifier must be annotated by @Qualifier");
         }
         for (Annotation qualifier : qualifiers) {
             Component component = new Component(componentType, qualifier);
