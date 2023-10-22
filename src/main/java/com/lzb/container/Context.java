@@ -1,5 +1,6 @@
 package com.lzb.container;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Objects;
@@ -28,7 +29,7 @@ public interface Context {
     class Ref<T> {
         private Type containerType;
         private Class<T> componentType;
-        private Component qualifierComponentType;
+        private Annotation qualifier;
 
         public Ref(Type type) {
             init(type);
@@ -43,7 +44,8 @@ public interface Context {
                 init(componentType);
                 return;
             }
-            this.qualifierComponentType = new Component(componentType, qualifier);
+            this.componentType = componentType;
+            this.qualifier = qualifier;
         }
 
         public static Ref of(Type type) {
