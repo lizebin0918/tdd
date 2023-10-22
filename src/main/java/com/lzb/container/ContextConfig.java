@@ -55,38 +55,40 @@ public class ContextConfig {
 
         return new Context() {
             @Override
-            public Optional<?> get(Ref ref) {
-                if (ref.isContainerType()) {
-                    if (ref.getContainerType() != Provider.class) return Optional.empty();
-                    return getValue(ref).map(provider -> (Provider<Object>) () -> provider.get(this));
+            public Optional<?> get(ComponentRef componentRef) {
+                if (componentRef.isContainerType()) {
+                    if (componentRef.getContainerType() != Provider.class) return Optional.empty();
+                    return getValue(componentRef).map(provider -> (Provider<Object>) () -> provider.get(this));
                 }
-                return getValue(ref).map(provider -> provider.get(this));
+                return getValue(componentRef).map(provider -> provider.get(this));
             }
 
         };
     }
 
-    private Optional<? extends ComponentProvider<?>> getValue(Context.Ref ref) {
-        return Optional.ofNullable(componentProviders.get(new Component(ref.getComponentType(), ref.getQualifier())));
+    private Optional<? extends ComponentProvider<?>> getValue(ComponentRef componentRef) {
+        return Optional.ofNullable(componentProviders.get(componentRef.getComponent()));
     }
 
     private void checkDependency(Component componentType, Deque<Class<?>> visiting) {
-        for (Context.Ref dependency : componentProviders.get(componentType).getDependencies()) {
+        for (ComponentRef dependency : componentProviders.get(componentType).getDependencies()) {
+
+            Component component = dependency.getComponent();
 
             // 检查依赖是否存在
-            if (!componentProviders.containsKey(new Component(dependency.getComponentType(), dependency.getQualifier()))) {
-                throw new DependencyNotBindException(componentType.type(), dependency.getComponentType());
+            if (!componentProviders.containsKey(component)) {
+                throw new DependencyNotBindException(componentType.type(), component.type());
             }
 
             if (!dependency.isContainerType()) {
 
                 // 检查循环依赖
-                if (visiting.contains(dependency.getComponentType())) {
+                if (visiting.contains(component.type())) {
                     throw new CyclicDependencyException(visiting);
                 }
 
-                visiting.push(dependency.getComponentType());
-                checkDependency(new Component(dependency.getComponentType(), dependency.getQualifier()), visiting);
+                visiting.push(component.type());
+                checkDependency(component, visiting);
                 visiting.pop();
             }
         }

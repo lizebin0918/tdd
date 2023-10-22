@@ -53,7 +53,7 @@ class ContextUnitTest extends BaseUnitTest {
             ComponentDirectlyInstance instance = new ComponentDirectlyInstance();
             contextConfig.bind(Component.class, instance);
             Context context = contextConfig.getContext();
-            Component component = (Component) context.get(Context.Ref.of(Component.class))
+            Component component = (Component) context.get(ComponentRef.of(Component.class))
                     .orElseThrow();
             assertSame(instance, component);
         }
@@ -64,7 +64,7 @@ class ContextUnitTest extends BaseUnitTest {
             // assertThrows(DependencyNotFoundException.class, () -> context.getOrThrow(Component.class));
             // 这样更加友好，毕竟这是一个接口，可能还没有实现
             Context context = contextConfig.getContext();
-            assertThat(context.get(Context.Ref.of(Component.class)).isEmpty()).isTrue();
+            assertThat(context.get(ComponentRef.of(Component.class)).isEmpty()).isTrue();
         }
 
         @Test
@@ -91,7 +91,7 @@ class ContextUnitTest extends BaseUnitTest {
         assertThat(Provider.class).isEqualTo(type.getRawType());
         assertThat(Component.class).isEqualTo(type.getActualTypeArguments()[0]);*/
 
-        Provider<Component> provider = context.get(new Context.Ref<Provider<Component>>(){}).orElseThrow();
+        Provider<Component> provider = context.get(new ComponentRef<Provider<Component>>(){}).orElseThrow();
         assertSame(instance, provider.get());
     }
 
@@ -101,7 +101,7 @@ class ContextUnitTest extends BaseUnitTest {
         Component instance = new Component() { };
         contextConfig.bind(Component.class, instance);
         Context context = contextConfig.getContext();
-        assertFalse(context.get(new Context.Ref<List<Component>>() {}).isPresent());
+        assertFalse(context.get(new ComponentRef<List<Component>>() {}).isPresent());
     }
 
     @Nested
@@ -116,7 +116,7 @@ class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(Component.class, instance, new NamedLiteral("myComponent"));
             Context context = contextConfig.getContext();
 
-            Context.Ref<Component> myComponentType = new Context.Ref<>(Component.class, new NamedLiteral("myComponent"));
+            ComponentRef<Component> myComponentType = new ComponentRef<>(Component.class, new NamedLiteral("myComponent"));
             Component myComponent = context.get(myComponentType)
                     .orElseThrow();
             assertThat(instance).isSameAs(myComponent);
@@ -131,10 +131,10 @@ class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(Component.class, instance, new NamedLiteral("myComponent"), new NamedLiteral("myComponent1"));
             Context context = contextConfig.getContext();
 
-            Context.Ref<Component> myComponentType = new Context.Ref<>(Component.class, new NamedLiteral("myComponent"));
+            ComponentRef<Component> myComponentType = new ComponentRef<>(Component.class, new NamedLiteral("myComponent"));
             Component myComponent = context.get(myComponentType).orElseThrow();
 
-            Context.Ref<Component> myComponentType1 = new Context.Ref<>(Component.class, new NamedLiteral("myComponent1"));
+            ComponentRef<Component> myComponentType1 = new ComponentRef<>(Component.class, new NamedLiteral("myComponent1"));
             Component myComponent1 = context.get(myComponentType1).orElseThrow();
 
             assertThat(instance).isSameAs(myComponent);
@@ -148,10 +148,10 @@ class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(Dependency.class, DependencyA.class, new NamedLiteral("d1"), new NamedLiteral("d2"));
             Context context = contextConfig.getContext();
 
-            Context.Ref<Dependency> d1 = new Context.Ref<>(Dependency.class, new NamedLiteral("d1"));
+            ComponentRef<Dependency> d1 = new ComponentRef<>(Dependency.class, new NamedLiteral("d1"));
             Dependency dependency1 = context.get(d1).orElseThrow();
 
-            Context.Ref<Dependency> d2 = new Context.Ref<>(Dependency.class, new NamedLiteral("d2"));
+            ComponentRef<Dependency> d2 = new ComponentRef<>(Dependency.class, new NamedLiteral("d2"));
             Dependency dependency2 = context.get(d2).orElseThrow();
 
             assertThat(dependency1).isNotNull();

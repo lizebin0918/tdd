@@ -11,6 +11,6 @@ public interface ComponentProvider<T> {
 
     T get(Context context);
 
-    List<Context.Ref> getDependencies();
+    List<ComponentRef> getDependencies();
 
 }

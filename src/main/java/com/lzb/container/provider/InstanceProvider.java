@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.lzb.container.ComponentProvider;
+import com.lzb.container.ComponentRef;
 import com.lzb.container.Context;
 
 /**
@@ -25,7 +26,7 @@ public class InstanceProvider<T> implements ComponentProvider<T> {
     }
 
     @Override
-    public List<Context.Ref> getDependencies() {
+    public List<ComponentRef> getDependencies() {
         return Collections.emptyList();
     }
 

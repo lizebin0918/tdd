@@ -17,6 +17,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import com.lzb.container.ComponentProvider;
+import com.lzb.container.ComponentRef;
 import com.lzb.container.Context;
 import com.lzb.container.exception.IllegalComponentException;
 import jakarta.inject.Inject;
@@ -110,7 +111,7 @@ public class InjectProvider<T> implements ComponentProvider<T> {
     }
 
     private static Object toDependency(Context context, Type type) {
-        return context.get(Context.Ref.of(type))
+        return context.get(ComponentRef.of(type))
                 .orElseThrow();
     }
 
@@ -127,14 +128,14 @@ public class InjectProvider<T> implements ComponentProvider<T> {
     }
 
     @Override
-    public List<Context.Ref> getDependencies() {
+    public List<ComponentRef> getDependencies() {
         // 作者写法
         // return Arrays.stream(injectConstructor.getParameters()).map(p -> p.getParameterizedType()).toList();
 
         List<Type> types = new ArrayList<>(stream(injectConstructor.getGenericParameterTypes()).toList());
         injectFields.forEach(f -> types.add(f.getGenericType()));
         injectMethods.forEach(m -> types.addAll(Arrays.asList(m.getGenericParameterTypes())));
-        return types.stream().map(Context.Ref::of).toList();
+        return types.stream().map(ComponentRef::of).toList();
     }
 
     private static <T> Consumer<Method> invokeMethod(Context context, T instance) {
