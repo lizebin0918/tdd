@@ -6,6 +6,8 @@ import com.lzb.BaseUnitTest;
 import com.lzb.container.constructor.AbstractComponent;
 import com.lzb.container.constructor.Component;
 import com.lzb.container.constructor.ComponentDirectlyInstance;
+import com.lzb.container.constructor.Dependency;
+import com.lzb.container.constructor.DependencyA;
 import com.lzb.container.exception.IllegalComponentException;
 import com.lzb.container.provider.InjectProvider;
 import jakarta.inject.Provider;
@@ -119,6 +121,43 @@ class ContextUnitTest extends BaseUnitTest {
                     .orElseThrow();
             assertThat(instance).isSameAs(myComponent);
         }
+
+        @Test
+        @DisplayName("实例绑定多个qualifier")
+        void should_bind_instance_with_multiple_qualifier() {
+            ComponentDirectlyInstance instance = new ComponentDirectlyInstance();
+            // 这样无法支持
+            // contextConfig.bind(Component.class, instance, @Named("myComponent"));
+            contextConfig.bind(Component.class, instance, new NamedLiteral("myComponent"), new NamedLiteral("myComponent1"));
+            Context context = contextConfig.getContext();
+
+            Context.Ref<Component> myComponentType = new Context.Ref<>(Component.class, new NamedLiteral("myComponent"));
+            Component myComponent = context.get(myComponentType).orElseThrow();
+
+            Context.Ref<Component> myComponentType1 = new Context.Ref<>(Component.class, new NamedLiteral("myComponent1"));
+            Component myComponent1 = context.get(myComponentType1).orElseThrow();
+
+            assertThat(instance).isSameAs(myComponent);
+            assertThat(instance).isSameAs(myComponent1);
+            assertThat(myComponent).isSameAs(myComponent);
+        }
+
+        @Test
+        @DisplayName("类实例绑定多个qualifier")
+        void should_bind_dependency_with_multiple_qualifier() {
+            contextConfig.bind(Dependency.class, DependencyA.class, new NamedLiteral("d1"), new NamedLiteral("d2"));
+            Context context = contextConfig.getContext();
+
+            Context.Ref<Dependency> d1 = new Context.Ref<>(Dependency.class, new NamedLiteral("d1"));
+            Dependency dependency1 = context.get(d1).orElseThrow();
+
+            Context.Ref<Dependency> d2 = new Context.Ref<>(Dependency.class, new NamedLiteral("d2"));
+            Dependency dependency2 = context.get(d2).orElseThrow();
+
+            assertThat(dependency1).isNotNull();
+            assertThat(dependency2).isNotNull();
+        }
+
 
     }
 }

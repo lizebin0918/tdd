@@ -2,10 +2,12 @@ package com.lzb.container;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Objects;
 import java.util.Optional;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 
 /**
  * 容器<br/>
@@ -36,7 +38,11 @@ public interface Context {
             init(componentType);
         }
 
-        public Ref(Class<T> componentType, NamedLiteral qualifier) {
+        public Ref(@NonNull Class<T> componentType, NamedLiteral qualifier) {
+            if (Objects.isNull(qualifier)) {
+                init(componentType);
+                return;
+            }
             this.qualifierComponentType = new Component(componentType, qualifier);
         }
 

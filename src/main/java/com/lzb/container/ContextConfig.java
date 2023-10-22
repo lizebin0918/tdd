@@ -30,13 +30,28 @@ public class ContextConfig {
         providers.put(componentType, new InstanceProvider<>(instance));
     }
 
-    public <T> void bind(Class<T> componentType, T instance, Annotation qualifier) {
-        Component component = new Component(componentType, qualifier);
-        componentProviders.put(component, new InstanceProvider<>(instance));
+    public <T> void bind(Class<T> componentType, T instance, Annotation... qualifiers) {
+        if (Objects.isNull(qualifiers)) {
+            return;
+        }
+        for (Annotation qualifier : qualifiers) {
+            Component component = new Component(componentType, qualifier);
+            componentProviders.put(component, new InstanceProvider<>(instance));
+        }
     }
 
     public <T, I extends T> void bind(Class<T> componentType, Class<I> implementationType) {
         providers.put(componentType, new InjectProvider<>(implementationType));
+    }
+
+    public <T, I extends T> void bind(Class<T> componentType, Class<I> implementationType, Annotation... qualifiers) {
+        if (Objects.isNull(qualifiers)) {
+            return;
+        }
+        for (Annotation qualifier : qualifiers) {
+            Component component = new Component(componentType, qualifier);
+            componentProviders.put(component, new InjectProvider<>(implementationType));
+        }
     }
 
     public Context getContext() {
