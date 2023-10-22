@@ -172,6 +172,17 @@ class ContextUnitTest extends BaseUnitTest {
             assertThrows(IllegalComponentException.class, () -> contextConfig.bind(Component.class, ComponentDirectlyInstance.class, new TestLiteral()));
         }
 
+        // todo provider
+
+        ///////////////////////////////////////////////////////////////////////////
+        // check
+        ///////////////////////////////////////////////////////////////////////////
+
+        @Test
+        @DisplayName("qualifier 声明的实例找不到")
+        void should_throw_exception_if_dependency_with_qualifier_not_found() {
+            // 30
+        }
 
     }
 }
