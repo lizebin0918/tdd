@@ -29,7 +29,7 @@ class ComponentRef<T> {
         init(componentType);
     }
 
-    public ComponentRef(@NonNull Class<T> componentType, Annotation qualifier) {
+    private ComponentRef(@NonNull Class<T> componentType, Annotation qualifier) {
         if (Objects.isNull(qualifier)) {
             init(componentType);
             return;
@@ -43,6 +43,10 @@ class ComponentRef<T> {
 
     public static <T> ComponentRef<T> of(Class<T> componentClass) {
         return new ComponentRef<>(componentClass);
+    }
+
+    public static <T> ComponentRef<T> of(@NonNull Class<T> componentType, Annotation qualifier) {
+        return new ComponentRef<T>(componentType, qualifier);
     }
 
     public boolean isContainerType() {

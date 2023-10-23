@@ -22,8 +22,10 @@ import com.lzb.container.method.ProviderInjectMethod;
 import com.lzb.container.method.SubNonParameterMethodComponent;
 import com.lzb.container.method.TypeParameterMethodInjectComponent;
 import com.lzb.container.provider.InjectProvider;
+import com.lzb.container.qualifier.QualifierInjectConstructor;
 import jakarta.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -74,7 +76,7 @@ public class InjectUnitTest extends BaseUnitTest {
             // 获取ComponentB需要的实例
             //Class[] klass = ComponentB.class.getConstructors()[0].getParameterTypes();
             Class<ComponentInstanceWithDefaultContructor> implementation = ComponentInstanceWithDefaultContructor.class;
-            var instance = getComponent(Component.class, implementation);
+            var instance = new InjectProvider<Component>(implementation).get(context);
 
             // 如果都有的话，那就直接返回ComponentB实例，如果没有会出现递归构造，先不考虑（步子迈太大）
             assertThat(instance).isNotNull();
@@ -85,7 +87,7 @@ public class InjectUnitTest extends BaseUnitTest {
         @DisplayName("通过构造函数注入的绑定方式")
         void should_bind_with_inject_constructor() {
 
-            ComponentInstaceWithInject component = (ComponentInstaceWithInject) getComponent(Component.class, ComponentInstaceWithInject.class);
+            ComponentInstaceWithInject component = (ComponentInstaceWithInject) new InjectProvider<Component>(ComponentInstaceWithInject.class).get(context);
 
             assertThat(component).isNotNull();
             assertThat(component).isInstanceOf(ComponentInstaceWithInject.class);
@@ -127,10 +129,18 @@ public class InjectUnitTest extends BaseUnitTest {
             assertArrayEquals(new ComponentRef[]{ComponentRef.of(dependencyProviderType)}, provider.getDependencies().toArray(ComponentRef[]::new));
         }
 
-    }
+        @Test
+        @Disabled
+        @DisplayName("通过构造函数注入qualifier声明的bean")
+        void should_include_qualifier_with_dependency() {
+            contextConfig.bind(Dependency.class, new Dependency() { }, new NamedLiteral("dependency"));
+            InjectProvider<QualifierInjectConstructor> provider = new InjectProvider<>(QualifierInjectConstructor.class);
+            //assertThat(provider.getDependencies().toArray()).isSameAs(new ComponentRef[]{ComponentRef.of(Dependency.class, new NamedLiteral("dependency"))});
+            assertArrayEquals(provider.getDependencies().toArray(), new ComponentRef[]{ComponentRef.of(Dependency.class, new NamedLiteral("dependency"))});
+        }
 
-    private <T, I extends T> T getComponent(Class<T> component, Class<I> implementation) {
-        return new InjectProvider<T>(implementation).get(context);
+
+
     }
 
     @Nested
@@ -140,7 +150,7 @@ public class InjectUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("属性注入（第一种写法）")
         void should_inject_dependency_via_field() {
-            ComponentWithFieldInjection component = (ComponentWithFieldInjection) getComponent(Component.class, ComponentWithFieldInjection.class);
+            ComponentWithFieldInjection component = (ComponentWithFieldInjection) new InjectProvider<Component>(ComponentWithFieldInjection.class).get(context);
             assertThat(component.getDependency()).isNotNull();
             assertThat(component.getDependency()).isSameAs(dependency);
         }
@@ -148,7 +158,7 @@ public class InjectUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("属性注入（第二种写法，更接近于我们平时说的单元测试），但是这个写法会有一个问题就是你需要知道里面的实现细节，因为在contextConfig.getContext()的时候，通过各种检查，但是这个测试无法模拟")
         void should_inject_dependency_vis_field_1() {
-            ComponentWithFieldInjection component = (ComponentWithFieldInjection) getComponent(Component.class, ComponentWithFieldInjection.class);
+            ComponentWithFieldInjection component = (ComponentWithFieldInjection) new InjectProvider<Component>(ComponentWithFieldInjection.class).get(context);
             assertThat(component.getDependency()).isNotNull();
             assertThat(component.getDependency()).isSameAs(dependency);
         }
@@ -157,7 +167,7 @@ public class InjectUnitTest extends BaseUnitTest {
         @DisplayName("父类继承属性")
         void should_inject_dependency_via_superclass_inject_field() {
 
-            SubComponentWithFieldInjection component = (SubComponentWithFieldInjection) getComponent(Component.class, SubComponentWithFieldInjection.class);
+            SubComponentWithFieldInjection component = (SubComponentWithFieldInjection) new InjectProvider<Component>(SubComponentWithFieldInjection.class).get(context);
             assertThat(component.getDependency()).isNotNull();
             assertThat(component.getDependency()).isSameAs(dependency);
         }
@@ -214,21 +224,21 @@ public class InjectUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("方法注入")
         void should_method_injection() {
-            MethodInjectComponent methodInjection = (MethodInjectComponent) getComponent(Component.class, MethodInjectComponent.class);
+            MethodInjectComponent methodInjection = (MethodInjectComponent) new InjectProvider<Component>(MethodInjectComponent.class).get(context);
             assertThat(methodInjection.getDependency()).isNotNull();
         }
 
         @Test
         @DisplayName("inject方法没有任何参数")
         void should_inject_non_parameter_method() {
-            NonParameterMethodComponent component = (NonParameterMethodComponent) getComponent(Component.class, NonParameterMethodComponent.class);
+            NonParameterMethodComponent component = (NonParameterMethodComponent) new InjectProvider<Component>(NonParameterMethodComponent.class).get(context);
             assertThat(component.called).isTrue();
         }
 
         @Test
         @DisplayName("@Inject存在于继承关系")
         void should_inject_in_extends() {
-            SubNonParameterMethodComponent component = (SubNonParameterMethodComponent) getComponent(Component.class, SubNonParameterMethodComponent.class);
+            SubNonParameterMethodComponent component = (SubNonParameterMethodComponent) new InjectProvider<Component>(SubNonParameterMethodComponent.class).get(context);
             assertThat(component.called).isTrue();
             assertThat(component.subCalled).isTrue();
         }
@@ -236,7 +246,7 @@ public class InjectUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("子类重写父类inject方法，但是子类没有inject注解，不会注入")
         void should_sub_class_without_inject() {
-            NonParameterAndInjectMethodComponent component = (NonParameterAndInjectMethodComponent) getComponent(Component.class, NonParameterAndInjectMethodComponent.class);
+            NonParameterAndInjectMethodComponent component = (NonParameterAndInjectMethodComponent) new InjectProvider<Component>(NonParameterAndInjectMethodComponent.class).get(context);
             assertThat(component.called).isFalse();
         }
 

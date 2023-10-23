@@ -9,10 +9,13 @@ import com.lzb.container.constructor.Component;
 import com.lzb.container.constructor.ComponentDirectlyInstance;
 import com.lzb.container.constructor.Dependency;
 import com.lzb.container.constructor.DependencyA;
+import com.lzb.container.exception.DependencyNotBindException;
 import com.lzb.container.exception.IllegalComponentException;
 import com.lzb.container.provider.InjectProvider;
+import com.lzb.container.qualifier.QualifierInjectConstructor;
 import jakarta.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -117,7 +120,7 @@ class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(Component.class, instance, new NamedLiteral("myComponent"));
             Context context = contextConfig.getContext();
 
-            ComponentRef<Component> myComponentType = new ComponentRef<>(Component.class, new NamedLiteral("myComponent"));
+            ComponentRef<Component> myComponentType = ComponentRef.of(Component.class, new NamedLiteral("myComponent"));
             Component myComponent = context.get(myComponentType)
                     .orElseThrow();
             assertThat(instance).isSameAs(myComponent);
@@ -132,10 +135,10 @@ class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(Component.class, instance, new NamedLiteral("myComponent"), new NamedLiteral("myComponent1"));
             Context context = contextConfig.getContext();
 
-            ComponentRef<Component> myComponentType = new ComponentRef<>(Component.class, new NamedLiteral("myComponent"));
+            ComponentRef<Component> myComponentType = ComponentRef.of(Component.class, new NamedLiteral("myComponent"));
             Component myComponent = context.get(myComponentType).orElseThrow();
 
-            ComponentRef<Component> myComponentType1 = new ComponentRef<>(Component.class, new NamedLiteral("myComponent1"));
+            ComponentRef<Component> myComponentType1 = ComponentRef.of(Component.class, new NamedLiteral("myComponent1"));
             Component myComponent1 = context.get(myComponentType1).orElseThrow();
 
             assertThat(instance).isSameAs(myComponent);
@@ -149,10 +152,10 @@ class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(Dependency.class, DependencyA.class, new NamedLiteral("d1"), new NamedLiteral("d2"));
             Context context = contextConfig.getContext();
 
-            ComponentRef<Dependency> d1 = new ComponentRef<>(Dependency.class, new NamedLiteral("d1"));
+            ComponentRef<Dependency> d1 = ComponentRef.of(Dependency.class, new NamedLiteral("d1"));
             Dependency dependency1 = context.get(d1).orElseThrow();
 
-            ComponentRef<Dependency> d2 = new ComponentRef<>(Dependency.class, new NamedLiteral("d2"));
+            ComponentRef<Dependency> d2 = ComponentRef.of(Dependency.class, new NamedLiteral("d2"));
             Dependency dependency2 = context.get(d2).orElseThrow();
 
             assertThat(dependency1).isNotNull();
@@ -179,9 +182,13 @@ class ContextUnitTest extends BaseUnitTest {
         ///////////////////////////////////////////////////////////////////////////
 
         @Test
+        //TODO
+        @Disabled
         @DisplayName("qualifier 声明的实例找不到")
         void should_throw_exception_if_dependency_with_qualifier_not_found() {
-            // 30
+            contextConfig.bind(Dependency.class, new Dependency() { });
+            contextConfig.bind(QualifierInjectConstructor.class, QualifierInjectConstructor.class);
+            assertThrows(DependencyNotBindException.class, () -> contextConfig.getContext());
         }
 
     }

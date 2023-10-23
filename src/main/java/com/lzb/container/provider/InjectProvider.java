@@ -132,10 +132,11 @@ public class InjectProvider<T> implements ComponentProvider<T> {
         // 作者写法
         // return Arrays.stream(injectConstructor.getParameters()).map(p -> p.getParameterizedType()).toList();
 
-        List<Type> types = new ArrayList<>(stream(injectConstructor.getGenericParameterTypes()).toList());
-        injectFields.forEach(f -> types.add(f.getGenericType()));
-        injectMethods.forEach(m -> types.addAll(Arrays.asList(m.getGenericParameterTypes())));
-        return types.stream().map(ComponentRef::of).toList();
+        List<ComponentRef> types = new ArrayList<>();
+        types.addAll(stream(this.injectConstructor.getGenericParameterTypes()).map(ComponentRef::of).toList());
+        injectFields.forEach(f -> types.add(ComponentRef.of(f.getGenericType())));
+        injectMethods.forEach(m -> types.addAll(Stream.of(m.getGenericParameterTypes()).map(ComponentRef::of).toList()));
+        return types.stream().toList();
     }
 
     private static <T> Consumer<Method> invokeMethod(Context context, T instance) {
