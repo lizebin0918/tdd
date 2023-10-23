@@ -15,7 +15,6 @@ import com.lzb.container.provider.InjectProvider;
 import com.lzb.container.qualifier.QualifierInjectConstructor;
 import jakarta.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -182,8 +181,6 @@ class ContextUnitTest extends BaseUnitTest {
         ///////////////////////////////////////////////////////////////////////////
 
         @Test
-        //TODO
-        @Disabled
         @DisplayName("qualifier 声明的实例找不到")
         void should_throw_exception_if_dependency_with_qualifier_not_found() {
             contextConfig.bind(Dependency.class, new Dependency() { });

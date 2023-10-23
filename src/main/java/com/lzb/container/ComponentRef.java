@@ -22,16 +22,20 @@ class ComponentRef<T> {
     private Component component;
 
     public ComponentRef(Type type) {
-        init(type);
+        init(type, null);
+    }
+
+    public ComponentRef(Type type, Annotation qualifier) {
+        init(type, qualifier);
     }
 
     public ComponentRef(Class<T> componentType) {
-        init(componentType);
+        init(componentType, null);
     }
 
     private ComponentRef(@NonNull Class<T> componentType, Annotation qualifier) {
         if (Objects.isNull(qualifier)) {
-            init(componentType);
+            init(componentType, null);
             return;
         }
         this.component = new Component(componentType, qualifier);
@@ -46,7 +50,11 @@ class ComponentRef<T> {
     }
 
     public static <T> ComponentRef<T> of(@NonNull Class<T> componentType, Annotation qualifier) {
-        return new ComponentRef<T>(componentType, qualifier);
+        return new ComponentRef<>(componentType, qualifier);
+    }
+
+    public static ComponentRef<?> of(Type parameterizedType, Annotation qualifier) {
+        return new ComponentRef<>(parameterizedType, qualifier);
     }
 
     public boolean isContainerType() {
@@ -55,10 +63,10 @@ class ComponentRef<T> {
 
     protected ComponentRef() {
         Type type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-        init(type);
+        init(type, null);
     }
 
-    private void init(Type type) {
+    private void init(Type type, Annotation qualifier) {
         Class<?> componentType;
         if (type instanceof ParameterizedType container) {
             componentType = (Class<?>) container.getActualTypeArguments()[0];
@@ -66,7 +74,7 @@ class ComponentRef<T> {
         } else {
             componentType = (Class<?>) type;
         }
-        this.component = new Component(componentType, null);
+        this.component = new Component(componentType, qualifier);
     }
 
 }

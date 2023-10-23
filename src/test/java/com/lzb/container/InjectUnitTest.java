@@ -25,7 +25,6 @@ import com.lzb.container.provider.InjectProvider;
 import com.lzb.container.qualifier.QualifierInjectConstructor;
 import jakarta.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -130,10 +129,10 @@ public class InjectUnitTest extends BaseUnitTest {
         }
 
         @Test
-        @Disabled
         @DisplayName("通过构造函数注入qualifier声明的bean")
         void should_include_qualifier_with_dependency() {
-            contextConfig.bind(Dependency.class, new Dependency() { }, new NamedLiteral("dependency"));
+            // TODO:为啥这个测试能通过？
+            //contextConfig.bind(Dependency.class, new Dependency() { }, new NamedLiteral("dependency"));
             InjectProvider<QualifierInjectConstructor> provider = new InjectProvider<>(QualifierInjectConstructor.class);
             //assertThat(provider.getDependencies().toArray()).isSameAs(new ComponentRef[]{ComponentRef.of(Dependency.class, new NamedLiteral("dependency"))});
             assertArrayEquals(provider.getDependencies().toArray(), new ComponentRef[]{ComponentRef.of(Dependency.class, new NamedLiteral("dependency"))});

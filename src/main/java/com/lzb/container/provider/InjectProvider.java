@@ -1,11 +1,13 @@
 package com.lzb.container.provider;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +23,7 @@ import com.lzb.container.ComponentRef;
 import com.lzb.container.Context;
 import com.lzb.container.exception.IllegalComponentException;
 import jakarta.inject.Inject;
+import jakarta.inject.Qualifier;
 
 import static java.util.Arrays.stream;
 
@@ -133,10 +136,16 @@ public class InjectProvider<T> implements ComponentProvider<T> {
         // return Arrays.stream(injectConstructor.getParameters()).map(p -> p.getParameterizedType()).toList();
 
         List<ComponentRef> types = new ArrayList<>();
-        types.addAll(stream(this.injectConstructor.getGenericParameterTypes()).map(ComponentRef::of).toList());
+        types.addAll(stream(this.injectConstructor.getParameters()).map(this::toComponentRef).toList());
         injectFields.forEach(f -> types.add(ComponentRef.of(f.getGenericType())));
         injectMethods.forEach(m -> types.addAll(Stream.of(m.getGenericParameterTypes()).map(ComponentRef::of).toList()));
         return types.stream().toList();
+    }
+
+    private ComponentRef<?> toComponentRef(Parameter p) {
+        Annotation qualifier = stream(p.getAnnotations()).filter(a -> a.annotationType()
+                .isAnnotationPresent(Qualifier.class)).findFirst().orElse(null);
+        return ComponentRef.of(p.getParameterizedType(), qualifier);
     }
 
     private static <T> Consumer<Method> invokeMethod(Context context, T instance) {
