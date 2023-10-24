@@ -1,5 +1,6 @@
 package com.lzb.container.exception;
 
+import com.lzb.container.Component;
 import lombok.Getter;
 
 /**
@@ -10,12 +11,18 @@ import lombok.Getter;
 @Getter
 public class DependencyNotBindException extends RuntimeException {
 
-    private final Class<?> dependencyType;
-    private final Class<?> componentType;
+    private Class<?> dependencyType;
+    private Class<?> componentType;
+    private Component dependencyComponent;
+    private Component componentComponent;
 
     public DependencyNotBindException(Class<?> componentType, Class<?> dependencyType) {
         this.dependencyType = dependencyType;
         this.componentType = componentType;
     }
 
+    public DependencyNotBindException(Component componentComponent, Component dependencyComponent) {
+        this.dependencyComponent = dependencyComponent;
+        this.componentComponent = componentComponent;
+    }
 }

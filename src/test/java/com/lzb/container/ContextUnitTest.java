@@ -184,8 +184,11 @@ class ContextUnitTest extends BaseUnitTest {
         @DisplayName("qualifier 声明的实例找不到")
         void should_throw_exception_if_dependency_with_qualifier_not_found() {
             contextConfig.bind(Dependency.class, new Dependency() { });
-            contextConfig.bind(QualifierInjectConstructor.class, QualifierInjectConstructor.class);
-            assertThrows(DependencyNotBindException.class, () -> contextConfig.getContext());
+            contextConfig.bind(QualifierInjectConstructor.class, QualifierInjectConstructor.class, new NamedLiteral("dependency"));
+            var dependencyNotBindException = assertThrows(DependencyNotBindException.class, () -> contextConfig.getContext());
+            assertThat(dependencyNotBindException.getComponentComponent()).isEqualTo(new com.lzb.container.Component(QualifierInjectConstructor.class, new NamedLiteral("dependency")));
+            /*assertThat(dependencyNotBindException.getDependencyComponent())
+                    .isEqualTo(new com.lzb.container.Component(Dependency.class, new NamedLiteral("Owner")));*/
         }
 
     }

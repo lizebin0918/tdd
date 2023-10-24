@@ -79,25 +79,25 @@ public class ContextConfig {
         return Optional.ofNullable(componentProviders.get(componentRef.getComponent()));
     }
 
-    private void checkDependency(Component componentType, Deque<Class<?>> visiting) {
-        for (ComponentRef dependency : componentProviders.get(componentType).getDependencies()) {
+    private void checkDependency(Component component, Deque<Class<?>> visiting) {
+        for (ComponentRef dependency : componentProviders.get(component).getDependencies()) {
 
-            Component component = dependency.getComponent();
+            Component dependencyComponent = dependency.getComponent();
 
             // 检查依赖是否存在
-            if (!componentProviders.containsKey(component)) {
-                throw new DependencyNotBindException(componentType.type(), component.type());
+            if (!componentProviders.containsKey(dependencyComponent)) {
+                throw new DependencyNotBindException(component, dependencyComponent);
             }
 
             if (!dependency.isContainerType()) {
 
                 // 检查循环依赖
-                if (visiting.contains(component.type())) {
+                if (visiting.contains(dependencyComponent.type())) {
                     throw new CyclicDependencyException(visiting);
                 }
 
-                visiting.push(component.type());
-                checkDependency(component, visiting);
+                visiting.push(dependencyComponent.type());
+                checkDependency(dependencyComponent, visiting);
                 visiting.pop();
             }
         }

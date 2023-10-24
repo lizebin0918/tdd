@@ -8,6 +8,7 @@ import java.util.Objects;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 
 /**
  * <br/>
@@ -16,6 +17,7 @@ import lombok.NonNull;
  */
 @Getter
 @EqualsAndHashCode
+@ToString
 public
 class ComponentRef<T> {
     private Type containerType;
