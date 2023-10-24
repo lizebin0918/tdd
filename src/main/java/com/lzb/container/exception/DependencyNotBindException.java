@@ -11,18 +11,12 @@ import lombok.Getter;
 @Getter
 public class DependencyNotBindException extends RuntimeException {
 
-    private Class<?> dependencyType;
-    private Class<?> componentType;
-    private Component dependencyComponent;
-    private Component componentComponent;
-
-    public DependencyNotBindException(Class<?> componentType, Class<?> dependencyType) {
-        this.dependencyType = dependencyType;
-        this.componentType = componentType;
-    }
+    private final Component dependencyComponent;
+    private final Component componentComponent;
 
     public DependencyNotBindException(Component componentComponent, Component dependencyComponent) {
         this.dependencyComponent = dependencyComponent;
         this.componentComponent = componentComponent;
     }
+
 }

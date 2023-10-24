@@ -55,8 +55,8 @@ class DependencyCheckUnitTest extends BaseUnitTest {
             contextConfig.getContext();
         });
 
-        assertThat(e.getDependencyType()).isEqualTo(String.class);
-        assertThat(e.getComponentType()).isEqualTo(Component.class);
+        assertThat(e.getDependencyComponent().type()).isEqualTo(String.class);
+        assertThat(e.getComponentComponent().type()).isEqualTo(Component.class);
     }
 
     @Test
@@ -147,8 +147,8 @@ class DependencyCheckUnitTest extends BaseUnitTest {
         contextConfig.bind(DependencyC.class, DependencyC.class);
 
         var e = assertThrows(DependencyNotBindException.class, () -> contextConfig.getContext());
-        assertThat(e.getDependencyType()).isEqualTo(String.class);
-        assertThat(e.getComponentType()).isEqualTo(DependencyC.class);
+        assertThat(e.getDependencyComponent().type()).isEqualTo(String.class);
+        assertThat(e.getComponentComponent().type()).isEqualTo(DependencyC.class);
     }
 
     @Test
@@ -162,7 +162,7 @@ class DependencyCheckUnitTest extends BaseUnitTest {
 
         // 希望测试告诉我哪个Provider没找到
         // TODO:lizebin provider inject field/method
-        assertThat(e.getDependencyType()).isEqualTo(Dependency.class);
+        assertThat(e.getDependencyComponent().type()).isEqualTo(Dependency.class);
     }
 
     @Test
@@ -175,7 +175,7 @@ class DependencyCheckUnitTest extends BaseUnitTest {
         });
 
         // 希望测试告诉我哪个Provider没找到
-        assertThat(e.getDependencyType()).isEqualTo(Dependency.class);
+        assertThat(e.getDependencyComponent().type()).isEqualTo(Dependency.class);
     }
 
     @Test
@@ -188,7 +188,7 @@ class DependencyCheckUnitTest extends BaseUnitTest {
         });
 
         // 希望测试告诉我哪个Provider没找到
-        assertThat(e.getDependencyType()).isEqualTo(Dependency.class);
+        assertThat(e.getDependencyComponent().type()).isEqualTo(Dependency.class);
     }
 
     @Test

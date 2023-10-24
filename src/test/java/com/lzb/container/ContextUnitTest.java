@@ -187,8 +187,7 @@ class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(QualifierInjectConstructor.class, QualifierInjectConstructor.class, new NamedLiteral("dependency"));
             var dependencyNotBindException = assertThrows(DependencyNotBindException.class, () -> contextConfig.getContext());
             assertThat(dependencyNotBindException.getComponentComponent()).isEqualTo(new com.lzb.container.Component(QualifierInjectConstructor.class, new NamedLiteral("dependency")));
-            /*assertThat(dependencyNotBindException.getDependencyComponent())
-                    .isEqualTo(new com.lzb.container.Component(Dependency.class, new NamedLiteral("Owner")));*/
+            assertThat(dependencyNotBindException.getDependencyComponent()).isEqualTo(new com.lzb.container.Component(Dependency.class, new NamedLiteral("dependency")));
         }
 
     }
