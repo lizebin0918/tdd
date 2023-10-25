@@ -14,6 +14,7 @@ import com.lzb.container.provider.InjectProvider;
 import com.lzb.container.qualifier.NotCyclicDependency;
 import com.lzb.container.qualifier.QualifierInjectConstructor;
 import com.lzb.container.qualifier.SkyWalkerLiteral;
+import com.lzb.container.qualifier.SkywalkerDependency;
 import com.lzb.container.qualifier.TestLiteral;
 import jakarta.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
@@ -199,7 +200,7 @@ class ContextUnitTest extends BaseUnitTest {
             // A -> @Skywalker A -> @Named A(instance)
             Dependency instance = new Dependency() { };
             contextConfig.bind(Dependency.class, instance, new NamedLiteral("ChosenOne"));
-            contextConfig.bind(Dependency.class, instance, new SkyWalkerLiteral());
+            contextConfig.bind(Dependency.class, SkywalkerDependency.class, new SkyWalkerLiteral());
             contextConfig.bind(Dependency.class, NotCyclicDependency.class);
 
             assertDoesNotThrow(() -> contextConfig.getContext());
