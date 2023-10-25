@@ -1,6 +1,5 @@
 package com.lzb.container;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
 
 import com.lzb.BaseUnitTest;
@@ -12,7 +11,10 @@ import com.lzb.container.constructor.DependencyA;
 import com.lzb.container.exception.DependencyNotBindException;
 import com.lzb.container.exception.IllegalComponentException;
 import com.lzb.container.provider.InjectProvider;
+import com.lzb.container.qualifier.NotCyclicDependency;
 import com.lzb.container.qualifier.QualifierInjectConstructor;
+import com.lzb.container.qualifier.SkyWalkerLiteral;
+import com.lzb.container.qualifier.TestLiteral;
 import jakarta.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -190,13 +192,19 @@ class ContextUnitTest extends BaseUnitTest {
             assertThat(dependencyNotBindException.getDependencyComponent()).isEqualTo(new com.lzb.container.Component(Dependency.class, new NamedLiteral("dependency")));
         }
 
+        @Test
+        @DisplayName("检测循环依赖")
+        void should_not_throw_exception_if_component_with_same_type_with_different_qualifier() {
+            // 这种情况属于非循环依赖
+            // A -> @Skywalker A -> @Named A(instance)
+            Dependency instance = new Dependency() { };
+            contextConfig.bind(Dependency.class, instance, new NamedLiteral("ChosenOne"));
+            contextConfig.bind(Dependency.class, instance, new SkyWalkerLiteral());
+            contextConfig.bind(Dependency.class, NotCyclicDependency.class);
+
+            assertDoesNotThrow(() -> contextConfig.getContext());
+        }
+
     }
 }
 
-record TestLiteral() implements Test {
-
-    @Override
-    public Class<? extends Annotation> annotationType() {
-        return Test.class;
-    }
-}
