@@ -79,7 +79,7 @@ public class ContextConfig {
         return Optional.ofNullable(componentProviders.get(componentRef.getComponent()));
     }
 
-    private void checkDependency(Component component, Deque<Class<?>> visiting) {
+    private void checkDependency(Component component, Deque<Component> visiting) {
         for (ComponentRef dependency : componentProviders.get(component).getDependencies()) {
 
             Component dependencyComponent = dependency.getComponent();
@@ -92,11 +92,11 @@ public class ContextConfig {
             if (!dependency.isContainerType()) {
 
                 // 检查循环依赖
-                if (visiting.contains(dependencyComponent.type())) {
+                if (visiting.contains(dependencyComponent)) {
                     throw new CyclicDependencyException(visiting);
                 }
 
-                visiting.push(dependencyComponent.type());
+                visiting.push(dependencyComponent);
                 checkDependency(dependencyComponent, visiting);
                 visiting.pop();
             }

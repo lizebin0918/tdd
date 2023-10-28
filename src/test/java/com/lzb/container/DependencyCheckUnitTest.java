@@ -70,7 +70,7 @@ class DependencyCheckUnitTest extends BaseUnitTest {
             contextConfig.getContext();
         });
 
-        assertThat(e.getComponents()).isEqualTo(Set.of(DependencyE.class, DependencyF.class));
+        assertThat(e.getComponentTypes()).isEqualTo(Set.of(DependencyE.class, DependencyF.class));
     }
 
     @Test
