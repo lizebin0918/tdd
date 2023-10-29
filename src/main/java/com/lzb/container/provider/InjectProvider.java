@@ -109,13 +109,12 @@ public class InjectProvider<T> implements ComponentProvider<T> {
 
     private static Object[] toDependencies(Context context, Executable executable) {
         return stream(executable.getParameters())
-                .map(p -> toDependency(context, p.getParameterizedType()))
+                .map(p -> toDependency(context, p.getParameterizedType(), getQualifier(p.getAnnotations())))
                 .toArray(Object[]::new);
     }
 
-    private static Object toDependency(Context context, Type type) {
-        return context.get(ComponentRef.of(type))
-                .orElseThrow();
+    private static Object toDependency(Context context, Type type, Annotation qualifier) {
+        return context.get(ComponentRef.of(type, qualifier)).orElseThrow();
     }
 
     @Override
@@ -143,14 +142,17 @@ public class InjectProvider<T> implements ComponentProvider<T> {
     }
 
     private static ComponentRef<?> toComponentRef(Field f) {
-        Annotation qualifier = stream(f.getAnnotations()).filter(a -> a.annotationType()
-                .isAnnotationPresent(Qualifier.class)).findFirst().orElse(null);
+        Annotation qualifier = getQualifier(f.getAnnotations());
         return ComponentRef.of(f.getGenericType(), qualifier);
     }
 
-    private ComponentRef<?> toComponentRef(Parameter p) {
-        Annotation qualifier = stream(p.getAnnotations()).filter(a -> a.annotationType()
+    private static Annotation getQualifier(Annotation[] f) {
+        return stream(f).filter(a -> a.annotationType()
                 .isAnnotationPresent(Qualifier.class)).findFirst().orElse(null);
+    }
+
+    private ComponentRef<?> toComponentRef(Parameter p) {
+        Annotation qualifier = getQualifier(p.getAnnotations());
         return ComponentRef.of(p.getParameterizedType(), qualifier);
     }
 
@@ -170,7 +172,7 @@ public class InjectProvider<T> implements ComponentProvider<T> {
         return f -> {
             try {
                 f.setAccessible(true);
-                Object dependency = toDependency(context, f.getGenericType());
+                Object dependency = toDependency(context, f.getGenericType(), getQualifier(f.getAnnotations()));
                 f.set(instance, dependency);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);

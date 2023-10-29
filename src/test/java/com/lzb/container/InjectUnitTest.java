@@ -31,6 +31,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -133,10 +134,14 @@ public class InjectUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("通过构造函数注入qualifier声明的bean")
         void should_include_qualifier_with_dependency_via_constructor() {
-            //contextConfig.bind(Dependency.class, new Dependency() { }, new NamedLiteral("dependency"));
             InjectProvider<QualifierInjectConstructor> provider = new InjectProvider<>(QualifierInjectConstructor.class);
-            //assertThat(provider.getDependencies().toArray()).isSameAs(new ComponentRef[]{ComponentRef.of(Dependency.class, new NamedLiteral("dependency"))});
             assertArrayEquals(provider.getDependencies().toArray(), new ComponentRef[]{ComponentRef.of(Dependency.class, new NamedLiteral("dependency"))});
+
+            Mockito.reset(context);
+            Mockito.when(context.get(ComponentRef.of(Dependency.class, new NamedLiteral("dependency")))).thenReturn(Optional.of(dependency));
+
+            QualifierInjectConstructor instance = provider.get(context);
+            assertSame(dependency, instance.getDependency());
         }
 
         @Test
@@ -144,6 +149,12 @@ public class InjectUnitTest extends BaseUnitTest {
         void should_include_qualifier_with_dependency_via_method() {
             InjectProvider<QualifierInjectMethod> provider = new InjectProvider<>(QualifierInjectMethod.class);
             assertArrayEquals(provider.getDependencies().toArray(), new ComponentRef[]{ComponentRef.of(Dependency.class, new NamedLiteral("ChosenOne"))});
+
+            Mockito.reset(context);
+            Mockito.when(context.get(ComponentRef.of(Dependency.class, new NamedLiteral("ChosenOne")))).thenReturn(Optional.of(dependency));
+
+            QualifierInjectMethod instance = provider.get(context);
+            assertSame(dependency, instance.getDependency());
         }
 
         @Test
@@ -151,7 +162,19 @@ public class InjectUnitTest extends BaseUnitTest {
         void should_include_qualifier_with_dependency_via_field() {
             InjectProvider<QualifierInjectField> provider = new InjectProvider<>(QualifierInjectField.class);
             assertArrayEquals(provider.getDependencies().toArray(), new ComponentRef[]{ComponentRef.of(Dependency.class, new NamedLiteral("fieldA"))});
+
+            Mockito.reset(context);
+            Mockito.when(context.get(ComponentRef.of(Dependency.class, new NamedLiteral("fieldA")))).thenReturn(Optional.of(dependency));
+
+            QualifierInjectField instance = provider.get(context);
+            assertSame(dependency, instance.getDependency());
         }
+
+        /*@Test
+        @DisplayName("声明多个Qualifier")
+        void should_() {
+
+        }*/
 
     }
 
