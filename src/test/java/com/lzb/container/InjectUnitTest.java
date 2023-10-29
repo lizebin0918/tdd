@@ -23,6 +23,8 @@ import com.lzb.container.method.SubNonParameterMethodComponent;
 import com.lzb.container.method.TypeParameterMethodInjectComponent;
 import com.lzb.container.provider.InjectProvider;
 import com.lzb.container.qualifier.QualifierInjectConstructor;
+import com.lzb.container.qualifier.QualifierInjectField;
+import com.lzb.container.qualifier.QualifierInjectMethod;
 import jakarta.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -130,15 +132,26 @@ public class InjectUnitTest extends BaseUnitTest {
 
         @Test
         @DisplayName("通过构造函数注入qualifier声明的bean")
-        void should_include_qualifier_with_dependency() {
-            // TODO:为啥这个测试能通过？
+        void should_include_qualifier_with_dependency_via_constructor() {
             //contextConfig.bind(Dependency.class, new Dependency() { }, new NamedLiteral("dependency"));
             InjectProvider<QualifierInjectConstructor> provider = new InjectProvider<>(QualifierInjectConstructor.class);
             //assertThat(provider.getDependencies().toArray()).isSameAs(new ComponentRef[]{ComponentRef.of(Dependency.class, new NamedLiteral("dependency"))});
             assertArrayEquals(provider.getDependencies().toArray(), new ComponentRef[]{ComponentRef.of(Dependency.class, new NamedLiteral("dependency"))});
         }
 
+        @Test
+        @DisplayName("通过方法注入qualifier声明的bean")
+        void should_include_qualifier_with_dependency_via_method() {
+            InjectProvider<QualifierInjectMethod> provider = new InjectProvider<>(QualifierInjectMethod.class);
+            assertArrayEquals(provider.getDependencies().toArray(), new ComponentRef[]{ComponentRef.of(Dependency.class, new NamedLiteral("ChosenOne"))});
+        }
 
+        @Test
+        @DisplayName("通过字段注入qualifier声明的bean")
+        void should_include_qualifier_with_dependency_via_field() {
+            InjectProvider<QualifierInjectField> provider = new InjectProvider<>(QualifierInjectField.class);
+            assertArrayEquals(provider.getDependencies().toArray(), new ComponentRef[]{ComponentRef.of(Dependency.class, new NamedLiteral("fieldA"))});
+        }
 
     }
 
@@ -270,6 +283,8 @@ public class InjectUnitTest extends BaseUnitTest {
             var provider = new InjectProvider<ProviderInjectMethod>(ProviderInjectMethod.class);
             assertArrayEquals(new ComponentRef[]{new ComponentRef(dependencyProviderType)}, provider.getDependencies().toArray(ComponentRef[]::new));
         }
+
+
 
     }
 

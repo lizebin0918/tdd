@@ -137,9 +137,15 @@ public class InjectProvider<T> implements ComponentProvider<T> {
 
         List<ComponentRef> types = new ArrayList<>();
         types.addAll(stream(this.injectConstructor.getParameters()).map(this::toComponentRef).toList());
-        injectFields.forEach(f -> types.add(ComponentRef.of(f.getGenericType())));
-        injectMethods.forEach(m -> types.addAll(Stream.of(m.getGenericParameterTypes()).map(ComponentRef::of).toList()));
+        injectFields.forEach(f -> types.add(toComponentRef(f)));
+        injectMethods.forEach(m -> types.addAll(Stream.of(m.getParameters()).map(this::toComponentRef).toList()));
         return types.stream().toList();
+    }
+
+    private static ComponentRef<?> toComponentRef(Field f) {
+        Annotation qualifier = stream(f.getAnnotations()).filter(a -> a.annotationType()
+                .isAnnotationPresent(Qualifier.class)).findFirst().orElse(null);
+        return ComponentRef.of(f.getGenericType(), qualifier);
     }
 
     private ComponentRef<?> toComponentRef(Parameter p) {
