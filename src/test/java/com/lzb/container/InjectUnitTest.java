@@ -22,6 +22,9 @@ import com.lzb.container.method.ProviderInjectMethod;
 import com.lzb.container.method.SubNonParameterMethodComponent;
 import com.lzb.container.method.TypeParameterMethodInjectComponent;
 import com.lzb.container.provider.InjectProvider;
+import com.lzb.container.qualifier.MultiQualifierInjectConstructor;
+import com.lzb.container.qualifier.MultiQualifierInjectField;
+import com.lzb.container.qualifier.MultiQualifierInjectMethod;
 import com.lzb.container.qualifier.QualifierInjectConstructor;
 import com.lzb.container.qualifier.QualifierInjectField;
 import com.lzb.container.qualifier.QualifierInjectMethod;
@@ -170,11 +173,19 @@ public class InjectUnitTest extends BaseUnitTest {
             assertSame(dependency, instance.getDependency());
         }
 
-        /*@Test
-        @DisplayName("声明多个Qualifier")
-        void should_() {
-
-        }*/
+        @Test
+        @DisplayName("声明多个Qualifier需要抛异常")
+        void should_throw_exception_when_given_multiple_qualifier() {
+            assertThrows(IllegalComponentException.class, () -> {
+                new InjectProvider<>(MultiQualifierInjectConstructor.class);
+            });
+            assertThrows(IllegalComponentException.class, () -> {
+                new InjectProvider<>(MultiQualifierInjectMethod.class);
+            });
+            assertThrows(IllegalComponentException.class, () -> {
+                new InjectProvider<>(MultiQualifierInjectField.class);
+            });
+        }
 
     }
 
