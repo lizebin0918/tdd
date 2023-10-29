@@ -55,7 +55,7 @@ class ComponentRef<T> {
         return new ComponentRef<>(componentType, qualifier);
     }
 
-    public static ComponentRef<?> of(Type parameterizedType, Annotation qualifier) {
+    public static ComponentRef of(Type parameterizedType, Annotation qualifier) {
         return new ComponentRef<>(parameterizedType, qualifier);
     }
 

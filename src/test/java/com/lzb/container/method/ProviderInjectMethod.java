@@ -8,7 +8,7 @@ public class ProviderInjectMethod {
     public Provider<Dependency> dependency;
 
     @jakarta.inject.Inject
-    void install(Provider<Dependency> dependency) {
+    public void install(Provider<Dependency> dependency) {
         this.dependency = dependency;
     }
 }

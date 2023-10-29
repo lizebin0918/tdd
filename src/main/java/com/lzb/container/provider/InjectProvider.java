@@ -1,14 +1,10 @@
 package com.lzb.container.provider;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,39 +17,35 @@ import java.util.stream.Stream;
 import com.lzb.container.ComponentProvider;
 import com.lzb.container.ComponentRef;
 import com.lzb.container.Context;
+import com.lzb.container.Injectable;
 import com.lzb.container.exception.IllegalComponentException;
 import jakarta.inject.Inject;
-import jakarta.inject.Qualifier;
 
 import static java.util.Arrays.stream;
 
 public class InjectProvider<T> implements ComponentProvider<T> {
 
-    private final Constructor<?> injectConstructor;
-
-    private final List<Field> injectFields;
-
-    private final List<Method> injectMethods;
-
-    private final List<ComponentRef> dependencies;
+    private final List<Injectable<Field>> injectFields;
+    private final Injectable<Constructor> injectConstructor;
+    private final List<Injectable<Method>> injectMethods;
 
     public InjectProvider(Class<?> component) {
 
         if (Modifier.isAbstract(component.getModifiers())) throw new IllegalComponentException();
 
-        this.injectConstructor = getConstructor(component);
-        this.injectFields = getInjectFields(component);
-        this.injectMethods = getInjectMethods(component);
+        this.injectConstructor = Injectable.of(getConstructor(component));
 
-        if (injectFields.stream().anyMatch(f -> Modifier.isFinal(f.getModifiers()))) {
+        this.injectFields = getInjectFields(component).stream().map(Injectable::of).toList();
+        this.injectMethods = getInjectMethods(component).stream().map(Injectable::of).toList();
+
+        if (injectFields.stream().anyMatch(f -> Modifier.isFinal(f.element().getModifiers()))) {
             throw new IllegalComponentException();
         }
 
-        if (injectMethods.stream().anyMatch(m -> m.getTypeParameters().length != 0)) {
+        if (injectMethods.stream().anyMatch(m -> m.element().getTypeParameters().length != 0)) {
             throw new IllegalComponentException();
         }
 
-        this.dependencies = getDependencies();
     }
 
     /**
@@ -100,7 +92,7 @@ public class InjectProvider<T> implements ComponentProvider<T> {
         }
     }
 
-    static <T, I extends T> Constructor<?> getConstructor(Class<I> implementationClass) {
+    static <T, I extends T> Constructor getConstructor(Class<I> implementationClass) {
 
         List<Constructor<?>> injectConstructors = injectable(implementationClass.getConstructors()).toList();
         long injectConstructorsCount = injectConstructors.size();
@@ -111,20 +103,10 @@ public class InjectProvider<T> implements ComponentProvider<T> {
                 .orElseThrow();
     }
 
-    private static Object[] toDependencies(Context context, Executable executable) {
-        return stream(executable.getParameters())
-                .map(p -> toDependency(context, p.getParameterizedType(), getQualifier(p)))
-                .toArray(Object[]::new);
-    }
-
-    private static Object toDependency(Context context, Type type, Annotation qualifier) {
-        return context.get(ComponentRef.of(type, qualifier)).orElseThrow();
-    }
-
     @Override
     public T get(Context context) {
         try {
-            T instance = (T) injectConstructor.newInstance(toDependencies(context, injectConstructor));
+            T instance = (T) injectConstructor.element().newInstance(injectConstructor.toDependencies(context));
             injectFields.forEach(setField(context, instance));
             injectMethods.forEach(invokeMethod(context, instance));
             return instance;
@@ -139,45 +121,29 @@ public class InjectProvider<T> implements ComponentProvider<T> {
         // return Arrays.stream(injectConstructor.getParameters()).map(p -> p.getParameterizedType()).toList();
 
         List<ComponentRef> types = new ArrayList<>();
-        types.addAll(stream(this.injectConstructor.getParameters()).map(this::toComponentRef).toList());
-        injectFields.forEach(f -> types.add(toComponentRef(f)));
-        injectMethods.forEach(m -> types.addAll(Stream.of(m.getParameters()).map(this::toComponentRef).toList()));
+        types.addAll(injectConstructor.componentRefs());
+        injectFields.forEach(f -> types.addAll(f.componentRefs()));
+        injectMethods.forEach(m -> types.addAll(m.componentRefs()));
         return types.stream().toList();
     }
 
-    private static ComponentRef<?> toComponentRef(Field f) {
-        return ComponentRef.of(f.getGenericType(), getQualifier(f));
-    }
-
-    private static Annotation getQualifier(AnnotatedElement element) {
-        List<Annotation> qualifierAnnotations = stream(element.getAnnotations()).filter(a -> a.annotationType()
-                .isAnnotationPresent(Qualifier.class)).toList();
-        if (qualifierAnnotations.size() > 1) throw new IllegalComponentException();
-        return qualifierAnnotations.stream().findFirst().orElse(null);
-    }
-
-    private ComponentRef<?> toComponentRef(Parameter p) {
-        return ComponentRef.of(p.getParameterizedType(), getQualifier(p));
-    }
-
-    private static <T> Consumer<Method> invokeMethod(Context context, T instance) {
-        return m -> {
+    private static <T> Consumer<Injectable<Method>> invokeMethod(Context context, T instance) {
+        return element -> {
             try {
-                m.setAccessible(true);
-                Object[] parameters = toDependencies(context, m);
-                m.invoke(instance, parameters);
+                Method m = element.element();
+                m.invoke(instance, element.toDependencies(context));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         };
     }
 
-    private static <T> Consumer<Field> setField(Context context, T instance) {
-        return f -> {
+    private static <T> Consumer<Injectable<Field>> setField(Context context, T instance) {
+        return element -> {
             try {
+                Field f = element.element();
                 f.setAccessible(true);
-                Object dependency = toDependency(context, f.getGenericType(), getQualifier(f));
-                f.set(instance, dependency);
+                f.set(instance, element.toDependencies(context)[0]);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
