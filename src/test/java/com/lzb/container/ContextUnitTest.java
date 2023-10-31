@@ -16,6 +16,7 @@ import com.lzb.container.qualifier.QualifierInjectConstructor;
 import com.lzb.container.qualifier.SkyWalkerLiteral;
 import com.lzb.container.qualifier.SkywalkerDependency;
 import com.lzb.container.qualifier.TestLiteral;
+import com.lzb.container.scope.NotSingleton;
 import jakarta.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -177,8 +178,6 @@ class ContextUnitTest extends BaseUnitTest {
             assertThrows(IllegalComponentException.class, () -> contextConfig.bind(Component.class, ComponentDirectlyInstance.class, new TestLiteral()));
         }
 
-        // todo provider
-
         ///////////////////////////////////////////////////////////////////////////
         // check
         ///////////////////////////////////////////////////////////////////////////
@@ -204,6 +203,46 @@ class ContextUnitTest extends BaseUnitTest {
             contextConfig.bind(Dependency.class, NotCyclicDependency.class);
 
             assertDoesNotThrow(() -> contextConfig.getContext());
+        }
+
+    }
+
+    @Nested
+    class WithScope {
+
+        @Test
+        @DisplayName("默认不是singleton")
+        void should_not_be_singleton_scope_by_default() {
+            contextConfig.bind(NotSingleton.class, NotSingleton.class);
+            Context context = contextConfig.getContext();
+            NotSingleton notSingleton1 = context.get(ComponentRef.of(NotSingleton.class)).orElseThrow();
+            NotSingleton notSingleton2 = context.get(ComponentRef.of(NotSingleton.class)).orElseThrow();
+            assertThat(notSingleton1).isNotSameAs(notSingleton2);
+        }
+
+        @Test
+        @DisplayName("绑定为singleton")
+        void should_bind_component_as_singleton_scoped() {
+            contextConfig.bind(NotSingleton.class, NotSingleton.class, new SingletonLiteral());
+            Context context = contextConfig.getContext();
+            NotSingleton singleton1 = context.get(ComponentRef.of(NotSingleton.class)).orElseThrow();
+            NotSingleton singleton2 = context.get(ComponentRef.of(NotSingleton.class)).orElseThrow();
+            assertThat(singleton1).isSameAs(singleton2);
+        }
+
+        @Nested
+        class WithQualifier {
+
+            @Test
+            @DisplayName("默认不是singleton")
+            void should_not_be_singleton_scope_by_default() {
+                contextConfig.bind(NotSingleton.class, NotSingleton.class, new SkyWalkerLiteral());
+                Context context = contextConfig.getContext();
+                NotSingleton notSingleton1 = context.get(ComponentRef.of(NotSingleton.class, new SkyWalkerLiteral())).orElseThrow();
+                NotSingleton notSingleton2 = context.get(ComponentRef.of(NotSingleton.class, new SkyWalkerLiteral())).orElseThrow();
+                assertThat(notSingleton1).isNotSameAs(notSingleton2);
+            }
+
         }
 
     }
