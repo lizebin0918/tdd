@@ -1,6 +1,7 @@
 package com.lzb.container;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import jakarta.inject.Scope;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Context->ContextConfig 改造成 builder 模式，实现构造和初始化context分离<br/>
@@ -54,12 +56,7 @@ public class ContextConfig {
             throw new IllegalComponentException("annotation must be annotated by @Qualifier or @Singleton");
         }
 
-        List<@NonNull Annotation> scopes = Arrays.stream(annotations)
-                .filter(a -> a.annotationType().isAnnotationPresent(Scope.class)).toList();
-        ComponentProvider<T> provider = new InjectProvider<>(implementationType);
-        if (!scopes.isEmpty()) {
-            provider = new SingletonProvider<>(provider);
-        }
+        ComponentProvider<T> provider = gettComponentProvider(implementationType, annotations);
 
         List<@NonNull Annotation> qualifiers = Arrays.stream(annotations)
                 .filter(a -> a.annotationType().isAnnotationPresent(Qualifier.class)).toList();
@@ -70,6 +67,18 @@ public class ContextConfig {
             Component component = new Component(componentType, qualifier);
             componentProviders.put(component, provider);
         }
+    }
+
+    @NotNull
+    private static <T, I extends T> ComponentProvider<T> gettComponentProvider(Class<I> implementationType,
+            @NonNull Annotation[] annotations) {
+        ComponentProvider<T> provider = new InjectProvider<>(implementationType);
+        List<@NonNull Annotation> scopes = Arrays.stream(annotations)
+                .filter(a -> a.annotationType().isAnnotationPresent(Scope.class)).toList();
+        if (scopes.isEmpty()) {
+            return provider;
+        }
+        return new SingletonProvider<>(provider);
     }
 
     public Context getContext() {
