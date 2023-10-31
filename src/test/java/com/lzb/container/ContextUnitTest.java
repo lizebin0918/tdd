@@ -17,9 +17,9 @@ import com.lzb.container.qualifier.SkyWalkerLiteral;
 import com.lzb.container.qualifier.SkywalkerDependency;
 import com.lzb.container.qualifier.TestLiteral;
 import com.lzb.container.scope.NotSingleton;
+import com.lzb.container.scope.SingletonClass;
 import jakarta.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -231,6 +231,26 @@ class ContextUnitTest extends BaseUnitTest {
             assertThat(singleton1).isSameAs(singleton2);
         }
 
+        @Test
+        @DisplayName("qualifier声明，且singleton")
+        void should_bind_component_with_qualifier_as_singleton_scoped() {
+            contextConfig.bind(NotSingleton.class, NotSingleton.class, new SingletonLiteral(), new SkyWalkerLiteral());
+            Context context = contextConfig.getContext();
+            NotSingleton singleton1 = context.get(ComponentRef.of(NotSingleton.class, new SkyWalkerLiteral())).orElseThrow();
+            NotSingleton singleton2 = context.get(ComponentRef.of(NotSingleton.class, new SkyWalkerLiteral())).orElseThrow();
+            assertThat(singleton1).isSameAs(singleton2);
+        }
+
+        @Test
+        @DisplayName("class声明singleton")
+        void should_retrieve_scope_annotation_from_component() {
+            contextConfig.bind(SingletonClass.class, SingletonClass.class);
+            Context context = contextConfig.getContext();
+            SingletonClass singleton1 = context.get(ComponentRef.of(SingletonClass.class)).orElseThrow();
+            SingletonClass singleton2 = context.get(ComponentRef.of(SingletonClass.class)).orElseThrow();
+            assertThat(singleton1).isSameAs(singleton2);
+        }
+
         @Nested
         class WithQualifier {
 
@@ -242,6 +262,16 @@ class ContextUnitTest extends BaseUnitTest {
                 NotSingleton notSingleton1 = context.get(ComponentRef.of(NotSingleton.class, new SkyWalkerLiteral())).orElseThrow();
                 NotSingleton notSingleton2 = context.get(ComponentRef.of(NotSingleton.class, new SkyWalkerLiteral())).orElseThrow();
                 assertThat(notSingleton1).isNotSameAs(notSingleton2);
+            }
+
+            @Test
+            @DisplayName("class声明singleton")
+            void should_retrieve_scope_annotation_from_component() {
+                contextConfig.bind(SingletonClass.class, SingletonClass.class, new SkyWalkerLiteral());
+                Context context = contextConfig.getContext();
+                SingletonClass singleton1 = context.get(ComponentRef.of(SingletonClass.class, new SkyWalkerLiteral())).orElseThrow();
+                SingletonClass singleton2 = context.get(ComponentRef.of(SingletonClass.class, new SkyWalkerLiteral())).orElseThrow();
+                assertThat(singleton1).isSameAs(singleton2);
             }
 
         }

@@ -1,7 +1,6 @@
 package com.lzb.container;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
@@ -9,6 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
+
+import javax.validation.constraints.NotNull;
 
 import com.lzb.container.exception.CyclicDependencyException;
 import com.lzb.container.exception.DependencyNotBindException;
@@ -22,7 +24,6 @@ import jakarta.inject.Scope;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Context->ContextConfig 改造成 builder 模式，实现构造和初始化context分离<br/>
@@ -49,6 +50,17 @@ public class ContextConfig {
         }
     }
 
+    /**
+     * 通过重载的方式调用更好
+     * @param componentType
+     * @param implementationType
+     * @param <T>
+     * @param <I>
+     */
+    public <T, I extends T> void bind(Class<T> componentType, Class<I> implementationType) {
+        bind(componentType, implementationType, implementationType.getAnnotations());
+    }
+
     public <T, I extends T> void bind(Class<T> componentType, Class<I> implementationType, @NonNull Annotation... annotations) {
         if (Arrays.stream(annotations).map(Annotation::annotationType)
                 .anyMatch(q -> !q.isAnnotationPresent(Qualifier.class) && !q.isAnnotationPresent(Scope.class))) {
@@ -56,7 +68,7 @@ public class ContextConfig {
             throw new IllegalComponentException("annotation must be annotated by @Qualifier or @Singleton");
         }
 
-        ComponentProvider<T> provider = gettComponentProvider(implementationType, annotations);
+        ComponentProvider<T> provider = getComponentProvider(implementationType, annotations);
 
         List<@NonNull Annotation> qualifiers = Arrays.stream(annotations)
                 .filter(a -> a.annotationType().isAnnotationPresent(Qualifier.class)).toList();
@@ -70,15 +82,17 @@ public class ContextConfig {
     }
 
     @NotNull
-    private static <T, I extends T> ComponentProvider<T> gettComponentProvider(Class<I> implementationType,
+    private static <T, I extends T> ComponentProvider<T> getComponentProvider(Class<I> implementationType,
             @NonNull Annotation[] annotations) {
         ComponentProvider<T> provider = new InjectProvider<>(implementationType);
-        List<@NonNull Annotation> scopes = Arrays.stream(annotations)
-                .filter(a -> a.annotationType().isAnnotationPresent(Scope.class)).toList();
-        if (scopes.isEmpty()) {
-            return provider;
+        Optional<Annotation> scopes = Stream.concat(
+                Arrays.stream(implementationType.getAnnotations()).filter(a -> a.annotationType().isAnnotationPresent(Scope.class)),
+                Arrays.stream(annotations).filter(a -> a.annotationType().isAnnotationPresent(Scope.class))
+        ).findFirst();
+        if (scopes.isPresent()) {
+            return new SingletonProvider<>(provider);
         }
-        return new SingletonProvider<>(provider);
+        return provider;
     }
 
     public Context getContext() {
