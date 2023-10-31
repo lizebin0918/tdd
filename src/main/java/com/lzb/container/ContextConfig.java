@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ import com.lzb.container.exception.DependencyNotBindException;
 import com.lzb.container.exception.IllegalComponentException;
 import com.lzb.container.provider.InjectProvider;
 import com.lzb.container.provider.InstanceProvider;
+import com.lzb.container.provider.SingletonProvider;
 import jakarta.inject.Provider;
 import jakarta.inject.Qualifier;
 import jakarta.inject.Scope;
@@ -46,18 +48,27 @@ public class ContextConfig {
     }
 
     public <T, I extends T> void bind(Class<T> componentType, Class<I> implementationType, @NonNull Annotation... annotations) {
-        if (ArrayUtils.isEmpty(annotations)) {
-            componentProviders.put(new Component(componentType, null), new InjectProvider<>(implementationType));
-            return;
-        }
         if (Arrays.stream(annotations).map(Annotation::annotationType)
                 .anyMatch(q -> !q.isAnnotationPresent(Qualifier.class) && !q.isAnnotationPresent(Scope.class))) {
                 //.anyMatch(q -> !q.isAnnotationPresent(Qualifier.class) && !q.isAnnotationPresent(Singleton.class))) {
             throw new IllegalComponentException("annotation must be annotated by @Qualifier or @Singleton");
         }
-        for (Annotation qualifier : annotations) {
+
+        List<@NonNull Annotation> scopes = Arrays.stream(annotations)
+                .filter(a -> a.annotationType().isAnnotationPresent(Scope.class)).toList();
+        ComponentProvider<T> provider = new InjectProvider<>(implementationType);
+        if (!scopes.isEmpty()) {
+            provider = new SingletonProvider<>(provider);
+        }
+
+        List<@NonNull Annotation> qualifiers = Arrays.stream(annotations)
+                .filter(a -> a.annotationType().isAnnotationPresent(Qualifier.class)).toList();
+        if (qualifiers.isEmpty()) {
+            componentProviders.put(new Component(componentType, null), provider);
+        }
+        for (Annotation qualifier : qualifiers) {
             Component component = new Component(componentType, qualifier);
-            componentProviders.put(component, new InjectProvider<>(implementationType));
+            componentProviders.put(component, provider);
         }
     }
 

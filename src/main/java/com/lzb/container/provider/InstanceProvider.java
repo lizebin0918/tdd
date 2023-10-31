@@ -25,9 +25,4 @@ public class InstanceProvider<T> implements ComponentProvider<T> {
         return instance;
     }
 
-    @Override
-    public List<ComponentRef> getDependencies() {
-        return Collections.emptyList();
-    }
-
 }
