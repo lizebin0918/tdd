@@ -18,6 +18,7 @@ import com.lzb.container.qualifier.SkyWalkerLiteral;
 import com.lzb.container.qualifier.SkywalkerDependency;
 import com.lzb.container.qualifier.TestLiteral;
 import com.lzb.container.scope.MissingDependencyScoped;
+import com.lzb.container.scope.MissingProviderDependencyScoped;
 import com.lzb.container.scope.NotSingleton;
 import com.lzb.container.scope.SingletonClass;
 import jakarta.inject.Provider;
@@ -259,6 +260,16 @@ class ContextUnitTest extends BaseUnitTest {
         void should_throw_exception_if_dependency_with_scope_not_found() {
             contextConfig.bind(Component.class, MissingDependencyScoped.class);
             assertThrows(DependencyNotBindException.class, () -> contextConfig.getContext());
+
+
+            contextConfig.bind(Component.class, MissingProviderDependencyScoped.class);
+            assertThrows(DependencyNotBindException.class, () -> contextConfig.getContext());
+        }
+
+        @Test
+        @DisplayName("自定义注解绑定")
+        void should_bind_component_with_customize_scope_annotation() {
+
         }
 
         //TODO 实例注入还有点问题
