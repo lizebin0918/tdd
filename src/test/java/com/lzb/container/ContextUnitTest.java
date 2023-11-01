@@ -2,6 +2,7 @@ package com.lzb.container;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
 import com.lzb.BaseUnitTest;
 import com.lzb.container.constructor.AbstractComponent;
 import com.lzb.container.constructor.Component;
@@ -16,10 +17,12 @@ import com.lzb.container.qualifier.QualifierInjectConstructor;
 import com.lzb.container.qualifier.SkyWalkerLiteral;
 import com.lzb.container.qualifier.SkywalkerDependency;
 import com.lzb.container.qualifier.TestLiteral;
+import com.lzb.container.scope.MissingDependencyScoped;
 import com.lzb.container.scope.NotSingleton;
 import com.lzb.container.scope.SingletonClass;
 import jakarta.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -244,11 +247,27 @@ class ContextUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("class声明singleton")
         void should_retrieve_scope_annotation_from_component() {
-            contextConfig.bind(SingletonClass.class, SingletonClass.class);
+            contextConfig.bind(Dependency.class, SingletonClass.class);
             Context context = contextConfig.getContext();
-            SingletonClass singleton1 = context.get(ComponentRef.of(SingletonClass.class)).orElseThrow();
-            SingletonClass singleton2 = context.get(ComponentRef.of(SingletonClass.class)).orElseThrow();
+            Dependency singleton1 = context.get(ComponentRef.of(Dependency.class)).orElseThrow();
+            Dependency singleton2 = context.get(ComponentRef.of(Dependency.class)).orElseThrow();
             assertThat(singleton1).isSameAs(singleton2);
+        }
+
+        @Test
+        @DisplayName("scope 声明的类实例找不到")
+        void should_throw_exception_if_dependency_with_scope_not_found() {
+            contextConfig.bind(Component.class, MissingDependencyScoped.class);
+            assertThrows(DependencyNotBindException.class, () -> contextConfig.getContext());
+        }
+
+        //TODO 实例注入还有点问题
+        @Test
+        @Disabled
+        @DisplayName("scope 声明的实例找不到")
+        void should_throw_exception_if_dependency_with_scope_instance_not_found() {
+            contextConfig.bind(Component.class, new MissingDependencyScoped());
+            assertThrows(DependencyNotBindException.class, () -> contextConfig.getContext());
         }
 
         @Nested
@@ -267,10 +286,10 @@ class ContextUnitTest extends BaseUnitTest {
             @Test
             @DisplayName("class声明singleton")
             void should_retrieve_scope_annotation_from_component() {
-                contextConfig.bind(SingletonClass.class, SingletonClass.class, new SkyWalkerLiteral());
+                contextConfig.bind(Dependency.class, SingletonClass.class, new SkyWalkerLiteral());
                 Context context = contextConfig.getContext();
-                SingletonClass singleton1 = context.get(ComponentRef.of(SingletonClass.class, new SkyWalkerLiteral())).orElseThrow();
-                SingletonClass singleton2 = context.get(ComponentRef.of(SingletonClass.class, new SkyWalkerLiteral())).orElseThrow();
+                Dependency singleton1 = context.get(ComponentRef.of(Dependency.class, new SkyWalkerLiteral())).orElseThrow();
+                Dependency singleton2 = context.get(ComponentRef.of(Dependency.class, new SkyWalkerLiteral())).orElseThrow();
                 assertThat(singleton1).isSameAs(singleton2);
             }
 

@@ -1,5 +1,6 @@
 package com.lzb.container.scope;
 
+import com.lzb.container.constructor.Dependency;
 import jakarta.inject.Singleton;
 
 /**
@@ -8,6 +9,6 @@ import jakarta.inject.Singleton;
  * @author mac
  */
 @Singleton
-public class SingletonClass {
+public class SingletonClass implements Dependency {
 
 }
