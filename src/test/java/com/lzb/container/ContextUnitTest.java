@@ -1,8 +1,9 @@
 package com.lzb.container;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.IntStream;
 
-import com.alibaba.fastjson.JSON;
 import com.lzb.BaseUnitTest;
 import com.lzb.container.constructor.AbstractComponent;
 import com.lzb.container.constructor.Component;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static java.util.stream.Collectors.toSet;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -269,7 +271,10 @@ class ContextUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("自定义注解绑定")
         void should_bind_component_with_customize_scope_annotation() {
-
+            contextConfig.bind(NotSingleton.class, NotSingleton.class, new PooledLiteral());
+            Context context = contextConfig.getContext();
+            Set<NotSingleton> instances = IntStream.range(0, 5).mapToObj(i -> context.get(ComponentRef.of(NotSingleton.class)).orElseThrow()).collect(toSet());
+            assertThat(instances).hasSize(PooledProvider.MAX);
         }
 
         //TODO 实例注入还有点问题

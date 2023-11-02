@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import javax.validation.constraints.NotNull;
@@ -21,6 +22,7 @@ import com.lzb.container.provider.SingletonProvider;
 import jakarta.inject.Provider;
 import jakarta.inject.Qualifier;
 import jakarta.inject.Scope;
+import jakarta.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
@@ -35,6 +37,15 @@ public class ContextConfig {
 
     // private final Map<Class<?>, ComponentProvider<?>> providers = new HashMap<>();
     private final Map<Component, ComponentProvider<?>> componentProviders = new HashMap<>();
+    private final Map<Class<?>, Function<ComponentProvider<?>, ComponentProvider<?>>> scopes = new HashMap<>();
+
+    public ContextConfig() {
+        scope(Singleton.class, SingletonProvider::new);
+    }
+
+    public <ScopeType extends Annotation> void scope(Class<ScopeType> scope, Function<ComponentProvider<?>, ComponentProvider<?>> provider) {
+        scopes.put(scope, provider);
+    }
 
     public <T> void bind(Class<T> componentType, T instance, Annotation... qualifiers) {
         if (ArrayUtils.isEmpty(qualifiers)) {
@@ -82,15 +93,16 @@ public class ContextConfig {
     }
 
     @NotNull
-    private static <T, I extends T> ComponentProvider<T> getComponentProvider(Class<I> implementationType,
+    private <T, I extends T> ComponentProvider<T> getComponentProvider(Class<I> implementationType,
             @NonNull Annotation[] annotations) {
         ComponentProvider<T> provider = new InjectProvider<>(implementationType);
-        Optional<Annotation> scopes = Stream.concat(
+        Optional<Annotation> scope = Stream.concat(
                 Arrays.stream(implementationType.getAnnotations()).filter(a -> a.annotationType().isAnnotationPresent(Scope.class)),
                 Arrays.stream(annotations).filter(a -> a.annotationType().isAnnotationPresent(Scope.class))
         ).findFirst();
-        if (scopes.isPresent()) {
-            return new SingletonProvider<>(provider);
+        if (scope.isPresent()) {
+            var providerFun = scopes.get(scope.get().annotationType());
+            return (ComponentProvider<T>) providerFun.apply(new SingletonProvider<>(provider));
         }
         return provider;
     }
