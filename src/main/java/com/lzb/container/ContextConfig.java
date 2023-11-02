@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 import javax.validation.constraints.NotNull;
@@ -37,13 +37,16 @@ public class ContextConfig {
 
     // private final Map<Class<?>, ComponentProvider<?>> providers = new HashMap<>();
     private final Map<Component, ComponentProvider<?>> componentProviders = new HashMap<>();
-    private final Map<Class<?>, Function<ComponentProvider<?>, ComponentProvider<?>>> scopes = new HashMap<>();
+
+    // private final Map<Class<?>, Function<ComponentProvider<?>, ComponentProvider<?>>> scopes = new HashMap<>();
+    // 如果出参和入参都是同一个类型，可以用UnaryOperator
+    private final Map<Class<?>, UnaryOperator<ComponentProvider<?>>> scopes = new HashMap<>();
 
     public ContextConfig() {
         scope(Singleton.class, SingletonProvider::new);
     }
 
-    public <ScopeType extends Annotation> void scope(Class<ScopeType> scope, Function<ComponentProvider<?>, ComponentProvider<?>> provider) {
+    public <ScopeType extends Annotation> void scope(Class<ScopeType> scope, UnaryOperator<ComponentProvider<?>> provider) {
         scopes.put(scope, provider);
     }
 
@@ -102,7 +105,7 @@ public class ContextConfig {
         ).findFirst();
         if (scope.isPresent()) {
             var providerFun = scopes.get(scope.get().annotationType());
-            return (ComponentProvider<T>) providerFun.apply(new SingletonProvider<>(provider));
+            return (ComponentProvider<T>) providerFun.apply(provider);
         }
         return provider;
     }

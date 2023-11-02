@@ -271,6 +271,7 @@ class ContextUnitTest extends BaseUnitTest {
         @Test
         @DisplayName("自定义注解绑定")
         void should_bind_component_with_customize_scope_annotation() {
+            contextConfig.scope(Pooled.class, PooledProvider::new);
             contextConfig.bind(NotSingleton.class, NotSingleton.class, new PooledLiteral());
             Context context = contextConfig.getContext();
             Set<NotSingleton> instances = IntStream.range(0, 5).mapToObj(i -> context.get(ComponentRef.of(NotSingleton.class)).orElseThrow()).collect(toSet());
