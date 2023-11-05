@@ -26,7 +26,6 @@ import jakarta.inject.Scope;
 import jakarta.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Context->ContextConfig 改造成 builder 模式，实现构造和初始化context分离<br/>
@@ -52,18 +51,18 @@ public class ContextConfig {
         scopes.put(scope, provider);
     }
 
-    public <T> void bind(Class<T> componentType, T instance, Annotation... qualifiers) {
-        if (ArrayUtils.isEmpty(qualifiers)) {
-            componentProviders.put(new Component(componentType, null), new InstanceProvider<>(instance));
-            return;
+    public <T> void bind(Class<T> componentType, T instance, Annotation... annotations) {
+        Map<Class<?>, List<Annotation>> annotationGroups = groupAnnotations(annotations);
+        bind(componentType, createScopeProvider(instance.getClass(), annotationGroups,
+                new InstanceProvider<>(instance)), annotationGroups.getOrDefault(Qualifier.class, Collections.emptyList()));
+    }
+
+    private Map<Class<?>, List<Annotation>> groupAnnotations(Annotation[] annotations) {
+        Map<Class<?>, List<Annotation>> annotationGroups = Arrays.stream(annotations).collect(Collectors.groupingBy(this::typeOf));
+        if (annotationGroups.containsKey(Illegal.class)) {
+            throw new IllegalComponentException("annotation must be annotated by @Qualifier or @Singleton");
         }
-        if (Arrays.stream(qualifiers).anyMatch(q -> !q.annotationType().isAnnotationPresent(Qualifier.class))) {
-            throw new IllegalComponentException("qualifier must be annotated by @Qualifier");
-        }
-        for (Annotation qualifier : qualifiers) {
-            Component component = new Component(componentType, qualifier);
-            componentProviders.put(component, new InstanceProvider<>(instance));
-        }
+        return annotationGroups;
     }
 
     /**
@@ -86,12 +85,9 @@ public class ContextConfig {
     public <T, I extends T> void bind(Class<T> componentType, Class<I> implementationType, @NonNull Annotation... annotations) {
 
         // 分组：scope/qualifier/illegal
-        Map<Class<?>, List<Annotation>> annotationGroups = Arrays.stream(annotations).collect(Collectors.groupingBy(this::typeOf));
-        if (annotationGroups.containsKey(Illegal.class)) {
-            throw new IllegalComponentException("annotation must be annotated by @Qualifier or @Singleton");
-        }
+        Map<Class<?>, List<Annotation>> annotationGroups = groupAnnotations(annotations);
 
-        ComponentProvider<T> scopeProvider = getScopeProvider(implementationType, annotationGroups, new InjectProvider<>(implementationType));
+        ComponentProvider<T> scopeProvider = createScopeProvider(implementationType, annotationGroups, new InjectProvider<>(implementationType));
 
         bind(componentType, scopeProvider, annotationGroups.getOrDefault(Qualifier.class, Collections.emptyList()));
     }
@@ -112,7 +108,7 @@ public class ContextConfig {
     }
 
     @NotNull
-    private <T, I extends T> ComponentProvider<T> getScopeProvider(Class<I> implementationType,
+    private <T> ComponentProvider<T> createScopeProvider(Class<?> implementationType,
             @NonNull Map<Class<?>, List<Annotation>> annotationGroup, ComponentProvider<T> provider) {
         Optional<Annotation> scope = annotationGroup.getOrDefault(Scope.class, Collections.emptyList()).stream().findFirst()
                 .or(() -> Arrays.stream(implementationType.getAnnotations()).filter(a -> a.annotationType().isAnnotationPresent(Scope.class)).findFirst());

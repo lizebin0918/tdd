@@ -24,7 +24,6 @@ import com.lzb.container.scope.NotSingleton;
 import com.lzb.container.scope.SingletonClass;
 import jakarta.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -278,13 +277,15 @@ class ContextUnitTest extends BaseUnitTest {
             assertThat(instances).hasSize(PooledProvider.MAX);
         }
 
-        //TODO 实例注入还有点问题
         @Test
-        @Disabled
-        @DisplayName("scope 声明的实例找不到")
-        void should_throw_exception_if_dependency_with_scope_instance_not_found() {
-            contextConfig.bind(Component.class, new MissingDependencyScoped());
-            assertThrows(DependencyNotBindException.class, () -> contextConfig.getContext());
+        @DisplayName("实例声明singleton")
+        void should_retrieve_scope_annotation_from_instance() {
+            SingletonClass instance = new SingletonClass();
+            contextConfig.bind(Dependency.class, instance);
+            Context context = contextConfig.getContext();
+            Dependency singleton1 = context.get(ComponentRef.of(Dependency.class)).orElseThrow();
+            Dependency singleton2 = context.get(ComponentRef.of(Dependency.class)).orElseThrow();
+            assertThat(singleton1).isSameAs(singleton2);
         }
 
         @Nested
