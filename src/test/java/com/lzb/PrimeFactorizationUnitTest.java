@@ -22,6 +22,10 @@ class PrimeFactorizationUnitTest extends BaseUnitTest {
         assertThat(PrimeFactorization.of(7)).isEqualTo(List.of(7));
         assertThat(PrimeFactorization.of(24)).isEqualTo(List.of(2, 2, 2, 3));
         assertThat(PrimeFactorization.of(8)).isEqualTo(List.of(2, 2, 2));
+        assertThat(PrimeFactorization.of(9)).isEqualTo(List.of(3, 3));
+        assertThat(PrimeFactorization.of(25)).isEqualTo(List.of(5, 5));
+        assertThat(PrimeFactorization.of(5)).isEqualTo(List.of(5));
+        assertThat(PrimeFactorization.of(49)).isEqualTo(List.of(7, 7));
     }
 
 }
