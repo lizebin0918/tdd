@@ -2,13 +2,14 @@ package com.lzb.container;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.validation.constraints.NotNull;
@@ -25,7 +26,6 @@ import jakarta.inject.Scope;
 import jakarta.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Context->ContextConfig 改造成 builder 模式，实现构造和初始化context分离<br/>
@@ -40,28 +40,29 @@ public class ContextConfig {
 
     // private final Map<Class<?>, Function<ComponentProvider<?>, ComponentProvider<?>>> scopes = new HashMap<>();
     // 如果出参和入参都是同一个类型，可以用UnaryOperator
-    private final Map<Class<?>, UnaryOperator<ComponentProvider<?>>> scopes = new HashMap<>();
+    //private final Map<Class<?>, UnaryOperator<ComponentProvider<?>>> scopes = new HashMap<>();
+    private final Map<Class<?>, ScopeProvider> scopes = new HashMap<>();
 
     public ContextConfig() {
         scope(Singleton.class, SingletonProvider::new);
     }
 
-    public <ScopeType extends Annotation> void scope(Class<ScopeType> scope, UnaryOperator<ComponentProvider<?>> provider) {
+    public <ScopeType extends Annotation> void scope(Class<ScopeType> scope, ScopeProvider provider) {
         scopes.put(scope, provider);
     }
 
-    public <T> void bind(Class<T> componentType, T instance, Annotation... qualifiers) {
-        if (ArrayUtils.isEmpty(qualifiers)) {
-            componentProviders.put(new Component(componentType, null), new InstanceProvider<>(instance));
-            return;
+    public <T> void bind(Class<T> componentType, T instance, Annotation... annotations) {
+        Map<Class<?>, List<Annotation>> annotationGroups = groupAnnotations(annotations);
+        bind(componentType, createScopeProvider(instance.getClass(), annotationGroups,
+                new InstanceProvider<>(instance)), annotationGroups.getOrDefault(Qualifier.class, Collections.emptyList()));
+    }
+
+    private Map<Class<?>, List<Annotation>> groupAnnotations(Annotation[] annotations) {
+        Map<Class<?>, List<Annotation>> annotationGroups = Arrays.stream(annotations).collect(Collectors.groupingBy(this::typeOf));
+        if (annotationGroups.containsKey(Illegal.class)) {
+            throw new IllegalComponentException("annotation must be annotated by @Qualifier or @Singleton");
         }
-        if (Arrays.stream(qualifiers).anyMatch(q -> !q.annotationType().isAnnotationPresent(Qualifier.class))) {
-            throw new IllegalComponentException("qualifier must be annotated by @Qualifier");
-        }
-        for (Annotation qualifier : qualifiers) {
-            Component component = new Component(componentType, qualifier);
-            componentProviders.put(component, new InstanceProvider<>(instance));
-        }
+        return annotationGroups;
     }
 
     /**
@@ -75,17 +76,23 @@ public class ContextConfig {
         bind(componentType, implementationType, implementationType.getAnnotations());
     }
 
+    /**
+     * 绑定
+     * @param componentType
+     * @param implementationType
+     * @param annotations 实现Annotation的实例
+     */
     public <T, I extends T> void bind(Class<T> componentType, Class<I> implementationType, @NonNull Annotation... annotations) {
-        if (Arrays.stream(annotations).map(Annotation::annotationType)
-                .anyMatch(q -> !q.isAnnotationPresent(Qualifier.class) && !q.isAnnotationPresent(Scope.class))) {
-                //.anyMatch(q -> !q.isAnnotationPresent(Qualifier.class) && !q.isAnnotationPresent(Singleton.class))) {
-            throw new IllegalComponentException("annotation must be annotated by @Qualifier or @Singleton");
-        }
 
-        ComponentProvider<T> provider = getComponentProvider(implementationType, annotations);
+        // 分组：scope/qualifier/illegal
+        Map<Class<?>, List<Annotation>> annotationGroups = groupAnnotations(annotations);
 
-        List<@NonNull Annotation> qualifiers = Arrays.stream(annotations)
-                .filter(a -> a.annotationType().isAnnotationPresent(Qualifier.class)).toList();
+        ComponentProvider<T> scopeProvider = createScopeProvider(implementationType, annotationGroups, new InjectProvider<>(implementationType));
+
+        bind(componentType, scopeProvider, annotationGroups.getOrDefault(Qualifier.class, Collections.emptyList()));
+    }
+
+    private <T> void bind(Class<T> componentType, ComponentProvider<T> provider, List<Annotation> qualifiers) {
         if (qualifiers.isEmpty()) {
             componentProviders.put(new Component(componentType, null), provider);
         }
@@ -95,17 +102,19 @@ public class ContextConfig {
         }
     }
 
+    private Class<?> typeOf(Annotation annotation) {
+        Class<? extends Annotation> type = annotation.annotationType();
+        return Stream.of(Qualifier.class, Scope.class).filter(type::isAnnotationPresent).findFirst().orElse(Illegal.class);
+    }
+
     @NotNull
-    private <T, I extends T> ComponentProvider<T> getComponentProvider(Class<I> implementationType,
-            @NonNull Annotation[] annotations) {
-        ComponentProvider<T> provider = new InjectProvider<>(implementationType);
-        Optional<Annotation> scope = Stream.concat(
-                Arrays.stream(implementationType.getAnnotations()).filter(a -> a.annotationType().isAnnotationPresent(Scope.class)),
-                Arrays.stream(annotations).filter(a -> a.annotationType().isAnnotationPresent(Scope.class))
-        ).findFirst();
+    private <T> ComponentProvider<T> createScopeProvider(Class<?> implementationType,
+            @NonNull Map<Class<?>, List<Annotation>> annotationGroup, ComponentProvider<T> provider) {
+        Optional<Annotation> scope = annotationGroup.getOrDefault(Scope.class, Collections.emptyList()).stream().findFirst()
+                .or(() -> Arrays.stream(implementationType.getAnnotations()).filter(a -> a.annotationType().isAnnotationPresent(Scope.class)).findFirst());
         if (scope.isPresent()) {
             var providerFun = scopes.get(scope.get().annotationType());
-            return (ComponentProvider<T>) providerFun.apply(provider);
+            return (ComponentProvider<T>) providerFun.create(provider);
         }
         return provider;
     }
