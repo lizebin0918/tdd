@@ -19,18 +19,18 @@ public class TennisGame {
     public TennisGame(String player1Name, String player2Name) {
         this.player1Name = player1Name;
         this.player2Name = player2Name;
-        playerToScore.put(player1Name, new Score(0));
-        playerToScore.put(player2Name, new Score(0));
+        playerToScore.put(this.player1Name, new Score(0));
+        playerToScore.put(this.player2Name, new Score(0));
     }
 
     protected TennisGame(String player1Name, Score player1Score, String player2Name, Score player2Score) {
         this.player1Name = player1Name;
         this.player2Name = player2Name;
-        playerToScore.put(player1Name, player1Score);
-        playerToScore.put(player2Name, player2Score);
+        playerToScore.put(this.player1Name, player1Score);
+        playerToScore.put(this.player2Name, player2Score);
     }
 
-    private static final String[] SCORE_DISPLAY_TEXT = {"love", "fifteen", "thirty", "forty"};
+    private static final String[] SCORE_DISPLAY_TEXT = {"love", "fifteen", "thirty", "forty", "win"};
 
     private static final Map<String, Score> playerToScore = new HashMap<>();
 
@@ -39,17 +39,43 @@ public class TennisGame {
         return getPlayerScore(playerName);
     }
 
-    public String getPlayerScore(String palyerName) {
-        Score score = playerToScore.get(palyerName);
+    public String getPlayerScore(String playerName) {
+        if (isDeuce()) {
+            // 领先的player需要返回advantage
+            Map.Entry<String, Score> current = playerToScore.entrySet().stream()
+                    .filter(e -> e.getKey().equals(playerName)).findFirst().orElseThrow();
+            Map.Entry<String, Score> other = playerToScore.entrySet().stream()
+                    .filter(e -> !e.getKey().equals(playerName)).findFirst().orElseThrow();
+            if (current.getValue().getValue() - other.getValue().getValue() == 1) {
+                return "advantage";
+            }
+            return "deuce";
+        }
+        Score score = playerToScore.get(playerName);
         return SCORE_DISPLAY_TEXT[score.getValue()];
+    }
+
+    private static boolean isDeuce() {
+        return playerToScore.values().stream().allMatch(s -> s.value == 3);
     }
 
     static class Score {
 
-        static final Score LOVE = new Score(0);
-        static final Score FIFTEEN = new Score(1);
-        static final Score THIRTY = new Score(2);
-        static final Score FORTY = new Score(3);
+        public static Score love() {
+            return new Score(0);
+        }
+
+        public static Score fifteen() {
+            return new Score(1);
+        }
+
+        public static Score thirty() {
+            return new Score(2);
+        }
+
+        public static Score forty() {
+            return new Score(3);
+        }
 
         private int value;
 
