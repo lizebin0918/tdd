@@ -42,13 +42,13 @@ class TennisGameUnitTest {
     @Test
     @DisplayName("Player1开始比赛")
     void should_love_when_player1_start_game() {
-        assertEquals("love", tennisGame.getPlayerScore(player1Name));
+        assertEquals("love", tennisGame.displayPlayerScore(player1Name));
     }
 
     @Test
     @DisplayName("Player2开始比赛")
     void should_love_when_player2_start_game() {
-        assertEquals("love", tennisGame.getPlayerScore(player2Name));
+        assertEquals("love", tennisGame.displayPlayerScore(player2Name));
     }
 
     @Test
@@ -60,65 +60,80 @@ class TennisGameUnitTest {
     @Test
     @DisplayName("Player1得分:fifteen->thirty")
     void should_fifteen_to_thirty_when_player_won() {
-        tennisGame = new TennisGame(player1Name, TennisGame.Score.fifteen(), player2Name, TennisGame.Score.love());
+        tennisGame = new TennisGame(player1Name, Score.fifteen(), player2Name, Score.love());
         assertEquals("thirty", tennisGame.wonPoint(player1Name));
     }
 
     @Test
     @DisplayName("Player1得分:thirty->forty")
     void should_thirty_to_forty_when_player_won() {
-        tennisGame = new TennisGame(player1Name, TennisGame.Score.thirty(), player2Name, TennisGame.Score.love());
+        tennisGame = new TennisGame(player1Name, Score.thirty(), player2Name, Score.love());
         assertEquals("forty", tennisGame.wonPoint(player1Name));
     }
 
     @Test
     @DisplayName("Player1得分:forty->win")
     void should_forty_to_win_when_player_won() {
-        tennisGame = new TennisGame(player1Name, TennisGame.Score.forty(), player2Name, TennisGame.Score.love());
+        tennisGame = new TennisGame(player1Name, Score.forty(), player2Name, Score.love());
         assertEquals("win", tennisGame.wonPoint(player1Name));
     }
 
     @Test
     @DisplayName("Player1得分:deuce")
     void should_deuce_when_player_won() {
-        tennisGame = new TennisGame(player1Name, TennisGame.Score.thirty(), player2Name, TennisGame.Score.forty());
+        tennisGame = new TennisGame(player1Name, Score.thirty(), player2Name, Score.forty());
         assertEquals("deuce", tennisGame.wonPoint(player1Name));
     }
 
     @Test
     @DisplayName("Player1:forty vs Player2:forty")
     void should_deuce_when_forty_tie() {
-        tennisGame = new TennisGame(player1Name, TennisGame.Score.forty(), player2Name, TennisGame.Score.forty());
-        assertEquals("deuce", tennisGame.getPlayerScore(player1Name));
-        assertEquals("deuce", tennisGame.getPlayerScore(player2Name));
+        tennisGame = new TennisGame(player1Name, Score.forty(), player2Name, Score.forty());
+        assertEquals("deuce", tennisGame.displayPlayerScore(player1Name));
+        assertEquals("deuce", tennisGame.displayPlayerScore(player2Name));
     }
 
     @Test
     @DisplayName("当前平局，player1赢1分变成advantage")
     void should_advantage_when_deuce() {
-        tennisGame = new TennisGame(player1Name, TennisGame.Score.forty(), player2Name, TennisGame.Score.forty());
+        tennisGame = new TennisGame(player1Name, Score.forty(), player2Name, Score.forty());
         assertEquals("advantage", tennisGame.wonPoint(player1Name));
     }
 
 
     @Test
     void test_get_other_player_score() {
-        tennisGame = new TennisGame(player1Name, TennisGame.Score.forty(), player2Name, TennisGame.Score.thirty());
-        TennisGame.Score otherPlayerScore = tennisGame.getOtherPlayerScore(player1Name);
-        assertEquals(TennisGame.Score.thirty(), otherPlayerScore);
+        tennisGame = new TennisGame(player1Name, Score.forty(), player2Name, Score.thirty());
+        Score otherPlayerScore = tennisGame.getOtherPlayerScore(player1Name);
+        assertEquals(Score.thirty(), otherPlayerScore);
     }
 
     @Test
     @DisplayName("初始化advantage")
     void should_init_advantage() {
-        tennisGame = new TennisGame(player1Name, new TennisGame.Score(7), player2Name, new TennisGame.Score(6));
-        assertEquals("advantage", tennisGame.getPlayerScore(player1Name));
+        tennisGame = new TennisGame(player1Name, new Score(7), player2Name, new Score(6));
+        assertEquals("advantage", tennisGame.displayPlayerScore(player1Name));
     }
 
     @Test
     @DisplayName("初始化advantage，player1赢一分，比赛结束")
     void should_init_advantage_when_player1_won() {
-        tennisGame = new TennisGame(player1Name, new TennisGame.Score(7), player2Name, new TennisGame.Score(6));
+        tennisGame = new TennisGame(player1Name, new Score(7), player2Name, new Score(6));
         assertEquals("win", tennisGame.wonPoint(player1Name));
+    }
+
+    @Test
+    @DisplayName("初始化advantage，对方追回一分，educe")
+    void should_init_advantage_when_other_player_won() {
+        tennisGame = new TennisGame(player1Name, new Score(7), player2Name, new Score(6));
+        assertEquals("deuce", tennisGame.wonPoint(player2Name));
+    }
+
+    @Test
+    @DisplayName("初始化deuce，连续赢两分，比赛结束")
+    void should_init_deuce_when_player_won_twice() {
+        tennisGame = new TennisGame(player1Name, Score.forty(), player2Name, Score.forty());
+        assertEquals("advantage", tennisGame.wonPoint(player2Name));
+        assertEquals("win", tennisGame.wonPoint(player2Name));
     }
 }
