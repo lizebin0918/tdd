@@ -7,13 +7,17 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * 只要需求理解没问题，每一步其实都有用的，而不会导致整个工程返工<br/>
  * 如果返工有可能是需求理解错了，或者有另一个思路...tdd好像不能让你找到对的思路...之前的返工有两个原因
- * 1.需求理解错了
- * 2.有更好的实现思路
+ *
+ *
+ * 0.任务拆解
+ * 1.每个任务的实现又可以有很多种方法，容易返工
+ * 2.会涌现各种实现思路，不知道用哪个是对的
  * Created on : 2024-01-13 20:15
  * @author mac
  */
@@ -43,13 +47,10 @@ class ConwayGameTest {
     @Test
     @DisplayName("遍历死细胞变成活细胞")
     void should_live_when_dead_traversal() {
-        ConwayGame game = new ConwayGame(4, 2);
-        game.live(0, 0).live(0, 1).live(2, 0);
-
-        /**
-         {1, 0, 1, 0},
-         {1, 0, 0, 0}
-         **/
+        ConwayGame game = new ConwayGame(new int[][] {
+                {1, 0, 1, 0},
+                {1, 0, 0, 0}
+        });
 
         List<Point> livePoints = game.pointsOfDeadToLive();
         assertEquals(2, livePoints.size());
@@ -59,18 +60,15 @@ class ConwayGameTest {
     @Test
     @DisplayName("定位死细胞")
     void should_return_value_when_dead() {
-        ConwayGame game = new ConwayGame(4, 2);
-        game.live(0, 0).live(0, 1).live(2, 0);
+        ConwayGame game = new ConwayGame(new int[][] {
+                {1, 0, 1, 0},
+                {1, 0, 0, 0}
+        });
 
-        /**
-         {1, 0, 1, 0},
-         {1, 0, 0, 0}
-         **/
-
-        assertEquals(false, game.isDead(0, 0));
-        assertEquals(true, game.isDead(1, 0));
-        assertEquals(false, game.isDead(2, 0));
-        assertEquals(true, game.isDead(3, 0));
+        assertFalse(game.isDead(0, 0));
+        assertTrue(game.isDead(1, 0));
+        assertFalse(game.isDead(2, 0));
+        assertTrue(game.isDead(3, 0));
     }
 
     @Test
@@ -90,13 +88,10 @@ class ConwayGameTest {
     @Test
     @DisplayName("如果图形是长方形，获取编号2的细胞状态")
     void should_return_get_two_when_gird_is_rectangle() {
-        ConwayGame game = new ConwayGame(4, 2);
-        game.live(0, 0).live(0, 1).live(2, 0);
-
-        /**
-         {1, 0, 1, 0},
-         {1, 0, 0, 0}
-         **/
+        ConwayGame game = new ConwayGame(new int[][] {
+                {1, 0, 1, 0},
+                {1, 0, 0, 0}
+        });
 
         assertEquals(1, game.getTwo(1, 0));
     }
@@ -104,8 +99,10 @@ class ConwayGameTest {
     @Test
     @DisplayName("获取序号1的值")
     void should_return_index1_value_when_location_is_x_1_y_1() {
-        ConwayGame game = new ConwayGame(3, 3);
-        game.live(0, 0);
+        ConwayGame game = new ConwayGame(new int[][] {
+                {1, 0, 0, 0},
+                {0, 0, 0, 0}
+        });
         assertEquals(1, game.getOne(1, 1));
     }
 
@@ -168,8 +165,10 @@ class ConwayGameTest {
     @Test
     @DisplayName("遍历活细胞小于2个的活细胞位置")
     void should_less_2_live_when_live_traversal() {
-        ConwayGame game = new ConwayGame(4, 2);
-        game.live(0, 0).live(0, 1).live(2, 0);
+        ConwayGame game = new ConwayGame(new int[][] {
+                {1, 0, 1, 0},
+                {1, 0, 0, 0}
+        });
 
         /**
          {1(T), 0(F), 1(T), 0(F)},
@@ -184,8 +183,10 @@ class ConwayGameTest {
     @Test
     @DisplayName("遍历活细胞大于3个的活细胞位置")
     void should_greater_3_live_when_live_traversal() {
-        ConwayGame game = new ConwayGame(4, 2);
-        game.live(0, 0).live(0, 1).live(1, 0).live(2, 0).live(1, 1);
+        ConwayGame game = new ConwayGame(new int[][] {
+                {1, 1, 1, 0},
+                {1, 1, 0, 0}
+        });
 
         /**
          {1(F), 1(T), 1(F), 0(F)},
@@ -244,5 +245,6 @@ class ConwayGameTest {
                 {1, 1}
         }, game.getGrid());
     }
+
 
 }

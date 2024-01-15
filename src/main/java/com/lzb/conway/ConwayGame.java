@@ -20,6 +20,12 @@ public class ConwayGame {
         grid = new int[y][x];
     }
 
+    ConwayGame(int[][] grid) {
+        this.grid = grid;
+        this.y = grid.length;
+        this.x = grid[0].length;
+    }
+
     int[][] getGrid() {
         return grid;
     }
