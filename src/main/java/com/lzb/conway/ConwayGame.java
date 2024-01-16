@@ -141,56 +141,56 @@ public class ConwayGame {
      */
 
     public int getOne(int x, int y) {
-        if ((x = x - 1) >= 0 && (y = y - 1) >= 0) {
+        if ((--x) >= 0 && --y >= 0) {
             return grid[y][x];
         }
         return -1;
     }
 
     public int getTwo(int x, int y) {
-        if ((x = x - 1) >= 0) {
+        if (--x >= 0) {
             return grid[y][x];
         }
         return -1;
     }
 
     public int getThree(int x, int y) {
-        if ((x = x - 1) >= 0 && (y = y + 1) <= (this.y - 1)) {
+        if (--x >= 0 && ++y <= (this.y - 1)) {
             return grid[y][x];
         }
         return -1;
     }
 
     public int getFour(int x, int y) {
-        if ((y = y + 1) <= (this.y - 1)) {
+        if (++y <= (this.y - 1)) {
             return grid[y][x];
         }
         return -1;
     }
 
     public int getFive(int x, int y) {
-        if (((x = x + 1) <= (this.x - 1)) && (y = y + 1) <= (this.y - 1)) {
+        if ((++x <= (this.x - 1)) && ++y <= (this.y - 1)) {
             return grid[y][x];
         }
         return -1;
     }
 
     public int getSix(int x, int y) {
-        if (((x = x + 1) <= (this.x - 1))) {
+        if ((++x <= (this.x - 1))) {
             return grid[y][x];
         }
         return -1;
     }
 
     public int getSeven(int x, int y) {
-        if (((x = x + 1) <= (this.x - 1)) && (y = y - 1) >= 0) {
+        if ((++x <= (this.x - 1)) && --y >= 0) {
             return grid[y][x];
         }
         return -1;
     }
 
     public int getEight(int x, int y) {
-        if ((y = y - 1) >= 0) {
+        if (--y >= 0) {
             return grid[y][x];
         }
         return -1;
