@@ -1,6 +1,7 @@
 package com.lzb.conway;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -104,6 +105,17 @@ class ConwayGameTest {
                 {0, 0, 0, 0}
         });
         assertEquals(1, game.getOne(1, 1));
+    }
+
+    @Test
+    @DisplayName("测试point的位移")
+    void should_move_point() {
+        Point point = new Point(1, 1);
+        assertEquals(new Point(1, 0), point.next(Point.Direction.UP));
+        assertEquals(new Point(1, 2), point.next(Point.Direction.DOWN));
+        assertEquals(new Point(0, 1), point.next(Point.Direction.LEFT));
+        assertEquals(new Point(2, 1), point.next(Point.Direction.RIGHT));
+        assertEquals(new Point(0, 0), point.next(Point.Direction.UP).next(Point.Direction.LEFT));
     }
 
     @Test
@@ -246,5 +258,13 @@ class ConwayGameTest {
         }, game.getGrid());
     }
 
+    @Test
+    @DisplayName("测试point是否在边界内")
+    void should_point_within_grid_bound() {
+        ConwayGame game = new ConwayGame(2, 2);
+        assertTrue(game.isWithin(new Point(0, 0)));
+        assertTrue(game.isWithin(new Point(1, 1)));
+        assertFalse(game.isWithin(new Point(2, 2)));
+    }
 
 }

@@ -3,6 +3,8 @@ package com.lzb.conway;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.lzb.conway.Point.Direction;
+
 /**
  * <br/>
  * Created on : 2024-01-13 20:14
@@ -132,6 +134,14 @@ public class ConwayGame {
         return grid[y][x] == 0;
     }
 
+    public boolean isWithin(Point point) {
+        return point.x() >= 0 && point.y() >= 0 && point.x() < x && point.y() < y;
+    }
+
+    public int getValue(Point point) {
+        return grid[point.y()][point.x()];
+    }
+
     /*
      * 逆时针编号
      * 1 8 7
@@ -141,10 +151,12 @@ public class ConwayGame {
      */
 
     public int getOne(int x, int y) {
-        if ((--x) >= 0 && --y >= 0) {
-            return grid[y][x];
-        }
-        return -1;
+        return new Point(x, y)
+                .next(Direction.LEFT)
+                .next(Direction.UP)
+                .within(this::isWithin)
+                .map(this::getValue)
+                .orElse(-1);
     }
 
     public int getTwo(int x, int y) {
