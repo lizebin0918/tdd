@@ -1,7 +1,6 @@
 package com.lzb.conway;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -75,26 +74,22 @@ class ConwayGameTest {
     @Test
     @DisplayName("遍历获取活细胞数量")
     void should_return_live_count() {
-        ConwayGame game = new ConwayGame(4, 2);
-        game.live(0, 0).live(0, 1).live(2, 0);
-
-        /**
-         {1, 0, 1, 0},
-         {1, 0, 0, 0}
-         **/
-
-        assertEquals(3, game.traversalLive(1, 0));
+        ConwayGame game = new ConwayGame(new int[][] {
+            {1, 0, 1, 0},
+            {1, 0, 0, 0}
+        });
+        assertEquals(3, game.getLiveCount(1, 0));
     }
 
     @Test
-    @DisplayName("如果图形是长方形，获取编号2的细胞状态")
-    void should_return_get_two_when_gird_is_rectangle() {
+    @DisplayName("如果图形是长方形，获取所有活细胞数量")
+    void should_return_live_count_when_game_rectangle() {
         ConwayGame game = new ConwayGame(new int[][] {
                 {1, 0, 1, 0},
                 {1, 0, 0, 0}
         });
 
-        assertEquals(1, game.getTwo(1, 0));
+        assertEquals(3, game.getLiveCount(1, 0));
     }
 
     @Test
@@ -104,7 +99,7 @@ class ConwayGameTest {
                 {1, 0, 0, 0},
                 {0, 0, 0, 0}
         });
-        assertEquals(1, game.getOne(1, 1));
+        assertEquals(1, game.getLiveCount(1, 1));
     }
 
     @Test
@@ -123,7 +118,7 @@ class ConwayGameTest {
     void should_return_index2_value_when_location_is_x_1_y_1() {
         ConwayGame game = new ConwayGame(3, 3);
         game.live(0, 1);
-        assertEquals(1, game.getTwo(1, 1));
+        assertEquals(1, game.getLiveCount(1, 1));
     }
 
     @Test
@@ -131,7 +126,7 @@ class ConwayGameTest {
     void should_return_index3_value_when_location_is_x_1_y_1() {
         ConwayGame game = new ConwayGame(3, 3);
         game.live(0, 2);
-        assertEquals(1, game.getThree(1, 1));
+        assertEquals(1, game.getLiveCount(1, 1));
     }
 
     @Test
@@ -139,7 +134,7 @@ class ConwayGameTest {
     void should_return_index4_value_when_location_is_x_1_y_1() {
         ConwayGame game = new ConwayGame(3, 3);
         game.live(1, 2);
-        assertEquals(1, game.getFour(1, 1));
+        assertEquals(1, game.getLiveCount(1, 1));
     }
 
     @Test
@@ -147,7 +142,7 @@ class ConwayGameTest {
     void should_return_index5_value_when_location_is_x_1_y_1() {
         ConwayGame game = new ConwayGame(3, 3);
         game.live(2, 2);
-        assertEquals(1, game.getFive(1, 1));
+        assertEquals(1, game.getLiveCount(1, 1));
     }
 
     @Test
@@ -155,7 +150,7 @@ class ConwayGameTest {
     void should_return_index6_value_when_location_is_x_1_y_1() {
         ConwayGame game = new ConwayGame(3, 3);
         game.live(2, 1);
-        assertEquals(1, game.getSix(1, 1));
+        assertEquals(1, game.getLiveCount(1, 1));
     }
 
     @Test
@@ -163,7 +158,7 @@ class ConwayGameTest {
     void should_return_index7_value_when_location_is_x_1_y_1() {
         ConwayGame game = new ConwayGame(3, 3);
         game.live(2, 0);
-        assertEquals(1, game.getSeven(1, 1));
+        assertEquals(1, game.getLiveCount(1, 1));
     }
 
     @Test
@@ -171,7 +166,7 @@ class ConwayGameTest {
     void should_return_index8_value_when_location_is_x_1_y_1() {
         ConwayGame game = new ConwayGame(3, 3);
         game.live(1, 0);
-        assertEquals(1, game.getEight(1, 1));
+        assertEquals(1, game.getLiveCount(1, 1));
     }
 
     @Test

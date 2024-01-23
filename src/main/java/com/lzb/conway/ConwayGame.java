@@ -3,8 +3,6 @@ package com.lzb.conway;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.lzb.conway.Point.Direction;
-
 /**
  * <br/>
  * Created on : 2024-01-13 20:14
@@ -66,7 +64,7 @@ public class ConwayGame {
         for (int i = 0; i < x; i++) {
             for (int j = 0; j < y; j++) {
                 if (isDead(i, j)) {
-                    int count = traversalLive(i, j);
+                    int count = getLiveCount(i, j);
                     if (count == 3) {
                         livePoints.add(new Point(i, j));
                     }
@@ -83,7 +81,7 @@ public class ConwayGame {
         for (int i = 0; i < x; i++) {
             for (int j = 0; j < y; j++) {
                 if (isLive(i, j)) {
-                    int count = traversalLive(i, j);
+                    int count = getLiveCount(i, j);
                     if (count < 2) {
                         deadPoints.add(new Point(i, j));
                     }
@@ -101,33 +99,8 @@ public class ConwayGame {
         return !isDead(x, y);
     }
 
-    int traversalLive(int x, int y) {
-        int count = 0;
-        if (getOne(x, y) == 1) {
-            count++;
-        }
-        if (getTwo(x, y) == 1) {
-            count++;
-        }
-        if (getThree(x, y) == 1) {
-            count++;
-        }
-        if (getFour(x, y) == 1) {
-            count++;
-        }
-        if (getFive(x, y) == 1) {
-            count++;
-        }
-        if (getSix(x, y) == 1) {
-            count++;
-        }
-        if (getSeven(x, y) == 1) {
-            count++;
-        }
-        if (getEight(x, y) == 1) {
-            count++;
-        }
-        return count;
+    int getLiveCount(int x, int y) {
+        return new Point(x, y).roundPoints().stream().filter(this::isWithin).mapToInt(this::getValue).sum();
     }
 
     boolean isDead(int x, int y) {
@@ -139,73 +112,10 @@ public class ConwayGame {
     }
 
     public int getValue(Point point) {
+        if (!isWithin(point)) {
+            return -1;
+        }
         return grid[point.y()][point.x()];
-    }
-
-    /*
-     * 逆时针编号
-     * 1 8 7
-     * 2 x 6
-     * 3 4 5
-     * 如果超出边界，返回-1
-     */
-
-    public int getOne(int x, int y) {
-        return new Point(x, y)
-                .next(Direction.LEFT)
-                .next(Direction.UP)
-                .within(this::isWithin)
-                .map(this::getValue)
-                .orElse(-1);
-    }
-
-    public int getTwo(int x, int y) {
-        if (--x >= 0) {
-            return grid[y][x];
-        }
-        return -1;
-    }
-
-    public int getThree(int x, int y) {
-        if (--x >= 0 && ++y <= (this.y - 1)) {
-            return grid[y][x];
-        }
-        return -1;
-    }
-
-    public int getFour(int x, int y) {
-        if (++y <= (this.y - 1)) {
-            return grid[y][x];
-        }
-        return -1;
-    }
-
-    public int getFive(int x, int y) {
-        if ((++x <= (this.x - 1)) && ++y <= (this.y - 1)) {
-            return grid[y][x];
-        }
-        return -1;
-    }
-
-    public int getSix(int x, int y) {
-        if ((++x <= (this.x - 1))) {
-            return grid[y][x];
-        }
-        return -1;
-    }
-
-    public int getSeven(int x, int y) {
-        if ((++x <= (this.x - 1)) && --y >= 0) {
-            return grid[y][x];
-        }
-        return -1;
-    }
-
-    public int getEight(int x, int y) {
-        if (--y >= 0) {
-            return grid[y][x];
-        }
-        return -1;
     }
 
 }
