@@ -10,16 +10,16 @@ import java.util.List;
  */
 public class PrimeFactorization {
 
-    static List<Integer> of(int input) {
+    static List<Integer> ofV2(int input) {
         List<Integer> result = new ArrayList<>();
-        for (int i = 2; i < input; i++) {
-            while (input % i == 0) {
-                result.add(i);
-                input /= i;
-            }
+        if (input == 1) {
+            return List.of(1);
         }
-        if (input > 1) {
-            result.add(input);
+        for (int i = 1, bound = input; i <= bound; i++) {
+            while (i > 1 && (input % i) == 0) {
+                result.add(i);
+                input = input / i;
+            }
         }
         return result;
     }
