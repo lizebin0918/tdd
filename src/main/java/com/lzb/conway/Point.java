@@ -2,8 +2,6 @@ package com.lzb.conway;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 import static com.lzb.conway.Point.Direction.DOWN;
 import static com.lzb.conway.Point.Direction.LEFT;
@@ -29,10 +27,6 @@ public record Point(int x, int y) {
             case LEFT -> Point.of(x - 1, y);
             case RIGHT -> Point.of(x + 1, y);
         };
-    }
-
-    Optional<Point> within(Predicate<Point> isWithin) {
-        return Optional.of(this).filter(isWithin);
     }
 
     public enum Direction {
