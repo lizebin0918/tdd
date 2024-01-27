@@ -1,6 +1,7 @@
 package com.lzb.bowling_game;
 
 import com.lzb.BaseUnitTest;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -90,6 +91,13 @@ class BowlingGameCalculatorTest extends BaseUnitTest {
     }
 
     @Test
+    @DisplayName("解析字符串：截取奖励球,有一个奖励球")
+    void should_parse_input_string_for_bonus_when_bonus_has_one() {
+        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("9-|9-|9-|9-|9-|9-|9-|9-|9-|9-||X");
+        Assertions.assertEquals("X", bowlingGameCalculator.getBonus().toString());
+    }
+
+    @Test
     @DisplayName("解析字符串：比赛中途，还没打完")
     void should_parse_input_string_for_game_is_not_end() {
         BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("9-|9-|9-|9-|9-|9-|9-|9-|9-|");
@@ -99,8 +107,9 @@ class BowlingGameCalculatorTest extends BaseUnitTest {
     @Test
     @DisplayName("解析字符串：截取帧")
     void should_parse_input_string_for_frame() {
-
-
+        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|X");
+        Assertions.assertEquals(List.of(new Frame(1, "X"), new Frame(2, "X")),
+            bowlingGameCalculator.getFrames());
     }
 
 }

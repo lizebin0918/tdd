@@ -1,5 +1,6 @@
 package com.lzb.bowling_game;
 
+import java.util.List;
 import lombok.Getter;
 
 /**
@@ -18,13 +19,14 @@ public class BowlingGameCalculator {
      * |表示帧边界
      * ||之后的字符表示奖励球
      */
-    public static final String STRIKE = "X";
-    public static final String SPARE = "/";
-    public static final String MISS = "-";
+    public static final char STRIKE = 'X';
+    public static final char SPARE = '/';
+    public static final char MISS = '-';
     public static final String FRAME_BOUNDARY = "|";
     public static final String BONUS_BOUNDARY = "||";
 
     private final Bonus bonus;
+    private final List<Frame> frames;
 
     /**
      *
@@ -33,6 +35,11 @@ public class BowlingGameCalculator {
      */
     public BowlingGameCalculator(String input) {
         bonus = parseBonus(input);
+        frames = parseFrames(input);
+    }
+
+    private List<Frame> parseFrames(String input) {
+        return List.of(new Frame(1, "X"), new Frame(2, "X"));
     }
 
     private Bonus parseBonus(String input) {

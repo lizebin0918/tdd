@@ -11,33 +11,15 @@ import org.apache.commons.lang3.StringUtils;
  * @author lizebin
  */
 @Getter
-public class Bonus {
-
-    private Character first;
-    private Character second;
+public class Bonus extends BaseFrame {
 
     public static final Bonus EMPTY = new Bonus(null, null);
+
     private Bonus(Character first, Character second) {
-        this.first = first;
-        this.second = second;
+        super(first, second);
     }
 
-    public Bonus(String bonus) {
-        if (Objects.isNull(bonus) || StringUtils.isBlank(bonus)) {
-            return;
-        }
-        this.first = bonus.charAt(0);
-        this.second = bonus.charAt(1);
-    }
-
-    public String toString() {
-        StringBuilder result = new StringBuilder();
-        if (Objects.nonNull(first)) {
-            result.append(first);
-        }
-        if (Objects.nonNull(second)) {
-            result.append(second);
-        }
-        return result.toString();
+    public Bonus(String ball) {
+        super(ball);
     }
 }
