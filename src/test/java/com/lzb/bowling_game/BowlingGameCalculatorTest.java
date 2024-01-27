@@ -1,5 +1,10 @@
 package com.lzb.bowling_game;
 
+import com.lzb.BaseUnitTest;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 /**
  * 保龄球游戏<br/>
  * 编写一个程序来计算保龄球比赛的得分。
@@ -59,8 +64,43 @@ package com.lzb.bowling_game;
  * 总得分== 167
  * Created on : 2024-01-24 10:12
  *
+ *
  * @author lizebin
  */
-public class BowlingGameTest {
+class BowlingGameCalculatorTest extends BaseUnitTest {
+
+
+    /**
+     * 解析字符串，分别是奖励球和帧
+     * 按帧解析对应字符，算出每帧得分
+     */
+
+    @Test
+    @DisplayName("解析字符串：截取奖励球 ")
+    void should_parse_input_string_for_bonus() {
+        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|X|X|X|X|X|X|X|X|X||XX");
+        Assertions.assertEquals("XX", bowlingGameCalculator.getBonus().toString());
+    }
+
+    @Test
+    @DisplayName("解析字符串：截取奖励球,没有奖励球")
+    void should_parse_input_string_for_bonus_when_bonus_is_empty() {
+        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("9-|9-|9-|9-|9-|9-|9-|9-|9-|9-||");
+        Assertions.assertEquals("", bowlingGameCalculator.getBonus().toString());
+    }
+
+    @Test
+    @DisplayName("解析字符串：比赛中途，还没打完")
+    void should_parse_input_string_for_game_is_not_end() {
+        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("9-|9-|9-|9-|9-|9-|9-|9-|9-|");
+        Assertions.assertEquals("", bowlingGameCalculator.getBonus().toString());
+    }
+
+    @Test
+    @DisplayName("解析字符串：截取帧")
+    void should_parse_input_string_for_frame() {
+
+
+    }
 
 }
