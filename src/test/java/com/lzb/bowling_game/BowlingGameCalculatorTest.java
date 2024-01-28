@@ -112,4 +112,35 @@ class BowlingGameCalculatorTest extends BaseUnitTest {
             bowlingGameCalculator.getFrames());
     }
 
+    @Test
+    @DisplayName("按照帧分隔符截取各帧的字符串，没有奖励球")
+    void should_parse_frame_string_by_frame_boundary_when_input_without_bonus() {
+        Assertions.assertArrayEquals(new String[]{"X", "X"}, BowlingGameCalculator.parseFrameString("X|X"));
+    }
+
+    @Test
+    @DisplayName("按照帧分隔符截取各帧的字符串，有奖励球")
+    void should_parse_frame_string_by_frame_boundary_when_input_with_bonus() {
+        Assertions.assertArrayEquals(new String[]{"9-", "9-", "9-", "9-", "9-", "9-", "9-", "9-", "9-", "9-"},
+            BowlingGameCalculator.parseFrameString("9-|9-|9-|9-|9-|9-|9-|9-|9-|9-||X"));
+    }
+
+    @Test
+    @DisplayName("解析字符串：截取所有帧")
+    void should_parse_input_string_for_all_frame() {
+        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("9-|9-|9-|9-|9-|9-|9-|9-|9-|9-||X");
+        Assertions.assertEquals(List.of(
+            new Frame(1, '9', '-'),
+            new Frame(2, '9', '-'),
+            new Frame(3, '9', '-'),
+            new Frame(4, '9', '-'),
+            new Frame(5, '9', '-'),
+            new Frame(6, '9', '-'),
+            new Frame(7, '9', '-'),
+            new Frame(8, '9', '-'),
+            new Frame(9, '9', '-'),
+            new Frame(10, '9', '-')),
+            bowlingGameCalculator.getFrames());
+    }
+
 }

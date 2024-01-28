@@ -23,4 +23,9 @@ public class Frame extends BaseFrame {
         super(balls);
         this.index = index;
     }
+
+    public Frame(int index, Character first, Character second) {
+        super(first, second);
+        this.index = index;
+    }
 }

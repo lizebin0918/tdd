@@ -1,5 +1,6 @@
 package com.lzb.bowling_game;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 
@@ -24,9 +25,10 @@ public class BowlingGameCalculator {
     public static final char MISS = '-';
     public static final String FRAME_BOUNDARY = "|";
     public static final String BONUS_BOUNDARY = "||";
+    public static final String ESCAPE_CHARACTER_FRAME_BOUNDARY = "\\|";
 
-    private final Bonus bonus;
-    private final List<Frame> frames;
+    private Bonus bonus;
+    private List<Frame> frames = new ArrayList<>();
 
     /**
      *
@@ -34,20 +36,30 @@ public class BowlingGameCalculator {
      * @return
      */
     public BowlingGameCalculator(String input) {
-        bonus = parseBonus(input);
-        frames = parseFrames(input);
+        initBonus(input);
+        initFrames(input);
     }
 
-    private List<Frame> parseFrames(String input) {
-        return List.of(new Frame(1, "X"), new Frame(2, "X"));
+    private void initFrames(String input) {
+        String[] frameStrings = parseFrameString(input);
+        for (int i = 0; i < frameStrings.length; i++) {
+            frames.add(new Frame(i + 1, frameStrings[i]));
+        }
     }
 
-    private Bonus parseBonus(String input) {
+    protected static String[] parseFrameString(String input) {
+        int bonusIndex = input.lastIndexOf(BONUS_BOUNDARY);
+        int end = bonusIndex < 0 ? input.length() : bonusIndex;
+        return input.substring(0, end).split(ESCAPE_CHARACTER_FRAME_BOUNDARY);
+    }
+
+    private void initBonus(String input) {
         int index = input.lastIndexOf(BONUS_BOUNDARY);
         if (index < 0) {
-            return Bonus.EMPTY;
+            bonus = Bonus.EMPTY;
+            return;
         }
-        return new Bonus(input.substring(index + BONUS_BOUNDARY.length(), input.length()));
+        bonus = new Bonus(input.substring(index + BONUS_BOUNDARY.length(), input.length()));
     }
 
 }
