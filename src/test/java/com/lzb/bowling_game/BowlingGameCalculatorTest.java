@@ -154,7 +154,7 @@ class BowlingGameCalculatorTest extends BaseUnitTest {
     @DisplayName("1/|2-:第一帧补中，需要奖励第二帧的第一球分数，总得分：12")
     void should_spare_1_frame_bonus_first_score_of_2_frame() {
         BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("1/|1-");
-        Assertions.assertEquals(12, bowlingGameCalculator.getFrameScore(1));
+        Assertions.assertEquals(11, bowlingGameCalculator.getFrameScore(1));
     }
 
     @Test
@@ -162,5 +162,19 @@ class BowlingGameCalculatorTest extends BaseUnitTest {
     void should_spare_1_frame_when_input_1_spare() {
         BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("1/|");
         Assertions.assertTrue(bowlingGameCalculator.isSpare(1));
+    }
+
+    @Test
+    @DisplayName("X|：表示第一帧全中")
+    void should_strike_1_frame_when_input_1_strike() {
+        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|");
+        Assertions.assertTrue(bowlingGameCalculator.isStrike(1));
+    }
+
+    @Test
+    @DisplayName("X|2-:第一帧补中，需要奖励第二帧的第一球分数，总得分：12")
+    void should_strike_1_frame_bonus_first_score_of_2_frame() {
+        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|2-");
+        Assertions.assertEquals(12, bowlingGameCalculator.getFrameScore(1));
     }
 }

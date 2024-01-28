@@ -1,7 +1,6 @@
 package com.lzb.bowling_game;
 
 import java.util.Optional;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
@@ -26,6 +25,8 @@ public enum Score {
     STRIKE(10, 'X'),
     SPARE(10, '/'),
     ;
+    public static final int TEN_SCORE = 10;
+
 
     private final int score;
     private final char symbol;

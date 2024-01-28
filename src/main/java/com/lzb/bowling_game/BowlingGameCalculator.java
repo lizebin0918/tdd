@@ -85,4 +85,12 @@ public class BowlingGameCalculator {
         }
         return frames.get(actualFrameIndex).isSpare();
     }
+
+    public boolean isStrike(int frameIndex) {
+        int actualFrameIndex = frameIndex - 1;
+        if (!isInBoundary(actualFrameIndex)) {
+            return false;
+        }
+        return frames.get(actualFrameIndex).isStrike();
+    }
 }

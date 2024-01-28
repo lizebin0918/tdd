@@ -37,12 +37,21 @@ public class Frame extends BaseFrame {
             return getCurrentFrameScore();
         }
         if (this.isSpare()) {
-            return getCurrentFrameScore() + Optional.ofNullable(nextFrame.getFirst()).map(Score::getScore).orElse(0);
+            return getCurrentFrameScore()
+                + Optional.ofNullable(nextFrame.getFirst()).map(Score::getScore).orElse(0);
+        }
+        if (this.isStrike()) {
+            return getCurrentFrameScore()
+                + Optional.ofNullable(nextFrame.getFirst()).map(Score::getScore).orElse(0)
+                + Optional.ofNullable(nextFrame.getSecond()).map(Score::getScore).orElse(0);
         }
         return getCurrentFrameScore();
     }
 
     private int getCurrentFrameScore() {
+        if (isSpare() || isStrike()) {
+            return Score.TEN_SCORE;
+        }
         int firstScore = Optional.ofNullable(first).map(Score::getScore).orElse(0);
         int secondScore = Optional.ofNullable(second).map(Score::getScore).orElse(0);
         return firstScore + secondScore;
@@ -50,5 +59,9 @@ public class Frame extends BaseFrame {
 
     public boolean isSpare() {
         return Optional.ofNullable(second).map(Score::isSpare).orElse(false);
+    }
+
+    public boolean isStrike() {
+        return Optional.ofNullable(first).map(Score::isStrike).orElse(false);
     }
 }
