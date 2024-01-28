@@ -1,7 +1,10 @@
 package com.lzb.bowling_game;
 
+import java.util.Objects;
+import java.util.Optional;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 帧<br/>
@@ -27,5 +30,25 @@ public class Frame extends BaseFrame {
     public Frame(int index, Character first, Character second) {
         super(first, second);
         this.index = index;
+    }
+
+    public int getScore(@Nullable Frame nextFrame) {
+        if (Objects.isNull(nextFrame)) {
+            return getCurrentFrameScore();
+        }
+        if (this.isSpare()) {
+            return getCurrentFrameScore() + Optional.ofNullable(nextFrame.getFirst()).map(Score::getScore).orElse(0);
+        }
+        return getCurrentFrameScore();
+    }
+
+    private int getCurrentFrameScore() {
+        int firstScore = Optional.ofNullable(first).map(Score::getScore).orElse(0);
+        int secondScore = Optional.ofNullable(second).map(Score::getScore).orElse(0);
+        return firstScore + secondScore;
+    }
+
+    public boolean isSpare() {
+        return Optional.ofNullable(second).map(Score::isSpare).orElse(false);
     }
 }

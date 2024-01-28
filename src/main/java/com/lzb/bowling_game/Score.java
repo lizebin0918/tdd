@@ -55,4 +55,12 @@ public enum Score {
         return Optional.empty();
     }
 
+    public boolean isStrike() {
+        return this == STRIKE;
+    }
+
+    public boolean isSpare() {
+        return this == SPARE;
+    }
+
 }

@@ -62,4 +62,27 @@ public class BowlingGameCalculator {
         bonus = new Bonus(input.substring(index + BONUS_BOUNDARY.length(), input.length()));
     }
 
+    /**
+     * 获取帧的分数
+     *
+     * @param frameIndex 从1开始
+     * @return
+     */
+    public int getFrameScore(int frameIndex) {
+        Frame frame = frames.get(frameIndex - 1);
+        Frame nextFrame = isInBoundary(frameIndex) ? frames.get(frameIndex) : null;
+        return frame.getScore(nextFrame);
+    }
+
+    private boolean isInBoundary(int frameIndex) {
+        return frameIndex <= frames.size() - 1;
+    }
+
+    public boolean isSpare(int frameIndex) {
+        int actualFrameIndex = frameIndex - 1;
+        if (!isInBoundary(actualFrameIndex)) {
+            return false;
+        }
+        return frames.get(actualFrameIndex).isSpare();
+    }
 }
