@@ -15,32 +15,31 @@ import org.apache.commons.lang3.StringUtils;
 @EqualsAndHashCode
 public abstract class BaseFrame {
 
-
-    protected Character first;
-    protected Character second;
+    protected Score first;
+    protected Score second;
 
     protected BaseFrame(Character first, Character second) {
-        this.first = first;
-        this.second = second;
+        this.first = Score.of(first).orElse(null);
+        this.second = Score.of(second).orElse(null);
     }
 
     protected BaseFrame(String balls) {
         if (Objects.isNull(balls) || StringUtils.isBlank(balls)) {
             return;
         }
-        this.first = balls.charAt(0);
+        this.first = Score.of(balls.charAt(0)).orElse(null);
         if (balls.length() > 1) {
-            this.second = balls.charAt(1);
+            this.second = Score.of(balls.charAt(1)).orElse(null);
         }
     }
 
     public String toString() {
         StringBuilder result = new StringBuilder();
         if (Objects.nonNull(first)) {
-            result.append(first);
+            result.append(first.getSymbol());
         }
         if (Objects.nonNull(second)) {
-            result.append(second);
+            result.append(second.getSymbol());
         }
         return result.toString();
     }
