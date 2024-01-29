@@ -172,9 +172,16 @@ class BowlingGameCalculatorTest extends BaseUnitTest {
     }
 
     @Test
-    @DisplayName("X|2-:第一帧补中，需要奖励第二帧的第一球分数，总得分：12")
+    @DisplayName("X|2-:第一帧全中，需要奖励第二帧的两球分数，总得分：12")
     void should_strike_1_frame_bonus_first_score_of_2_frame() {
         BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|2-");
         Assertions.assertEquals(12, bowlingGameCalculator.getFrameScore(1));
+    }
+
+    @Test
+    @DisplayName("获取bonus分数")
+    void should_get_bonus_score() {
+        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|X|X|X|X|X|X|X|X|X||XX");
+        Assertions.assertEquals(20, bowlingGameCalculator.getBonusScore());
     }
 }

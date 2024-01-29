@@ -93,4 +93,8 @@ public class BowlingGameCalculator {
         }
         return frames.get(actualFrameIndex).isStrike();
     }
+
+    public int getBonusScore() {
+        return bonus.getScore();
+    }
 }

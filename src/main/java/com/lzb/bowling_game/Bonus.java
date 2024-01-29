@@ -1,8 +1,7 @@
 package com.lzb.bowling_game;
 
-import java.util.Objects;
+import java.util.Optional;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * <br/>
@@ -21,5 +20,10 @@ public class Bonus extends BaseFrame {
 
     public Bonus(String ball) {
         super(ball);
+    }
+
+    public int getScore() {
+        return Optional.ofNullable(first).map(Score::getScore).orElse(0)
+            + Optional.ofNullable(second).map(Score::getScore).orElse(0);
     }
 }
