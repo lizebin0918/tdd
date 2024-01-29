@@ -71,7 +71,8 @@ public class BowlingGameCalculator {
     public int getFrameScore(int frameIndex) {
         Frame frame = frames.get(frameIndex - 1);
         Frame nextFrame = isInBoundary(frameIndex) ? frames.get(frameIndex) : null;
-        return frame.getScore(nextFrame);
+        Frame nextNextFrame = isInBoundary(frameIndex + 1) ? frames.get(frameIndex + 1) : null;
+        return frame.getScore(nextFrame, nextNextFrame);
     }
 
     private boolean isInBoundary(int frameIndex) {
@@ -96,5 +97,14 @@ public class BowlingGameCalculator {
 
     public int getBonusScore() {
         return bonus.getScore();
+    }
+
+    public int getTotalScore() {
+        int total = 0;
+        for (int i = 1; i <= frames.size(); i++) {
+            total += getFrameScore(i);
+        }
+        total = total + getBonusScore();
+        return total;
     }
 }

@@ -32,17 +32,20 @@ public class Frame extends BaseFrame {
         this.index = index;
     }
 
-    public int getScore(@Nullable Frame nextFrame) {
+    public int getScore(@Nullable Frame nextFrame, @Nullable Frame nextNextFrame) {
+        int currentFrameScore = getCurrentFrameScore();
         if (this.isSpare()) {
-            return getCurrentFrameScore()
-                + Optional.ofNullable(nextFrame).map(Frame::getFirst).map(Score::getScore).orElse(0);
+            return currentFrameScore + Optional.ofNullable(nextFrame).map(Frame::getFirst).map(Score::getScore).orElse(0);
         }
         if (this.isStrike()) {
-            return getCurrentFrameScore()
-                + Optional.ofNullable(nextFrame).map(Frame::getFirst).map(Score::getScore).orElse(0)
-                + Optional.ofNullable(nextFrame).map(Frame::getSecond).map(Score::getScore).orElse(0);
+            if (Objects.nonNull(nextFrame) && nextFrame.isStrike()) {
+                return currentFrameScore
+                    + nextFrame.getCurrentFrameScore()
+                    + Optional.ofNullable(nextNextFrame).map(Frame::getFirst).map(Score::getScore).orElse(0);
+            }
+            return currentFrameScore + Optional.ofNullable(nextFrame).map(Frame::getCurrentFrameScore).orElse(0);
         }
-        return getCurrentFrameScore();
+        return currentFrameScore;
     }
 
     private int getCurrentFrameScore() {

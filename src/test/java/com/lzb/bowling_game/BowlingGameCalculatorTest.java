@@ -184,4 +184,26 @@ class BowlingGameCalculatorTest extends BaseUnitTest {
         BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|X|X|X|X|X|X|X|X|X||XX");
         Assertions.assertEquals(20, bowlingGameCalculator.getBonusScore());
     }
+
+    /*@Test
+    @DisplayName("计算总分")
+    void should_get_total() {
+        // X|7/|9-|X|-8|8/|-6|X|X|X||81
+        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|7/|9-|X|-8|8/|-6|X|X|X||81");
+        Assertions.assertEquals(167, bowlingGameCalculator.getTotalScore());
+    }*/
+
+    @Test
+    @DisplayName("X|7/|：计算第一帧分数")
+    void should_get_1st_frame_when_1st_frame_is_strike_and_2nd_is_spare() {
+        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|7/");
+        Assertions.assertEquals(20, bowlingGameCalculator.getFrameScore(1));
+    }
+
+    @Test
+    @DisplayName("X|X|X：计算第一帧分数，应该是30分")
+    void should_get_1st_frame_when_1st_2nd_3rd_frame_is_strike() {
+        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|X|X");
+        Assertions.assertEquals(30, bowlingGameCalculator.getFrameScore(1));
+    }
 }
