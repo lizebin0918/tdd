@@ -3,6 +3,7 @@ package com.lzb.bowling_game;
 import com.lzb.BaseUnitTest;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -185,13 +186,41 @@ class BowlingGameCalculatorTest extends BaseUnitTest {
         Assertions.assertEquals(20, bowlingGameCalculator.getBonusScore());
     }
 
-    /*@Test
+    @Test
     @DisplayName("计算总分")
     void should_get_total() {
         // X|7/|9-|X|-8|8/|-6|X|X|X||81
         BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|7/|9-|X|-8|8/|-6|X|X|X||81");
         Assertions.assertEquals(167, bowlingGameCalculator.getTotalScore());
-    }*/
+    }
+
+    @Test
+    @DisplayName("测试全中情况")
+    void should_all_strike() {
+        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|X|X|X|X|X|X|X|X|X||XX");
+        Assertions.assertEquals(300, bowlingGameCalculator.getTotalScore());
+    }
+
+    @Test
+    @DisplayName("测试全中情况")
+    void should_get_bonus() {
+        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|X|X|X|X|X|X|X|X|X||XX");
+        Assertions.assertEquals(20, bowlingGameCalculator.getBonus().getScore());
+    }
+
+    @Test
+    @DisplayName("测试第10帧分数，全部都是全中，预期：30分")
+    void should_10th_frame_is_stike() {
+        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|X|X|X|X|X|X|X|X|X||XX");
+        Assertions.assertEquals(30, bowlingGameCalculator.getFrameScore(10));
+    }
+
+    @Test
+    @DisplayName("测试第9帧分数，全部都是全中，预期：30分")
+    void should_9th_frame_is_stike() {
+        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|X|X|X|X|X|X|X|X|X||XX");
+        Assertions.assertEquals(30, bowlingGameCalculator.getFrameScore(9));
+    }
 
     @Test
     @DisplayName("X|7/|：计算第一帧分数")

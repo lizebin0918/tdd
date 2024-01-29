@@ -2,6 +2,7 @@ package com.lzb.bowling_game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.Getter;
 
 /**
@@ -72,6 +73,18 @@ public class BowlingGameCalculator {
         Frame frame = frames.get(frameIndex - 1);
         Frame nextFrame = isInBoundary(frameIndex) ? frames.get(frameIndex) : null;
         Frame nextNextFrame = isInBoundary(frameIndex + 1) ? frames.get(frameIndex + 1) : null;
+
+        // 倒数第二帧
+        if (frameIndex == frames.size() - 1 && isStrike(frameIndex)) {
+            return frame.getScore(nextFrame, null)
+                + (Optional.ofNullable(nextFrame).map(Frame::isStrike).orElse(false) ? bonus.getFirst().getScore() : 0);
+        }
+
+        // 最后一帧
+        if (frameIndex == frames.size() && (isSpare(frameIndex) || isStrike(frameIndex))) {
+            return frame.getScore(null, null) + getBonusScore();
+        }
+
         return frame.getScore(nextFrame, nextNextFrame);
     }
 
@@ -104,7 +117,6 @@ public class BowlingGameCalculator {
         for (int i = 1; i <= frames.size(); i++) {
             total += getFrameScore(i);
         }
-        total = total + getBonusScore();
         return total;
     }
 }
