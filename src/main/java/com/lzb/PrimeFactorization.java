@@ -23,4 +23,18 @@ public class PrimeFactorization {
         }
         return result;
     }
+
+    public static List<Integer> ofV3(int input) {
+        if (input == 1) {
+            return List.of(1);
+        }
+        List<Integer> results = new ArrayList<>();
+        for (int i = 2; i <= input; i++) {
+            while (input % i == 0) {
+                results.add(i);
+                input = input / i;
+            }
+        }
+        return results;
+    }
 }
