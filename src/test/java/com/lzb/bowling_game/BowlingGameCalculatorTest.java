@@ -159,20 +159,6 @@ class BowlingGameCalculatorTest extends BaseUnitTest {
     }
 
     @Test
-    @DisplayName("1/|：表示第一帧补中")
-    void should_spare_1_frame_when_input_1_spare() {
-        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("1/|");
-        Assertions.assertTrue(bowlingGameCalculator.isSpare(1));
-    }
-
-    @Test
-    @DisplayName("X|：表示第一帧全中")
-    void should_strike_1_frame_when_input_1_strike() {
-        BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|");
-        Assertions.assertTrue(bowlingGameCalculator.isStrike(1));
-    }
-
-    @Test
     @DisplayName("X|2-:第一帧全中，需要奖励第二帧的两球分数，总得分：12")
     void should_strike_1_frame_bonus_first_score_of_2_frame() {
         BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|2-");
@@ -235,4 +221,5 @@ class BowlingGameCalculatorTest extends BaseUnitTest {
         BowlingGameCalculator bowlingGameCalculator = new BowlingGameCalculator("X|X|X");
         Assertions.assertEquals(30, bowlingGameCalculator.getFrameScore(1));
     }
+
 }

@@ -75,13 +75,13 @@ public class BowlingGameCalculator {
         Frame nextNextFrame = isInBoundary(frameIndex + 1) ? frames.get(frameIndex + 1) : null;
 
         // 倒数第二帧
-        if (frameIndex == frames.size() - 1 && isStrike(frameIndex)) {
+        if (frame.isSecondToLast(frames.size()) && frame.isStrike()) {
             return frame.getScore(nextFrame, null)
                 + (Optional.ofNullable(nextFrame).map(Frame::isStrike).orElse(false) ? bonus.getFirst().getScore() : 0);
         }
 
         // 最后一帧
-        if (frameIndex == frames.size() && (isSpare(frameIndex) || isStrike(frameIndex))) {
+        if (frame.isLast(frames.size()) && (frame.isSpare() || frame.isStrike())) {
             return frame.getScore(null, null) + getBonusScore();
         }
 
@@ -90,22 +90,6 @@ public class BowlingGameCalculator {
 
     private boolean isInBoundary(int frameIndex) {
         return frameIndex <= frames.size() - 1;
-    }
-
-    public boolean isSpare(int frameIndex) {
-        int actualFrameIndex = frameIndex - 1;
-        if (!isInBoundary(actualFrameIndex)) {
-            return false;
-        }
-        return frames.get(actualFrameIndex).isSpare();
-    }
-
-    public boolean isStrike(int frameIndex) {
-        int actualFrameIndex = frameIndex - 1;
-        if (!isInBoundary(actualFrameIndex)) {
-            return false;
-        }
-        return frames.get(actualFrameIndex).isStrike();
     }
 
     public int getBonusScore() {

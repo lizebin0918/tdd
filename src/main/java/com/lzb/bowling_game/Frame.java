@@ -64,4 +64,12 @@ public class Frame extends BaseFrame {
     public boolean isStrike() {
         return Optional.ofNullable(first).map(Score::isStrike).orElse(false);
     }
+
+    boolean isSecondToLast(int size) {
+        return getIndex() == size - 1;
+    }
+
+    boolean isLast(int size) {
+        return getIndex() == size;
+    }
 }
