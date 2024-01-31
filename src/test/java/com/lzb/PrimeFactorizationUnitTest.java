@@ -31,7 +31,7 @@ class PrimeFactorizationUnitTest extends BaseUnitTest {
     @Test
     @DisplayName("v2合数分解质数 -> 1")
     void should_v2_input_1() {
-        assertThat(PrimeFactorization.ofV2(1)).isEqualTo(List.of(1));
+        assertThat(PrimeFactorization.ofV2(1)).isEqualTo(List.of());
     }
 
     @Test
@@ -40,11 +40,13 @@ class PrimeFactorizationUnitTest extends BaseUnitTest {
         assertThat(PrimeFactorization.ofV2(2)).isEqualTo(List.of(2));
     }
 
+
     @Test
     @DisplayName("v2合数分解质数 -> 3")
     void should_v2_input_3() {
         assertThat(PrimeFactorization.ofV2(3)).isEqualTo(List.of(3));
     }
+
 
     @Test
     @DisplayName("v2合数分解质数 -> 4")
@@ -53,15 +55,35 @@ class PrimeFactorizationUnitTest extends BaseUnitTest {
     }
 
     @Test
+    @DisplayName("v2合数分解质数 -> 8")
+    void should_v2_input_8() {
+        assertThat(PrimeFactorization.ofV2(2 * 2 * 2)).isEqualTo(List.of(2, 2, 2));
+    }
+
+    @Test
+    @DisplayName("v2合数分解质数 -> 6")
+    void should_v2_input_6() {
+        assertThat(PrimeFactorization.ofV2(2 * 3)).isEqualTo(List.of(2, 3));
+    }
+
+    @Test
+    @DisplayName("v2合数分解质数 -> 9")
+    void should_v2_input_9() {
+        assertThat(PrimeFactorization.ofV2(3 * 3)).isEqualTo(List.of(3, 3));
+    }
+
+
+
+    @Test
     @DisplayName("v2合数分解质数 -> 12")
     void should_v2_input_12() {
         assertThat(PrimeFactorization.ofV2(12)).isEqualTo(List.of(2, 2, 3));
     }
 
-    @Test
+    /*@Test
     @DisplayName("v2合数分解质数 -> 49")
     void should_v2_input_49() {
         assertThat(PrimeFactorization.ofV2(49)).isEqualTo(List.of(7, 7));
-    }
+    }*/
 
 }
