@@ -62,9 +62,9 @@ class ConwayGameTest {
                 {1, 0, 0, 0}
         });
 
-        List<Point> livePoints = game.pointsOfDeadToLive();
-        assertEquals(2, livePoints.size());
-        assertTrue(livePoints.containsAll(List.of(new Point(1, 0), new Point(1, 1))));
+        List<Cell> liveCells = game.pointsOfDeadToLive();
+        assertEquals(2, liveCells.size());
+        assertTrue(liveCells.containsAll(List.of(new Cell(1, 0), new Cell(1, 1))));
     }
 
     @Test
@@ -115,12 +115,12 @@ class ConwayGameTest {
     @Test
     @DisplayName("测试point的位移")
     void should_move_point() {
-        Point point = new Point(1, 1);
-        assertEquals(new Point(1, 0), point.next(Point.Direction.UP));
-        assertEquals(new Point(1, 2), point.next(Point.Direction.DOWN));
-        assertEquals(new Point(0, 1), point.next(Point.Direction.LEFT));
-        assertEquals(new Point(2, 1), point.next(Point.Direction.RIGHT));
-        assertEquals(new Point(0, 0), point.next(Point.Direction.UP).next(Point.Direction.LEFT));
+        Cell cell = new Cell(1, 1);
+        assertEquals(new Cell(1, 0), cell.next(Cell.Direction.UP));
+        assertEquals(new Cell(1, 2), cell.next(Cell.Direction.DOWN));
+        assertEquals(new Cell(0, 1), cell.next(Cell.Direction.LEFT));
+        assertEquals(new Cell(2, 1), cell.next(Cell.Direction.RIGHT));
+        assertEquals(new Cell(0, 0), cell.next(Cell.Direction.UP).next(Cell.Direction.LEFT));
     }
 
     @Test
@@ -192,9 +192,9 @@ class ConwayGameTest {
          {1(T), 0(F), 0(F), 0(F)}
          **/
 
-        List<Point> livePoints = game.pointsOfLiveToDead();
-        assertEquals(3, livePoints.size());
-        assertTrue(livePoints.containsAll(List.of(new Point(0, 0), new Point(0, 1), new Point(2, 0))));
+        List<Cell> liveCells = game.pointsOfLiveToDead();
+        assertEquals(3, liveCells.size());
+        assertTrue(liveCells.containsAll(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(2, 0))));
     }
 
     @Test
@@ -210,9 +210,9 @@ class ConwayGameTest {
          {1(F), 1(T), 0(F), 0(F)}
          **/
 
-        List<Point> livePoints = game.pointsOfLiveToDead();
-        assertEquals(2, livePoints.size());
-        assertTrue(livePoints.containsAll(List.of(new Point(1, 1), new Point(1, 0))));
+        List<Cell> liveCells = game.pointsOfLiveToDead();
+        assertEquals(2, liveCells.size());
+        assertTrue(liveCells.containsAll(List.of(new Cell(1, 1), new Cell(1, 0))));
     }
 
     @Test
@@ -267,9 +267,9 @@ class ConwayGameTest {
     @DisplayName("测试point是否在边界内")
     void should_point_within_grid_bound() {
         ConwayGame game = new ConwayGame(2, 2);
-        assertTrue(game.isWithin(new Point(0, 0)));
-        assertTrue(game.isWithin(new Point(1, 1)));
-        assertFalse(game.isWithin(new Point(2, 2)));
+        assertTrue(game.isWithin(new Cell(0, 0)));
+        assertTrue(game.isWithin(new Cell(1, 1)));
+        assertFalse(game.isWithin(new Cell(2, 2)));
     }
 
 }

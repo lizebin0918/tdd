@@ -31,7 +31,7 @@ public class ConwayGame {
     }
 
     ConwayGame live(int x, int y) {
-        return live(new Point(x, y));
+        return live(new Cell(x, y));
     }
 
     void tick() {
@@ -42,57 +42,57 @@ public class ConwayGame {
 
     }
 
-    private void liveToDead(List<Point> deadPointsByLive) {
-        for (Point point : deadPointsByLive) {
-            grid[point.y()][point.x()] = 0;
+    private void liveToDead(List<Cell> deadPointsByLive) {
+        for (Cell cell : deadPointsByLive) {
+            grid[cell.y()][cell.x()] = 0;
         }
     }
 
-    private void deadToLive(List<Point> livePointsByDead) {
-        for (Point point : livePointsByDead) {
-            live(point);
+    private void deadToLive(List<Cell> livePointsByDead) {
+        for (Cell cell : livePointsByDead) {
+            live(cell);
         }
     }
 
-    public ConwayGame live(Point point) {
-        grid[point.y()][point.x()] = 1;
+    public ConwayGame live(Cell cell) {
+        grid[cell.y()][cell.x()] = 1;
         return this;
     }
 
-    List<Point> pointsOfDeadToLive() {
-        List<Point> livePoints = new ArrayList<>();
+    List<Cell> pointsOfDeadToLive() {
+        List<Cell> liveCells = new ArrayList<>();
         for (int i = 0; i < x; i++) {
             for (int j = 0; j < y; j++) {
                 if (isDead(i, j)) {
                     int count = getLiveCount(i, j);
                     if (count == 3) {
-                        livePoints.add(new Point(i, j));
+                        liveCells.add(new Cell(i, j));
                     }
                 }
             }
         }
-        return livePoints;
+        return liveCells;
     }
 
-    List<Point> pointsOfLiveToDead() {
+    List<Cell> pointsOfLiveToDead() {
 
-        List<Point> deadPoints = new ArrayList<>();
+        List<Cell> deadCells = new ArrayList<>();
 
         for (int i = 0; i < x; i++) {
             for (int j = 0; j < y; j++) {
                 if (isLive(i, j)) {
                     int count = getLiveCount(i, j);
                     if (count < 2) {
-                        deadPoints.add(new Point(i, j));
+                        deadCells.add(new Cell(i, j));
                     }
                     if (count > 3) {
-                        deadPoints.add(new Point(i, j));
+                        deadCells.add(new Cell(i, j));
                     }
                 }
             }
         }
 
-        return deadPoints;
+        return deadCells;
     }
 
     boolean isLive(int x, int y) {
@@ -100,22 +100,22 @@ public class ConwayGame {
     }
 
     int getLiveCount(int x, int y) {
-        return new Point(x, y).roundPoints().stream().filter(this::isWithin).mapToInt(this::getValue).sum();
+        return new Cell(x, y).roundPoints().stream().filter(this::isWithin).mapToInt(this::getValue).sum();
     }
 
     boolean isDead(int x, int y) {
         return grid[y][x] == 0;
     }
 
-    public boolean isWithin(Point point) {
-        return point.x() >= 0 && point.y() >= 0 && point.x() < x && point.y() < y;
+    public boolean isWithin(Cell cell) {
+        return cell.x() >= 0 && cell.y() >= 0 && cell.x() < x && cell.y() < y;
     }
 
-    public int getValue(Point point) {
-        if (!isWithin(point)) {
+    public int getValue(Cell cell) {
+        if (!isWithin(cell)) {
             return -1;
         }
-        return grid[point.y()][point.x()];
+        return grid[cell.y()][cell.x()];
     }
 
 }
