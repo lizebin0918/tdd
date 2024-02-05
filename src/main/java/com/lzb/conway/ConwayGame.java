@@ -9,20 +9,14 @@ import java.util.List;
  * @author mac
  */
 public class ConwayGame {
-    private final int x;
-    private final int y;
 
     private final Cells cells;
 
     ConwayGame(int x, int y) {
-        this.x = x;
-        this.y = y;
         cells = new Cells(x, y);
     }
 
     ConwayGame(int[][] grid) {
-        this.y = grid.length;
-        this.x = grid[0].length;
         cells = new Cells(grid);
     }
 
@@ -61,8 +55,8 @@ public class ConwayGame {
 
     List<Cell> pointsOfDeadToLive() {
         List<Cell> liveCells = new ArrayList<>();
-        for (int i = 0; i < x; i++) {
-            for (int j = 0; j < y; j++) {
+        for (int i = 0; i < cells.getX(); i++) {
+            for (int j = 0; j < cells.getY(); j++) {
                 if (isDead(i, j)) {
                     int count = getLiveCount(i, j);
                     if (count == 3) {
@@ -78,8 +72,8 @@ public class ConwayGame {
 
         List<Cell> deadCells = new ArrayList<>();
 
-        for (int i = 0; i < x; i++) {
-            for (int j = 0; j < y; j++) {
+        for (int i = 0; i < cells.getX(); i++) {
+            for (int j = 0; j < cells.getY(); j++) {
                 if (isLive(i, j)) {
                     int count = getLiveCount(i, j);
                     if (count < 2) {
@@ -108,7 +102,7 @@ public class ConwayGame {
     }
 
     public boolean isWithin(Cell cell) {
-        return cell.x() >= 0 && cell.y() >= 0 && cell.x() < x && cell.y() < y;
+        return cell.x() >= 0 && cell.y() >= 0 && cell.x() < cells.getX() && cell.y() < cells.getY();
     }
 
     public int getValue(Cell cell) {
