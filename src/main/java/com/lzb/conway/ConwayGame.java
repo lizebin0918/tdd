@@ -12,22 +12,22 @@ public class ConwayGame {
     private final int x;
     private final int y;
 
-    private final int[][] grid;
+    private final Cells cells;
 
     ConwayGame(int x, int y) {
         this.x = x;
         this.y = y;
-        grid = new int[y][x];
+        cells = new Cells(x, y);
     }
 
     ConwayGame(int[][] grid) {
-        this.grid = grid;
         this.y = grid.length;
         this.x = grid[0].length;
+        cells = new Cells(grid);
     }
 
     int[][] getGrid() {
-        return grid;
+        return cells.getGrid();
     }
 
     ConwayGame live(int x, int y) {
@@ -44,7 +44,7 @@ public class ConwayGame {
 
     private void liveToDead(List<Cell> deadPointsByLive) {
         for (Cell cell : deadPointsByLive) {
-            grid[cell.y()][cell.x()] = 0;
+            cells.getGrid()[cell.y()][cell.x()] = 0;
         }
     }
 
@@ -55,7 +55,7 @@ public class ConwayGame {
     }
 
     public ConwayGame live(Cell cell) {
-        grid[cell.y()][cell.x()] = 1;
+        cells.getGrid()[cell.y()][cell.x()] = 1;
         return this;
     }
 
@@ -104,7 +104,7 @@ public class ConwayGame {
     }
 
     boolean isDead(int x, int y) {
-        return grid[y][x] == 0;
+        return cells.getGrid()[y][x] == 0;
     }
 
     public boolean isWithin(Cell cell) {
@@ -115,7 +115,7 @@ public class ConwayGame {
         if (!isWithin(cell)) {
             return -1;
         }
-        return grid[cell.y()][cell.x()];
+        return cells.getGrid()[cell.y()][cell.x()];
     }
 
 }
