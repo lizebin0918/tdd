@@ -68,20 +68,6 @@ class ConwayGameTest {
     }
 
     @Test
-    @DisplayName("定位死细胞")
-    void should_return_value_when_dead() {
-        ConwayGame game = new ConwayGame(new int[][] {
-                {1, 0, 1, 0},
-                {1, 0, 0, 0}
-        });
-
-        assertFalse(game.isDead(0, 0));
-        assertTrue(game.isDead(1, 0));
-        assertFalse(game.isDead(2, 0));
-        assertTrue(game.isDead(3, 0));
-    }
-
-    @Test
     @DisplayName("遍历获取活细胞数量")
     void should_return_live_count() {
         ConwayGame game = new ConwayGame(new int[][] {
@@ -277,9 +263,9 @@ class ConwayGameTest {
     @DisplayName("测试point是否在边界内")
     void should_point_within_grid_bound() {
         ConwayGame game = new ConwayGame(2, 2);
-        assertTrue(game.isWithin(new Cell(0, 0)));
-        assertTrue(game.isWithin(new Cell(1, 1)));
-        assertFalse(game.isWithin(new Cell(2, 2)));
+        assertTrue(game.isWithin(0, 0));
+        assertTrue(game.isWithin(1, 1));
+        assertFalse(game.isWithin(2, 2));
     }
 
 }

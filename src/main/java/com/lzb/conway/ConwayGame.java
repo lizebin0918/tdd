@@ -57,8 +57,8 @@ public class ConwayGame {
         List<Cell> liveCells = new ArrayList<>();
         for (int i = 0; i < cells.getX(); i++) {
             for (int j = 0; j < cells.getY(); j++) {
-                if (isDead(i, j)) {
-                    int count = getLiveCount(i, j);
+                if (cells.isDead(i, j)) {
+                    int count = cells.getLiveCount(i, j);
                     if (count == 3) {
                         liveCells.add(new Cell(i, j));
                     }
@@ -74,8 +74,8 @@ public class ConwayGame {
 
         for (int i = 0; i < cells.getX(); i++) {
             for (int j = 0; j < cells.getY(); j++) {
-                if (isLive(i, j)) {
-                    int count = getLiveCount(i, j);
+                if (cells.isLive(i, j)) {
+                    int count = cells.getLiveCount(i, j);
                     if (count < 2) {
                         deadCells.add(new Cell(i, j));
                     }
@@ -89,27 +89,12 @@ public class ConwayGame {
         return deadCells;
     }
 
-    boolean isLive(int x, int y) {
-        return !isDead(x, y);
-    }
-
     int getLiveCount(int x, int y) {
-        return new Cell(x, y).roundPoints().stream().filter(this::isWithin).mapToInt(this::getValue).sum();
+        return cells.getLiveCount(x, y);
     }
 
-    boolean isDead(int x, int y) {
-        return cells.getGrid()[y][x] == 0;
-    }
-
-    public boolean isWithin(Cell cell) {
-        return cell.x() >= 0 && cell.y() >= 0 && cell.x() < cells.getX() && cell.y() < cells.getY();
-    }
-
-    public int getValue(Cell cell) {
-        if (!isWithin(cell)) {
-            return -1;
-        }
-        return cells.getGrid()[cell.y()][cell.x()];
+    public boolean isWithin(int x, int y) {
+        return cells.isWithin(x, y);
     }
 
 }
