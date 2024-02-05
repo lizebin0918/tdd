@@ -49,4 +49,8 @@ public class Cells {
         }
         return grid[cell.y()][cell.x()];
     }
+
+    public void live(int x, int y) {
+        grid[y][x] = 1;
+    }
 }

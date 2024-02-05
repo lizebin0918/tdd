@@ -44,17 +44,6 @@ class ConwayGameTest {
     }
 
     @Test
-    @DisplayName("初始化活细胞")
-    void should_init_live() {
-        ConwayGame game = new ConwayGame(4, 2);
-        game.live(0, 0);
-        assertArrayEquals(new int[][]{
-                {1, 0, 0, 0},
-                {0, 0, 0, 0}
-        }, game.getGrid());
-    }
-
-    @Test
     @DisplayName("遍历死细胞变成活细胞")
     void should_live_when_dead_traversal() {
         ConwayGame game = new ConwayGame(new int[][] {
@@ -112,56 +101,77 @@ class ConwayGameTest {
     @Test
     @DisplayName("获取序号2的值")
     void should_return_index2_value_when_location_is_x_1_y_1() {
-        ConwayGame game = new ConwayGame(3, 3);
-        game.live(0, 1);
+        ConwayGame game = new ConwayGame(new int[][] {
+            {0, 0, 0},
+            {1, 0, 0},
+            {0, 0, 0}
+        });
         assertEquals(1, game.getLiveCount(1, 1));
     }
 
     @Test
     @DisplayName("获取序号3的值")
     void should_return_index3_value_when_location_is_x_1_y_1() {
-        ConwayGame game = new ConwayGame(3, 3);
-        game.live(0, 2);
+        ConwayGame game = new ConwayGame(new int[][] {
+            {0, 0, 0},
+            {0, 0, 0},
+            {1, 0, 0}
+        });
         assertEquals(1, game.getLiveCount(1, 1));
     }
 
     @Test
     @DisplayName("获取序号4的值")
     void should_return_index4_value_when_location_is_x_1_y_1() {
-        ConwayGame game = new ConwayGame(3, 3);
-        game.live(1, 2);
+        ConwayGame game = new ConwayGame(new int[][] {
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 1, 0}
+        });
         assertEquals(1, game.getLiveCount(1, 1));
     }
 
     @Test
     @DisplayName("获取序号5的值")
     void should_return_index5_value_when_location_is_x_1_y_1() {
-        ConwayGame game = new ConwayGame(3, 3);
-        game.live(2, 2);
+        ConwayGame game = new ConwayGame(new int[][] {
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 0, 1}
+        });
         assertEquals(1, game.getLiveCount(1, 1));
     }
 
     @Test
     @DisplayName("获取序号6的值")
     void should_return_index6_value_when_location_is_x_1_y_1() {
-        ConwayGame game = new ConwayGame(3, 3);
-        game.live(2, 1);
+        ConwayGame game = new ConwayGame(new int[][] {
+            {0, 0, 0},
+            {0, 0, 1},
+            {0, 0, 0}
+        });
         assertEquals(1, game.getLiveCount(1, 1));
     }
 
     @Test
     @DisplayName("获取序号7的值")
     void should_return_index7_value_when_location_is_x_1_y_1() {
-        ConwayGame game = new ConwayGame(3, 3);
-        game.live(2, 0);
+        ConwayGame game = new ConwayGame(new int[][] {
+            {0, 0, 1},
+            {0, 0, 0},
+            {0, 0, 0}
+        });
         assertEquals(1, game.getLiveCount(1, 1));
     }
 
     @Test
     @DisplayName("获取序号8的值")
     void should_return_index8_value_when_location_is_x_1_y_1() {
-        ConwayGame game = new ConwayGame(3, 3);
-        game.live(1, 0);
+        ConwayGame game = new ConwayGame(new int[][] {
+            {0, 1, 0},
+            {0, 0, 0},
+            {0, 0, 0}
+        });
         assertEquals(1, game.getLiveCount(1, 1));
     }
 
@@ -181,7 +191,6 @@ class ConwayGameTest {
         List<Cell> liveCells = game.pointsOfLiveToDead();
         assertEquals(3, liveCells.size());
         assertTrue(liveCells.containsAll(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(2, 0))));
-
     }
 
     @Test
@@ -205,37 +214,24 @@ class ConwayGameTest {
     @Test
     @DisplayName("测试2*2网格，活细胞灭亡")
     void should_live_to_dead_when_2_2_gird() {
-        ConwayGame game = new ConwayGame(2, 2);
-        game.live(0, 0).live(1, 1);
-        /*
-        {1, 0},
-        {0, 1}
-         */
+        ConwayGame game = new ConwayGame(new int[][] {
+            {1, 0},
+            {0, 1}
+        });
         game.tick();
         assertArrayEquals(new int[][]{
                 {0, 0},
                 {0, 0}
         }, game.getGrid());
-
-        int[][] input = new int[][]{
-            {1, 0, 1, 0},
-            {1, 0, 0, 0}
-        };
-        int[][] output = new int[][]{
-            {0, 0, 1, 0},
-            {1, 0, 0, 0}
-        };
     }
 
     @Test
     @DisplayName("测试2*2网格，死细胞存活")
     void should_dead_to_live_when_2_2_gird() {
-        ConwayGame game = new ConwayGame(2, 2);
-        game.live(0, 0).live(0, 1).live(1, 0);
-        /*
-        {1, 1},
-        {1, 0}
-         */
+        ConwayGame game = new ConwayGame(new int[][] {
+            {1, 1},
+            {1, 0}
+        });
         game.tick();
         assertArrayEquals(new int[][]{
                 {1, 1},
@@ -246,12 +242,10 @@ class ConwayGameTest {
     @Test
     @DisplayName("测试2*2网格，无细胞变化")
     void should_no_change_when_2_2_gird() {
-        ConwayGame game = new ConwayGame(2, 2);
-        game.live(0, 0).live(0, 1).live(1, 0).live(1, 1);
-        /*
-        {1, 1},
-        {1, 1}
-         */
+        ConwayGame game = new ConwayGame(new int[][] {
+            {1, 1},
+            {1, 1}
+        });
         game.tick();
         assertArrayEquals(new int[][]{
                 {1, 1},

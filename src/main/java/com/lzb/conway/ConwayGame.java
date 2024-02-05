@@ -24,10 +24,6 @@ public class ConwayGame {
         return cells.getGrid();
     }
 
-    ConwayGame live(int x, int y) {
-        return live(new Cell(x, y));
-    }
-
     void tick() {
 
         liveToDead(pointsOfLiveToDead());
@@ -44,13 +40,8 @@ public class ConwayGame {
 
     private void deadToLive(List<Cell> livePointsByDead) {
         for (Cell cell : livePointsByDead) {
-            live(cell);
+            cells.live(cell.x(), cell.y());
         }
-    }
-
-    public ConwayGame live(Cell cell) {
-        cells.getGrid()[cell.y()][cell.x()] = 1;
-        return this;
     }
 
     List<Cell> pointsOfDeadToLive() {
