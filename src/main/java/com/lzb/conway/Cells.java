@@ -40,7 +40,9 @@ public class Cells {
     }
 
     public int liveCountFrom(int x, int y) {
-        return new Cell(x, y).roundPoints().stream().filter(cell -> isWithin(cell.x(), cell.y())).mapToInt(this::getValue).sum();
+        return new Cell(x, y).roundPoints().stream()
+            .filter(cell -> isWithin(cell.x(), cell.y()))
+            .mapToInt(this::getValue).sum();
     }
 
     private int getValue(Cell cell) {

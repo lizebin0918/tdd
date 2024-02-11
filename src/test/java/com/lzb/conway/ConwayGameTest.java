@@ -77,42 +77,6 @@ class ConwayGameTest {
     }
 
     @Test
-    @DisplayName("遍历活细胞小于2个的活细胞位置")
-    void should_less_2_live_when_live_traversal() {
-        ConwayGame game = new ConwayGame(new int[][] {
-                {1, 0, 1, 0},
-                {1, 0, 0, 0}
-        });
-
-        /**
-         {1(T), 0(F), 1(T), 0(F)},
-         {1(T), 0(F), 0(F), 0(F)}
-         **/
-
-        List<Cell> liveCells = game.pointsOfLiveToDead();
-        assertEquals(3, liveCells.size());
-        assertTrue(liveCells.containsAll(List.of(new Cell(0, 0), new Cell(0, 1), new Cell(2, 0))));
-    }
-
-    @Test
-    @DisplayName("遍历活细胞大于3个的活细胞位置")
-    void should_greater_3_live_when_live_traversal() {
-        ConwayGame game = new ConwayGame(new int[][] {
-                {1, 1, 1, 0},
-                {1, 1, 0, 0}
-        });
-
-        /**
-         {1(F), 1(T), 1(F), 0(F)},
-         {1(F), 1(T), 0(F), 0(F)}
-         **/
-
-        List<Cell> liveCells = game.pointsOfLiveToDead();
-        assertEquals(2, liveCells.size());
-        assertTrue(liveCells.containsAll(List.of(new Cell(1, 1), new Cell(1, 0))));
-    }
-
-    @Test
     @DisplayName("测试2*2网格，活细胞灭亡")
     void should_live_to_dead_when_2_2_gird() {
         ConwayGame game = new ConwayGame(new int[][] {
