@@ -39,7 +39,7 @@ public class Cells {
         return !isDead(x, y);
     }
 
-    public int getLiveCount(int x, int y) {
+    public int liveCountFrom(int x, int y) {
         return new Cell(x, y).roundPoints().stream().filter(cell -> isWithin(cell.x(), cell.y())).mapToInt(this::getValue).sum();
     }
 
@@ -52,5 +52,9 @@ public class Cells {
 
     public void live(int x, int y) {
         grid[y][x] = 1;
+    }
+
+    public void dead(int x, int y) {
+        grid[y][x] = 0;
     }
 }

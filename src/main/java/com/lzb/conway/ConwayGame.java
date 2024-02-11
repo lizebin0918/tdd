@@ -2,12 +2,14 @@ package com.lzb.conway;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
 
 /**
  * <br/>
  * Created on : 2024-01-13 20:14
  * @author mac
  */
+@Getter
 public class ConwayGame {
 
     private final Cells cells;
@@ -34,7 +36,7 @@ public class ConwayGame {
 
     private void liveToDead(List<Cell> deadPointsByLive) {
         for (Cell cell : deadPointsByLive) {
-            cells.getGrid()[cell.y()][cell.x()] = 0;
+            cells.dead(cell.y(), cell.x());
         }
     }
 
@@ -49,7 +51,7 @@ public class ConwayGame {
         for (int i = 0; i < cells.getX(); i++) {
             for (int j = 0; j < cells.getY(); j++) {
                 if (cells.isDead(i, j)) {
-                    int count = cells.getLiveCount(i, j);
+                    int count = cells.liveCountFrom(i, j);
                     if (count == 3) {
                         liveCells.add(new Cell(i, j));
                     }
@@ -66,7 +68,7 @@ public class ConwayGame {
         for (int i = 0; i < cells.getX(); i++) {
             for (int j = 0; j < cells.getY(); j++) {
                 if (cells.isLive(i, j)) {
-                    int count = cells.getLiveCount(i, j);
+                    int count = cells.liveCountFrom(i, j);
                     if (count < 2) {
                         deadCells.add(new Cell(i, j));
                     }
@@ -78,14 +80,6 @@ public class ConwayGame {
         }
 
         return deadCells;
-    }
-
-    int getLiveCount(int x, int y) {
-        return cells.getLiveCount(x, y);
-    }
-
-    public boolean isWithin(int x, int y) {
-        return cells.isWithin(x, y);
     }
 
 }
