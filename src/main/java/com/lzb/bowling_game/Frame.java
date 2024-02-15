@@ -4,7 +4,6 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * 帧<br/>
@@ -32,7 +31,7 @@ public class Frame extends BaseFrame {
         this.index = index;
     }
 
-    public int getScore(@Nullable Frame nextFrame, @Nullable Frame nextNextFrame) {
+    public int getScore(Frame nextFrame, Frame nextNextFrame) {
         int currentFrameScore = getCurrentFrameScore();
         if (this.isSpare()) {
             return currentFrameScore + Optional.ofNullable(nextFrame).map(Frame::getFirst).map(Score::getScore).orElse(0);
