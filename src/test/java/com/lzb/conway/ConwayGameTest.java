@@ -1,9 +1,7 @@
 package com.lzb.conway;
 
-import java.util.List;
-
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -35,8 +33,55 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ConwayGameTest {
 
     @Test
-    @DisplayName("test")
-    void should_() {
+    @DisplayName("初始化格子")
+    void should_init_conway_2_2() {
+        ConwayGame conwayGame = new ConwayGame(new int[][] {
+            {0, 0},
+            {0, 0}
+        });
+        assertArrayEquals(new int[][]{
+            {0, 0},
+            {0, 0}
+        }, conwayGame.getGrid());
+    }
 
+    @Test
+    @DisplayName("获取x,y边界")
+    void should_return_xBound_yBound() {
+        ConwayGame conwayGame = new ConwayGame(new int[][] {
+            {0, 0}
+        });
+        assertEquals(1, conwayGame.getXBound());
+        assertEquals(0, conwayGame.getYBound());
+    }
+
+    @Test
+    @DisplayName("{0, 0}坐标：返回活细胞数量=1")
+    void should_return_live_count_x_0_y_0() {
+        ConwayGame conwayGame = new ConwayGame(new int[][] {
+            {0, 1},
+            {0, 0}
+        });
+        assertEquals(1, conwayGame.getLiveCount(0, 0) );
+    }
+
+    @Test
+    @DisplayName("{1, 0}坐标：返回活细胞数量=0")
+    void should_return_live_count_x_1_y_0() {
+        ConwayGame conwayGame = new ConwayGame(new int[][] {
+            {0, 1},
+            {0, 0}
+        });
+        assertEquals(0, conwayGame.getLiveCount(1, 0) );
+    }
+
+    @Test
+    @DisplayName("测试边界是否溢出")
+    void should_out_of_bound() {
+        ConwayGame conwayGame = new ConwayGame(new int[][] {
+            {0, 1},
+            {0, 0}
+        });
+        assertFalse(conwayGame.isInOfBound(2, 0) );
     }
 }
