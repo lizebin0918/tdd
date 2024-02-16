@@ -84,4 +84,36 @@ class ConwayGameTest {
         });
         assertFalse(conwayGame.isInOfBound(2, 0) );
     }
+
+    @Test
+    @DisplayName("V1:遍历所有细胞，繁衍下一代")
+    void should_next_generation_v1() {
+        ConwayGame conwayGame = new ConwayGame(new int[][] {
+            {0, 1, 0},
+            {0, 1, 0},
+            {0, 1, 0}
+        });
+        conwayGame.nextGeneration();
+        assertArrayEquals(new int[][] {
+            {0, 0, 0},
+            {1, 1, 1},
+            {0, 0, 0}
+        }, conwayGame.getGrid());
+    }
+
+    @Test
+    @DisplayName("V2:遍历所有细胞，繁衍下一代")
+    void should_next_generation_v2() {
+        ConwayGame conwayGame = new ConwayGame(new int[][] {
+            {0, 0, 1},
+            {0, 1, 0},
+            {1, 0, 0}
+        });
+        conwayGame.nextGeneration();
+        assertArrayEquals(new int[][] {
+            {0, 0, 0},
+            {0, 1, 0},
+            {0, 0, 0}
+        }, conwayGame.getGrid());
+    }
 }

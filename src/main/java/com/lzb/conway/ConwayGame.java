@@ -1,6 +1,9 @@
 package com.lzb.conway;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 /**
  * <br/>
@@ -59,5 +62,29 @@ public class ConwayGame {
 
     public boolean isInOfBound(int x, int y) {
         return x >= 0 && x <= xBound && y >= 0 && y <= yBound;
+    }
+
+    public void nextGeneration() {
+
+        List<ImmutablePair<Integer, Integer>> liveToDie = new ArrayList<>();
+        List<ImmutablePair<Integer, Integer>> dieToLive = new ArrayList<>();
+
+        for (int x = 0; x <= xBound; x++) {
+            for (int y = 0; y <= yBound; y++) {
+                int liveCount = getLiveCount( x, y);
+                if (grid[y][x] == 1) {
+                    if (liveCount < 2 || liveCount > 3) {
+                        liveToDie.add(ImmutablePair.of(x, y));
+                    }
+                } else {
+                    if (liveCount == 3) {
+                        dieToLive.add(ImmutablePair.of(x, y));
+                    }
+                }
+            }
+        }
+
+        liveToDie.forEach(pair -> grid[pair.getRight()][pair.getLeft()] = 0);
+        dieToLive.forEach(pair -> grid[pair.getRight()][pair.getLeft()] = 1);
     }
 }
