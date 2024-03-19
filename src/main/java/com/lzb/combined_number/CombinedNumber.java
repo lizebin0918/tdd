@@ -13,21 +13,10 @@ import java.util.stream.IntStream;
  */
 public class CombinedNumber {
 
-    public static int maxNumOfLeftMost(int[] inputs, int start, int charAt) {
-        if (Objects.isNull(inputs) || inputs.length == 0) {
-            return -1;
-        }
-        if (start == inputs.length - 1) {
-            return start;
-        }
-        int[] numOfLeftMost = getNumCharAt(inputs, start, charAt);
-        int maxIndex = start;
-        for (int i = maxIndex + 1; i < numOfLeftMost.length; i++) {
-            if (numOfLeftMost[maxIndex] < numOfLeftMost[i]) {
-                maxIndex = i;
-            }
-        }
-        return maxIndex;
+    public static boolean isGreater(int a, int b) {
+        String ab = a + "" + b;
+        String ba = b + "" + a;
+        return Integer.parseInt(ab) > Integer.parseInt(ba);
     }
 
     protected static void swap(int[] inputs, int i, int j) {
@@ -36,34 +25,14 @@ public class CombinedNumber {
         inputs[j] = temp;
     }
 
-
-    protected static int[] getNumCharAt(int[] inputs, int start, int charAt) {
-        int[] numOfLeftMost = new int[inputs.length];
-        for (int i = 0; i < numOfLeftMost.length; i++) {
-            if (i >= start) {
-                String numString = Objects.toString(inputs[i]);
-                if (charAt <= numString.length() - 1) {
-                    numOfLeftMost[i] = Integer.valueOf(numString.substring(charAt, charAt + 1));
-                } else {
-                    numOfLeftMost[i] = 0;
-                }
-            } else {
-                numOfLeftMost[i] = inputs[i];
-            }
-        }
-        return numOfLeftMost;
-    }
-
     public static String combine(int[] inputs) {
-        int maxLength = IntStream.of(inputs).boxed().map(Objects::toString).max(Comparator.comparing(CharSequence::length)).map(String::length).orElse(0);
-        for (int j = 0; j < maxLength; j++) {
-            for (int i = 0; i < inputs.length; i++) {
-                int maxIndex = maxNumOfLeftMost(inputs, i, j);
-                if (maxIndex != i) {
-                    swap(inputs, i, maxIndex);
+        for (int maxIndex = 0; maxIndex < inputs.length; maxIndex++) {
+            for (int currentIndex = maxIndex + 1; currentIndex < inputs.length; currentIndex++) {
+                if (isGreater(inputs[currentIndex], inputs[maxIndex])) {
+                    swap(inputs, currentIndex, maxIndex);
                 }
             }
         }
-        return IntStream.of(inputs).boxed().map(Objects::toString).collect(Collectors.joining());
+        return IntStream.of(inputs).mapToObj(Objects::toString).collect(Collectors.joining());
     }
 }

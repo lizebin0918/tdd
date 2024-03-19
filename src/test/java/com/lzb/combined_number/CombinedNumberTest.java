@@ -27,69 +27,41 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CombinedNumberTest {
 
     @Test
-    @DisplayName("找出最左边的数字最大的那个数，比如：[100, 2, 3]，返回索引 index")
-    void should_return_2_when_input_100_2_3_start_index_0() {
-        assertThat(CombinedNumber.maxNumOfLeftMost(new int[]{100, 2, 3}, 0, 0)).isEqualTo(2);
+    @DisplayName("isGreater: 50 > 2")
+    void should_true_when_input_50_2() {
+        assertThat(CombinedNumber.isGreater(50,2)).isTrue();
     }
 
     @Test
-    @DisplayName("找出最左边的数字最大的那个数，比如：[100, 2, 3, 4]，返回索引 index")
-    void should_return_3_when_input_100_2_3_4_start_index_0() {
-        assertThat(CombinedNumber.maxNumOfLeftMost(new int[]{100, 2, 3, 4}, 0, 0)).isEqualTo(3);
+    @DisplayName("isGreater: 2 < 50")
+    void should_true_when_input_2_50() {
+        assertThat(CombinedNumber.isGreater(2,50)).isFalse();
     }
 
     @Test
-    @DisplayName("找出最左边的数字最大的那个数，比如：[100, 2, 3, 4]，返回索引 3")
-    void should_return_3_when_input_100_2_3_4_start_index_1() {
-        assertThat(CombinedNumber.maxNumOfLeftMost(new int[]{100, 2, 3, 4}, 1, 0)).isEqualTo(3);
+    @DisplayName("isGreater: 56 > 5")
+    void should_true_when_input_56_6() {
+        assertThat(CombinedNumber.isGreater(56,5)).isTrue();
     }
 
     @Test
-    @DisplayName("swap")
-    void should_swap() {
-        int[] inputs = {100, 2, 3};
-        CombinedNumber.swap(inputs, 0, 1);
-        assertThat(inputs).isEqualTo(new int[]{2, 100, 3});
+    @DisplayName("isGreater: 8 < 9")
+    void should_true_when_input_8_9() {
+        assertThat(CombinedNumber.isGreater(8,9)).isFalse();
     }
 
     @Test
-    @DisplayName("combine: 100, 2, 3 -> 10023")
-    void should_return_10023_when_input_100_2_3() {
-        assertThat(CombinedNumber.combine(new int[]{100, 2, 3})).isEqualTo("32100");
+    @DisplayName("combine: [1, 2]")
+    void should_combine_1_2() {
+        assertThat(CombinedNumber.combine(new int[]{1, 2})).isEqualTo("21");
     }
 
     @Test
-    @DisplayName("maxNumOfLeftMost([32, 33, 34], 0) -> 2")
-    void should_return_2_when_maxNumOfLeftMost_32_33_34_0() {
-        assertThat(CombinedNumber.maxNumOfLeftMost(new int[]{32, 33, 34}, 0, 1)).isEqualTo(2);
+    @DisplayName("combine: [1, 2, 3]")
+    void should_combine_1_2_3() {
+        assertThat(CombinedNumber.combine(new int[]{1, 2, 3})).isEqualTo("321");
     }
 
-
-
-    @Nested
-    class GetNumCharAt {
-        @Test
-        @DisplayName("getNumCharAt([32, 33, 345], 0, 2) -> 32, 33, 345")
-        void should_return_2_when_getNumCharAt_32_33_345_0_2() {
-            assertThat(CombinedNumber.getNumCharAt(new int[]{32, 33, 345}, 0, 2)).isEqualTo(new int[]{2, 3, 5});
-        }
-
-        @Test
-        @DisplayName("获取整个数组的最左边的数，100_2_3_4 返回数组 100_2_3_4")
-        void should_return_array_of_left_most_when_input_100_2_3_4_start_index_1() {
-            assertThat(CombinedNumber.getNumCharAt(new int[]{100, 2, 3, 4}, 1, 0)).isEqualTo(new int[]{100, 2, 3, 4});
-        }
-
-        /*
-        @Test
-        @DisplayName("获取整个数组的最左边的数，100_2_3_4 返回数组 1_2_3_4")
-        void should_return_array_of_left_most_when_input_100_2_3_4_start_index_0() {
-            assertThat(CombinedNumber.getNumCharAt(new int[]{100, 2, 3, 4}, 0, 0)).isEqualTo(new int[]{1, 2, 3, 4});
-        }*/
-
-    }
-
-    @Disabled
     @DisplayName("验收测试")
     @ParameterizedTest
     @MethodSource("acceptTest")
