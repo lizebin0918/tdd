@@ -1,6 +1,5 @@
 package com.lzb.combined_number;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -14,14 +13,14 @@ import java.util.stream.IntStream;
  */
 public class CombinedNumber {
 
-    public static int maxNumOfLeftMost(int[] inputs, int start, int charAt, int maxLength) {
+    public static int maxNumOfLeftMost(int[] inputs, int start, int charAt) {
         if (Objects.isNull(inputs) || inputs.length == 0) {
             return -1;
         }
         if (start == inputs.length - 1) {
             return start;
         }
-        int[] numOfLeftMost = getNumCharAt(inputs, start, charAt, maxLength);
+        int[] numOfLeftMost = getNumCharAt(inputs, start, charAt);
         int maxIndex = start;
         for (int i = maxIndex + 1; i < numOfLeftMost.length; i++) {
             if (numOfLeftMost[maxIndex] < numOfLeftMost[i]) {
@@ -59,7 +58,7 @@ public class CombinedNumber {
         int maxLength = IntStream.of(inputs).boxed().map(Objects::toString).max(Comparator.comparing(CharSequence::length)).map(String::length).orElse(0);
         for (int j = 0; j < maxLength; j++) {
             for (int i = 0; i < inputs.length; i++) {
-                int maxIndex = maxNumOfLeftMost(inputs, i, j, j);
+                int maxIndex = maxNumOfLeftMost(inputs, i, j);
                 if (maxIndex != i) {
                     swap(inputs, i, maxIndex);
                 }

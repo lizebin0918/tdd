@@ -12,6 +12,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
+ * Write a function accepting a list of non negative integers, and returning their largest possible combined number as a string. For example
+ *
+ * given [50, 2, 1, 9]  it returns "95021"    (9 + 50 + 2 + 1)
+ * given [5, 50, 56]    it returns "56550"    (56 + 5 + 50)
+ * given [420, 42, 423] it returns "42423420" (42 + 423 + 420)
+ *
+ * Source [https://blog.svpino.com/about]
  * <br/>
  * Created on : 2024-03-17 20:58
  *
@@ -22,19 +29,19 @@ class CombinedNumberTest {
     @Test
     @DisplayName("找出最左边的数字最大的那个数，比如：[100, 2, 3]，返回索引 index")
     void should_return_2_when_input_100_2_3_start_index_0() {
-        assertThat(CombinedNumber.maxNumOfLeftMost(new int[]{100, 2, 3}, 0, 0, 3)).isEqualTo(2);
+        assertThat(CombinedNumber.maxNumOfLeftMost(new int[]{100, 2, 3}, 0, 0)).isEqualTo(2);
     }
 
     @Test
     @DisplayName("找出最左边的数字最大的那个数，比如：[100, 2, 3, 4]，返回索引 index")
     void should_return_3_when_input_100_2_3_4_start_index_0() {
-        assertThat(CombinedNumber.maxNumOfLeftMost(new int[]{100, 2, 3, 4}, 0, 0, 3)).isEqualTo(3);
+        assertThat(CombinedNumber.maxNumOfLeftMost(new int[]{100, 2, 3, 4}, 0, 0)).isEqualTo(3);
     }
 
     @Test
     @DisplayName("找出最左边的数字最大的那个数，比如：[100, 2, 3, 4]，返回索引 3")
     void should_return_3_when_input_100_2_3_4_start_index_1() {
-        assertThat(CombinedNumber.maxNumOfLeftMost(new int[]{100, 2, 3, 4}, 1, 0, 3)).isEqualTo(3);
+        assertThat(CombinedNumber.maxNumOfLeftMost(new int[]{100, 2, 3, 4}, 1, 0)).isEqualTo(3);
     }
 
     @Test
@@ -54,7 +61,7 @@ class CombinedNumberTest {
     @Test
     @DisplayName("maxNumOfLeftMost([32, 33, 34], 0) -> 2")
     void should_return_2_when_maxNumOfLeftMost_32_33_34_0() {
-        assertThat(CombinedNumber.maxNumOfLeftMost(new int[]{32, 33, 34}, 0, 1, 2)).isEqualTo(2);
+        assertThat(CombinedNumber.maxNumOfLeftMost(new int[]{32, 33, 34}, 0, 1)).isEqualTo(2);
     }
 
 
@@ -64,13 +71,13 @@ class CombinedNumberTest {
         @Test
         @DisplayName("getNumCharAt([32, 33, 345], 0, 2) -> 32, 33, 345")
         void should_return_2_when_getNumCharAt_32_33_345_0_2() {
-            assertThat(CombinedNumber.getNumCharAt(new int[]{32, 33, 345}, 0, 2, 3)).isEqualTo(new int[]{2, 3, 5});
+            assertThat(CombinedNumber.getNumCharAt(new int[]{32, 33, 345}, 0, 2)).isEqualTo(new int[]{2, 3, 5});
         }
 
         @Test
         @DisplayName("获取整个数组的最左边的数，100_2_3_4 返回数组 100_2_3_4")
         void should_return_array_of_left_most_when_input_100_2_3_4_start_index_1() {
-            assertThat(CombinedNumber.getNumCharAt(new int[]{100, 2, 3, 4}, 1, 0. )).isEqualTo(new int[]{100, 2, 3, 4});
+            assertThat(CombinedNumber.getNumCharAt(new int[]{100, 2, 3, 4}, 1, 0)).isEqualTo(new int[]{100, 2, 3, 4});
         }
 
         /*
@@ -94,6 +101,8 @@ class CombinedNumberTest {
         return Stream.of(
                 Arguments.of(new int[]{50, 2, 1, 9}, "95021"),
                 Arguments.of(new int[]{5, 50, 56}, "56550"),
+                Arguments.of(new int[]{5, 50, 65}, "65550"),
+                Arguments.of(new int[]{54, 50, 56}, "565450"),
                 Arguments.of(new int[]{420, 42, 423}, "42423420")
         );
     }
